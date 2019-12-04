@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_my_playlists">
+
+    <fragment
+        android:id="@+id/navigation_my_playlists"
+        android:name="com.pheuture.playlists.my_playlists.MyPlaylistsFragment"
+        android:label="@string/title_my_playlist"
+        tools:layout="@layout/fragment_my_playlists" />
+
+    <fragment
+        android:id="@+id/navigation_trending"
+        android:name="com.pheuture.playlists.trending.TrendingFragment"
+        android:label="@string/title_trending"
+        tools:layout="@layout/fragment_trendings" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.pheuture.playlists.settings.SettingsFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/fragment_settings" />
+
+</navigation>

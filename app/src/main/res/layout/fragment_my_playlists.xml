@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView_dummy_text1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="@dimen/textSizeHeadline4"
+                android:text="Create your first playlist" />
+
+            <TextView
+                android:id="@+id/textView_dummy_text2"
+                android:textColor="@color/WhiteA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textSizeHeadline5"
+                android:text="Its easy, we'll help you." />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_create_playlist"
+                android:layout_marginTop="32dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="create playlist"/>
+
+        </LinearLayout>
+
+        <include
+            android:visibility="gone"
+            android:id="@+id/progress_layout"
+            layout="@layout/layout_progress_bar_full_screen"/>
+
+    </RelativeLayout>
+
+</layout>

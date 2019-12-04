@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="model"
+            type="com.pheuture.playlists.datasource.local.video_handler.VideoEntity"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="12dp"
+        app:layout_constraintEnd_toStartOf="@+id/textView_title"
+        app:layout_constraintStart_toStartOf="@+id/textView_title">
+
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/playerView"
+            android:layout_width="200dp"
+            android:layout_height="120dp"
+            android:tag="decorator_starting_view"
+            app:default_artwork="@drawable/exo_notification_rewind"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/imageView_thumbnail"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@color/gray"
+            app:imageUrl="@{model.videoUrl}"
+            app:layout_constraintBottom_toBottomOf="@+id/playerView"
+            app:layout_constraintEnd_toEndOf="@+id/playerView"
+            app:layout_constraintStart_toStartOf="@+id/playerView"
+            app:layout_constraintTop_toTopOf="@+id/playerView" />
+
+        <TextView
+            android:id="@+id/textView_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:hint="video title #"
+            android:maxLines="2"
+            android:tag="decorator_ending_view"
+            android:text="@{model.videoName}"
+            android:textSize="@dimen/textSizeHeadline5"
+            app:layout_constraintBottom_toTopOf="@+id/textView_creator"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/playerView"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/textView_creator"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:ellipsize="end"
+            android:hint="creator #"
+            android:maxLines="1"
+            android:text="@{model.videoDescription}"
+            android:textSize="@dimen/textSizeBody1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/playerView"
+            app:layout_constraintTop_toBottomOf="@+id/textView_title" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
+
+
