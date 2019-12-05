@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_my_playlists"
-        android:name="com.pheuture.playlists.my_playlists.MyPlaylistsFragment"
+        android:name="com.pheuture.playlists.playlists.PlaylistsFragment"
         android:label="@string/title_my_playlist"
         tools:layout="@layout/fragment_my_playlists" />
 

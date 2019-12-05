@@ -12,10 +12,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".videos.VideosActivity"
-            android:theme="@style/AppThemeNoActionBar"></activity>
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".playlists.detail.PlaylistDetailActivity"></activity>
+        <activity
+            android:name=".videos.VideosActivity"
+            android:theme="@style/AppThemeNoActionBar" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">

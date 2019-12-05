@@ -51,7 +51,7 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
                     dividerLeft = decoratorStartingView.getLeft();
                 }
                 if (decoratorEndingView!=null){
-                    dividerRight = parent.getWidth() - decoratorEndingView.getRight();
+                    dividerRight = decoratorEndingView.getRight();
                 }
             }
         }

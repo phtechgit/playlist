@@ -5,6 +5,9 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
+
+import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
+import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.video_handler.VideoDao;
 import com.pheuture.playlists.utils.Converters;
 import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
@@ -16,6 +19,7 @@ import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 
 @Database(version = 1,
         entities = {
+                PlaylistEntity.class,
                 VideoEntity.class,
         }, exportSchema = false)
 
@@ -23,6 +27,7 @@ import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 public abstract class LocalRepository extends RoomDatabase {
     private static LocalRepository mLocalRepository;
 
+    public abstract PlaylistDao playlistDao();
     public abstract VideoDao videoDao();
 
     public static LocalRepository getInstance(Context context) {

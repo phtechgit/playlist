@@ -14,10 +14,10 @@ import android.view.View;
 
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ActivityVideosBinding;
+import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseActivity;
-import com.pheuture.playlists.utils.SimpleDividerItemDecoration;
 
 import java.util.List;
 
@@ -27,16 +27,21 @@ public class VideosActivity extends BaseActivity implements TextWatcher, Recycle
     private VideosViewModel viewModel;
     private VideosRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private PlaylistEntity playlistModel;
 
     @Override
     public void initializations() {
+        playlistModel = getIntent().getParcelableExtra(ARG_PARAM1);
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_videos);
-        viewModel = ViewModelProviders.of(this).get(VideosViewModel.class);
+
+        setSupportActionBar(binding.toolbar);
+
+        assert playlistModel != null;
+        setTitle(playlistModel.getPlaylistName());
+
+        viewModel = ViewModelProviders.of(this, new VideosViewModelFactory(
+                this.getApplication(), playlistModel)).get(VideosViewModel.class);
 
         binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
         binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());
@@ -46,9 +51,9 @@ public class VideosActivity extends BaseActivity implements TextWatcher, Recycle
 
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);
-        binding.recyclerView.addItemDecoration(
+        /*binding.recyclerView.addItemDecoration(
                 new SimpleDividerItemDecoration(getResources().getDrawable(R.drawable.line_divider),
-                        0, 32));
+                        0, 32));*/
 
         viewModel.getVideosLive().observe(this, new Observer<List<VideoEntity>>() {
             @Override
@@ -61,6 +66,15 @@ public class VideosActivity extends BaseActivity implements TextWatcher, Recycle
             @Override
             public void onChanged(String s) {
                 viewModel.getFreshData();
+            }
+        });
+
+        viewModel.getNeedToUpdateParent().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean value) {
+                if (value) {
+                    onBackPressed();
+                }
             }
         });
     }
@@ -112,11 +126,16 @@ public class VideosActivity extends BaseActivity implements TextWatcher, Recycle
 
     @Override
     public void onRecyclerViewItemClick(Bundle bundle) {
+        int position = bundle.getInt(ARG_PARAM1, -1);
+        VideoEntity model = bundle.getParcelable(ARG_PARAM2);
 
+        assert model != null;
+        viewModel.addVideoToPlaylist(model.getId());
     }
 
     @Override
     public void onRecyclerViewItemLongClick(Bundle bundle) {
 
     }
+
 }

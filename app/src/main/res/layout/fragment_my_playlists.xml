@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/linearLayout_create_playlist"
             android:orientation="vertical"
             android:gravity="center"
             android:layout_width="match_parent"
@@ -33,12 +36,33 @@
                 android:layout_marginTop="32dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="create playlist"/>
+                android:text="create playlist" />
 
         </LinearLayout>
 
-        <include
+        <RelativeLayout
             android:visibility="gone"
+            android:id="@+id/relativeLayout_playlists"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                android:id="@+id/layout_search_bar"
+                layout="@layout/layout_search_bar" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/layout_search_bar"
+                android:clipToPadding="false"
+                android:paddingBottom="50dp"
+                android:scrollbarStyle="outsideOverlay"
+                tools:listitem="@layout/item_playlist"/>
+
+        </RelativeLayout>
+
+        <include
             android:id="@+id/progress_layout"
             layout="@layout/layout_progress_bar_full_screen"/>
 
