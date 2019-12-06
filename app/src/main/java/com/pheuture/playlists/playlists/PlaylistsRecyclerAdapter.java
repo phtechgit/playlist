@@ -44,6 +44,11 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         PlaylistEntity model = oldList.get(position);
         holder.binding.setModel(model);
         holder.binding.setPosition(position);
+        if (position == 0){
+            holder.binding.imageViewThumbnail.setImageResource(R.drawable.ic_plus_light);
+        } else {
+            holder.binding.imageViewThumbnail.setImageResource(R.drawable.exo_controls_play);
+        }
 
     }
 

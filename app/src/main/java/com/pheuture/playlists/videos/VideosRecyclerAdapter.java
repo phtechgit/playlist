@@ -4,9 +4,13 @@ import android.content.Context;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
@@ -41,13 +45,22 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private RecyclerViewInterface recyclerViewInterface;
     private SimpleExoPlayer exoPlayer;
     private DataSource.Factory dataSourceFactory;
+    private PlayerView playerView;
+    private int playerPosition = RecyclerView.NO_POSITION;
 
     VideosRecyclerAdapter(Context context) {
         this.mContext = context;
         this.recyclerViewInterface = (RecyclerViewInterface) context;
+
         exoPlayer = ExoPlayerFactory.newSimpleInstance(mContext);
+        exoPlayer.setPlayWhenReady(true);
+
         dataSourceFactory = new DefaultDataSourceFactory(mContext,
                 Util.getUserAgent(mContext, TAG));
+
+        playerView = new PlayerView(mContext);
+        playerView.setUseController(true);
+        playerView.setPlayer(exoPlayer);
     }
 
     @NonNull
@@ -64,11 +77,48 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         VideoEntity model = oldList.get(position);
         holder.binding.setModel(model);
 
-        /*setVideo(holder.binding.playerView, model);*/
+        if (playerPosition == position){
+            //add player to the frameLayout of current position
+            setVideo(holder.binding, model);
+
+        } else {
+            //remove player from the frameLayout of current position
+            removeVideoPlayer(holder.binding, position);
+        }
     }
 
-    public void setOnItemClickListener(RecyclerViewInterface recyclerViewInterface) {
-        this.recyclerViewInterface = recyclerViewInterface;
+    private void removeVideoPlayer(ItemVideoBinding binding, int position) {
+        /*binding.frameLayout.removeAllViews();*/
+        ViewGroup parent = (ViewGroup) playerView.getParent();
+        if (parent != null) {
+            int index = parent.indexOfChild(playerView);
+            if (index >= 0) {
+                parent.removeViewAt(index);
+            }
+        }
+
+        binding.imageViewThumbnail.setVisibility(View.VISIBLE);
+    }
+
+    private void setVideo(ItemVideoBinding binding, VideoEntity model) {
+        MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(Uri.parse(model.getVideoUrl()));
+
+        exoPlayer.prepare(mediaSource);
+
+        playerView.setLayoutParams(binding.frameLayout.getLayoutParams());
+
+        ViewGroup parent = (ViewGroup) playerView.getParent();
+        if (parent != null) {
+            int index = parent.indexOfChild(playerView);
+            if (index >= 0) {
+                parent.removeViewAt(index);
+            }
+        }
+
+        /*binding.frameLayout.removeAllViews();*/
+        binding.frameLayout.addView(playerView);
+        binding.imageViewThumbnail.setVisibility(View.GONE);
     }
 
     void setData(List<VideoEntity> newList) {
@@ -77,6 +127,18 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         oldList = newList;
 
         diffResult.dispatchUpdatesTo(this);
+    }
+
+    public void setCurrentPositions(int firstVisibleItemPosition, int lastVisibleItemPosition) {
+        if (playerPosition==-RecyclerView.NO_POSITION){
+            return;
+        }
+
+        if (playerPosition<firstVisibleItemPosition || playerPosition>lastVisibleItemPosition){
+            int tempPosition = playerPosition;
+            playerPosition = RecyclerView.NO_POSITION;
+            notifyItemChanged(tempPosition);
+        }
     }
 
     class DiffCallBack extends DiffUtil.Callback{
@@ -171,8 +233,10 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                         return;
                     }
 
-                    binding.imageViewThumbnail.setVisibility(View.GONE);
-                    setVideo(binding.playerView, oldList.get(getAdapterPosition()));
+                    int tempPosition = playerPosition;
+                    playerPosition = pos;
+                    notifyItemChanged(tempPosition);
+                    notifyItemChanged(playerPosition);
                 }
             });
 
@@ -197,17 +261,5 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public int getItemCount() {
         return oldList == null ? 0 : oldList.size();
-    }
-
-    private void setVideo(PlayerView playerView, VideoEntity model) {
-        /*FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, Utils.getScreenHeight(this) / 3);
-        playerView.setLayoutParams(params);*/
-        playerView.setUseController(true);
-        playerView.setPlayer(exoPlayer);
-
-        MediaSource mediaSource = new SsMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(Uri.parse(model.getVideoUrl()));
-        exoPlayer.prepare(mediaSource);
-        exoPlayer.setPlayWhenReady(true);
     }
 }

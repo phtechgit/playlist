@@ -11,6 +11,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 import com.pheuture.playlists.utils.ApiConstant;
@@ -35,6 +38,8 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> reachedLast;
     private MutableLiveData<Boolean> showProgress;
     private MutableLiveData<List<VideoEntity>> videos;
+    private SimpleExoPlayer exoPlayer;
+    private PlayerView playerView;
 
     public PlaylistDetailViewModel(@NonNull Application application, PlaylistEntity model) {
         super(application);
@@ -45,6 +50,8 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         searchQuery = new MutableLiveData<>("");
         showProgress = new MutableLiveData<>(true);
         videos = new MutableLiveData<>();
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(application);
+        playerView = new PlayerView(application);
     }
 
     public LiveData<List<VideoEntity>> getVideosLive() {
@@ -130,5 +137,13 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
 
     public void setProgressStatus(boolean b) {
         showProgress.postValue(b);
+    }
+
+    public SimpleExoPlayer getExoPlayer() {
+        return exoPlayer;
+    }
+
+    public PlayerView getPlayerView() {
+        return playerView;
     }
 }

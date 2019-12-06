@@ -23,12 +23,11 @@
         app:layout_constraintEnd_toStartOf="@+id/textView_title"
         app:layout_constraintStart_toStartOf="@+id/textView_title">
 
-        <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/playerView"
+        <FrameLayout
+            android:id="@+id/frameLayout"
             android:layout_width="200dp"
             android:layout_height="120dp"
             android:tag="decorator_starting_view"
-            app:default_artwork="@drawable/exo_notification_rewind"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -40,10 +39,10 @@
             android:layout_height="0dp"
             android:src="@color/gray"
             app:imageUrl="@{model.videoThumbnail}"
-            app:layout_constraintBottom_toBottomOf="@+id/playerView"
-            app:layout_constraintEnd_toEndOf="@+id/playerView"
-            app:layout_constraintStart_toStartOf="@+id/playerView"
-            app:layout_constraintTop_toTopOf="@+id/playerView" />
+            app:layout_constraintBottom_toBottomOf="@+id/frameLayout"
+            app:layout_constraintEnd_toEndOf="@+id/frameLayout"
+            app:layout_constraintStart_toStartOf="@+id/frameLayout"
+            app:layout_constraintTop_toTopOf="@+id/frameLayout" />
 
         <TextView
             android:id="@+id/textView_title"
@@ -59,7 +58,7 @@
             android:textSize="@dimen/textSizeHeadline5"
             app:layout_constraintBottom_toTopOf="@+id/textView_creator"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/playerView"
+            app:layout_constraintStart_toEndOf="@+id/frameLayout"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed" />
 
@@ -75,7 +74,7 @@
             android:textSize="@dimen/textSizeBody1"
             app:layout_constraintBottom_toTopOf="@+id/imageView_add"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/playerView"
+            app:layout_constraintStart_toEndOf="@+id/frameLayout"
             app:layout_constraintTop_toBottomOf="@+id/textView_title" />
 
         <ImageView
@@ -86,7 +85,7 @@
             android:layout_marginTop="8dp"
             android:src="@drawable/ic_add_light"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/playerView"
+            app:layout_constraintStart_toEndOf="@+id/frameLayout"
             app:layout_constraintTop_toBottomOf="@+id/textView_creator" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

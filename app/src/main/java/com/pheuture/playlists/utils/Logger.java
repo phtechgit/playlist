@@ -21,8 +21,8 @@ public class Logger {
     public static void e(String tag, String message) {
         if (message!=null) {
             Log.e(tag, message);
-            Calendar calendar = Calendar.getInstance();
-            appendLog(CalenderUtils.getFullTimeWithSecAndMillis(calendar) + " " + CalenderUtils.getFullDate(calendar)+ " " + ": " + tag + ": " + message + "\n");
+            /*Calendar calendar = Calendar.getInstance();
+            appendLog(CalenderUtils.getFullTimeWithSecAndMillis(calendar) + " " + CalenderUtils.getFullDate(calendar)+ " " + ": " + tag + ": " + message + "\n");*/
         }
     }
     public static void d(String tag, String message) {

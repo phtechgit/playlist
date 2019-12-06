@@ -1,4 +1,4 @@
-package com.pheuture.playlists.videos;
+package com.pheuture.playlists.trending;
 
 import android.app.Application;
 
@@ -6,12 +6,13 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.video_handler.VideoDao;
 import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 import com.pheuture.playlists.utils.ApiConstant;
@@ -19,14 +20,16 @@ import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.Url;
 import com.pheuture.playlists.utils.VolleyClient;
+
 import org.json.JSONObject;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class VideosViewModel extends AndroidViewModel {
-    private static final String TAG = VideosViewModel.class.getSimpleName();
+public class TrendingViewModel extends AndroidViewModel {
+    private static final String TAG = TrendingViewModel.class.getSimpleName();
     private MutableLiveData<Boolean> showProgress;
     private LiveData<List<VideoEntity>> videos;
     private VideoDao videoDao;
@@ -34,19 +37,14 @@ public class VideosViewModel extends AndroidViewModel {
     private long limit;
     private MutableLiveData<String> searchQuery;
     private MutableLiveData<Boolean> reachedLast;
-    private MutableLiveData<Boolean> updateParent;
-    private PlaylistEntity playlistEntity;
 
-    public VideosViewModel(@NonNull Application application, PlaylistEntity playlistEntity) {
+    public TrendingViewModel(@NonNull Application application) {
         super(application);
-        this.playlistEntity = playlistEntity;
-
         limit = 20;
         reachedLast = new MutableLiveData<>(false);
         searchQuery = new MutableLiveData<>("");
 
         showProgress = new MutableLiveData<>(false);
-        updateParent = new MutableLiveData<>(false);
 
         videoDao = LocalRepository.getInstance(application).videoDao();
         videos = videoDao.getVideosLive();
@@ -100,7 +98,6 @@ public class VideosViewModel extends AndroidViewModel {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getId()));
                 params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
                 params.put(ApiConstant.SEARCH_QUERY, searchQuery.getValue());
                 params.put(ApiConstant.LIMIT, String.valueOf(limit));
@@ -189,65 +186,6 @@ public class VideosViewModel extends AndroidViewModel {
 
     public MutableLiveData<String> getSearchQuery() {
         return searchQuery;
-    }
-
-    public void addVideoToPlaylist(long videoId) {
-        showProgress.postValue(true);
-
-        final String url = Url.PLAYLIST_VIDEO_ADD;
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    showProgress.postValue(false);
-
-                    Logger.e(url + ApiConstant.RESPONSE, response);
-
-                    JSONObject responseJsonObject = new JSONObject(response);
-
-                    if (!responseJsonObject.optBoolean(ApiConstant.MESSAGE, false)) {
-                        return;
-                    }
-
-                    updateParent.postValue(true);
-
-
-                } catch (Exception e) {
-                    Logger.e(TAG, e.toString());
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError e) {
-                try {
-                    showProgress.postValue(false);
-                    Logger.e(TAG, e.toString());
-                } catch (Exception ex) {
-                    Logger.e(TAG, ex.toString());
-                }
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                try {
-                    params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getId()));
-                    params.put(ApiConstant.VIDEO_ID, String.valueOf(videoId));
-                    params.put(ApiConstant.USER, ApiConstant.DUMMY_USER);
-                } catch (Exception e) {
-                    Logger.e(TAG, e.toString());
-                }
-                Logger.e(url + ApiConstant.PARAMS, params.toString());
-                return params;
-            }
-        };
-        stringRequest.setTag(TAG);
-        VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
-    }
-
-    public MutableLiveData<Boolean> getNeedToUpdateParent() {
-        return updateParent;
     }
 
     public MutableLiveData<Boolean> getProgressStatus() {

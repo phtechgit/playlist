@@ -1,4 +1,4 @@
-package com.pheuture.playlists.playlists.detail;
+package com.pheuture.playlists.trending;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,23 +9,15 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -35,33 +27,30 @@ import com.pheuture.playlists.databinding.ItemVideoBinding;
 import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.Constants;
-import com.pheuture.playlists.utils.Logger;
 
 import java.util.List;
 
-public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private static final String TAG = PlaylistVideosRecyclerAdapter.class.getSimpleName();
+public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private static final String TAG = TrendingRecyclerAdapter.class.getSimpleName();
     private Context mContext;
     private List<VideoEntity> oldList;
-    private LinearLayoutManager layoutManager;
     private RecyclerViewInterface recyclerViewInterface;
     private SimpleExoPlayer exoPlayer;
     private DataSource.Factory dataSourceFactory;
     private PlayerView playerView;
     private int playerPosition = RecyclerView.NO_POSITION;
 
-    PlaylistVideosRecyclerAdapter(Context context, LinearLayoutManager layoutManager, SimpleExoPlayer exoPlayer, PlayerView playerView) {
-        this.mContext = context;
-        this.layoutManager = layoutManager;
+    TrendingRecyclerAdapter(TrendingFragment context) {
+        this.mContext = context.getContext();
         this.recyclerViewInterface = (RecyclerViewInterface) context;
-        this.exoPlayer = exoPlayer;
 
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(mContext);
         exoPlayer.setPlayWhenReady(true);
 
         dataSourceFactory = new DefaultDataSourceFactory(mContext,
                 Util.getUserAgent(mContext, TAG));
 
-        this.playerView = playerView;
+        playerView = new PlayerView(mContext);
         playerView.setUseController(true);
         playerView.setPlayer(exoPlayer);
     }
@@ -99,6 +88,7 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
                 parent.removeViewAt(index);
             }
         }
+
         binding.imageViewThumbnail.setVisibility(View.VISIBLE);
     }
 
@@ -124,22 +114,11 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
     }
 
     void setData(List<VideoEntity> newList) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList));
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList),
+                true);
         oldList = newList;
 
         diffResult.dispatchUpdatesTo(this);
-    }
-
-    public void setPlayerState(boolean state) {
-        if (state) {
-         if (playerPosition==RecyclerView.NO_POSITION){
-             playerPosition = 0;
-         }
-
-         notifyItemChanged(playerPosition);
-         layoutManager.scrollToPosition(playerPosition);
-        }
-        exoPlayer.setPlayWhenReady(state);
     }
 
     class DiffCallBack extends DiffUtil.Callback{
@@ -171,10 +150,22 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
             VideoEntity oldModel = oldList.get(oldItemPosition);
             VideoEntity newModel = newList.get(newItemPosition);
 
+            if (contentsDifferent(oldModel.getVideoName(), newModel.getVideoName())){
+                return false;
+            }
+            if (contentsDifferent(oldModel.getVideoDescription(), newModel.getVideoDescription())){
+                return false;
+            }
+            if (contentsDifferent(oldModel.getVideoThumbnail(), newModel.getVideoThumbnail())){
+                return false;
+            }
             if (contentsDifferent(oldModel.getVideoUrl(), newModel.getVideoUrl())){
                 return false;
             }
-            if (contentsDifferent(oldModel.getVideoName(), newModel.getVideoName())){
+            if (contentsDifferent(String.valueOf(oldModel.getPostDate()), String.valueOf(newModel.getPostDate()))){
+                return false;
+            }
+            if (contentsDifferent(String.valueOf(oldModel.getStatus()), String.valueOf(newModel.getStatus()))){
                 return false;
             }
             return true;
@@ -245,7 +236,6 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
                     recyclerViewInterface.onRecyclerViewItemClick(bundle);
                 }
             });
-
         }
     }
 

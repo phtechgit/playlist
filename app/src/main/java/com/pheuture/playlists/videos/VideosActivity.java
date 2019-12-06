@@ -51,9 +51,6 @@ public class VideosActivity extends BaseActivity implements TextWatcher, Recycle
 
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);
-        /*binding.recyclerView.addItemDecoration(
-                new SimpleDividerItemDecoration(getResources().getDrawable(R.drawable.line_divider),
-                        0, 32));*/
 
         viewModel.getVideosLive().observe(this, new Observer<List<VideoEntity>>() {
             @Override
@@ -74,6 +71,17 @@ public class VideosActivity extends BaseActivity implements TextWatcher, Recycle
             public void onChanged(Boolean value) {
                 if (value) {
                     onBackPressed();
+                }
+            }
+        });
+
+        viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean show) {
+                if(show){
+                    showProgress(binding.progressLayout.progressFullscreen, true);
+                } else {
+                    hideProgress(binding.progressLayout.progressFullscreen);
                 }
             }
         });
@@ -114,13 +122,21 @@ public class VideosActivity extends BaseActivity implements TextWatcher, Recycle
         @Override
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
+
             int totalItemCount = layoutManager.getItemCount();
             int visibleItemCount = layoutManager.getChildCount();
             int currentPosition = layoutManager.findLastVisibleItemPosition();
+            int firstVisibleItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
+            int lastVisibleItemPosition = layoutManager.findLastCompletelyVisibleItemPosition();
             int remainingItems = totalItemCount - currentPosition;
+
+            //fetch more data from server
             if (dy > 0 && remainingItems < visibleItemCount) {
                 viewModel.getMoreData();
             }
+
+            //update current positions in adapter
+            recyclerAdapter.setCurrentPositions(firstVisibleItemPosition, lastVisibleItemPosition);
         }
     };
 
