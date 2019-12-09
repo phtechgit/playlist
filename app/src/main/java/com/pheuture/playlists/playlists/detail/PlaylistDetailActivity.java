@@ -1,12 +1,15 @@
 package com.pheuture.playlists.playlists.detail;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
@@ -15,6 +18,9 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -28,6 +34,7 @@ import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.SimpleDividerItemDecoration;
 import com.pheuture.playlists.videos.VideosActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistDetailActivity extends BaseActivity implements RecyclerViewInterface {
@@ -39,6 +46,10 @@ public class PlaylistDetailActivity extends BaseActivity implements RecyclerView
     private PlaylistEntity model;
     private SimpleExoPlayer exoPlayer;
     private PlayerView playerView;
+    private boolean isPlaying;
+    private int playerPosition;
+    private ConcatenatingMediaSource concatenatedSource;
+    private List<MediaSource> mediaSources;
 
     @Override
     public void initializations() {
@@ -59,26 +70,55 @@ public class PlaylistDetailActivity extends BaseActivity implements RecyclerView
         exoPlayer.addListener(playerListener);
 
         layoutManager = new LinearLayoutManager(this);
-        recyclerAdapter = new PlaylistVideosRecyclerAdapter(this, layoutManager, exoPlayer, playerView);
+        recyclerAdapter = new PlaylistVideosRecyclerAdapter(this, layoutManager, playerView);
 
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);
-        binding.recyclerView.addItemDecoration(
-                new SimpleDividerItemDecoration(getResources().getDrawable(R.drawable.line_divider),
-                        0, 32));
+        binding.recyclerView.addOnChildAttachStateChangeListener(new RecyclerView.OnChildAttachStateChangeListener() {
+            @Override
+            public void onChildViewAttachedToWindow(@NonNull View view) {
+                Logger.e(TAG, "onChildViewAttachedToWindow: " + binding.recyclerView.getChildAdapterPosition(view));
+            }
+
+            @Override
+            public void onChildViewDetachedFromWindow(@NonNull View view) {
+                Logger.e(TAG, "onChildViewDetachedFromWindow: " + binding.recyclerView.getChildAdapterPosition(view));
+            }
+        });
+        binding.recyclerView.addOnScrollListener(scrollListener);
+
 
         viewModel.getVideosLive().observe(this, new Observer<List<VideoEntity>>() {
             @Override
             public void onChanged(List<VideoEntity> videoEntities) {
+                //create single instance of media source/playlist
+                concatenatedSource = new ConcatenatingMediaSource(true);
+                mediaSources = new ArrayList<>();
+                for (int i=0; i<videoEntities.size() ; i++){
+                    VideoEntity model = videoEntities.get(i);
+
+                    MediaSource mediaSource = new ProgressiveMediaSource.Factory(viewModel.getDataSourceFactory())
+                            .createMediaSource(Uri.parse(model.getVideoUrl()));
+                    mediaSources.add(mediaSource);
+                }
+
+                concatenatedSource.addMediaSources(mediaSources);
+
+                exoPlayer.prepare(concatenatedSource);
+                recyclerAdapter.setData(videoEntities);
+
+                //show/hide play pause button
                 if (videoEntities.size()>0){
                     binding.imageButtonPlay.setVisibility(View.VISIBLE);
-                    binding.imageButtonShuffle.setVisibility(View.VISIBLE);
+                    if (videoEntities.size()>2) {
+                        binding.imageButtonShuffle.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.imageButtonShuffle.setVisibility(View.GONE);
+                    }
                 } else {
                     binding.imageButtonPlay.setVisibility(View.GONE);
                     binding.imageButtonShuffle.setVisibility(View.GONE);
                 }
-
-                recyclerAdapter.setData(videoEntities);
             }
         });
 
@@ -92,7 +132,52 @@ public class PlaylistDetailActivity extends BaseActivity implements RecyclerView
                 }
             }
         });
+
+        viewModel.isPlayling().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean value) {
+                isPlaying = value;
+                exoPlayer.setPlayWhenReady(isPlaying);
+                if (isPlaying){
+                    binding.imageButtonPlay.setImageResource(R.drawable.ic_pause_circular_light);
+                } else {
+                    binding.imageButtonPlay.setImageResource(R.drawable.ic_play_circular_white);
+                }
+
+                if (isPlaying && playerPosition== RecyclerView.NO_POSITION){
+                    viewModel.setPlayerPosition(0);
+                }
+            }
+        });
+
+        viewModel.getPlayerPosition().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer value) {
+                playerPosition = value;
+                recyclerAdapter.setPlayerPosition(playerPosition);
+            }
+        });
     }
+
+    private RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+            Logger.e(TAG, "onScrollStateChanged: " + newState);
+        }
+
+        @Override
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            int totalItemCount = layoutManager.getItemCount();
+            int visibleItemCount = layoutManager.getChildCount();
+            int currentPosition = layoutManager.findLastVisibleItemPosition();
+            int remainingItems = totalItemCount - currentPosition;
+            if (dy > 0 && remainingItems < visibleItemCount) {
+                /*viewModel.getMoreData();*/
+            }
+        }
+    };
 
     @Override
     public void setListeners() {
@@ -104,7 +189,14 @@ public class PlaylistDetailActivity extends BaseActivity implements RecyclerView
     @Override
     protected void onResume() {
         super.onResume();
+        playerView.onResume();
         viewModel.getFreshData();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        playerView.onPause();
     }
 
     @Override
@@ -115,11 +207,7 @@ public class PlaylistDetailActivity extends BaseActivity implements RecyclerView
             startActivity(intent);
 
         } else if (v.equals(binding.imageButtonPlay)) {
-          if (exoPlayer.getPlaybackState() == Player.STATE_READY && exoPlayer.getPlayWhenReady()){
-              recyclerAdapter.setPlayerState(false);
-          } else {
-              recyclerAdapter.setPlayerState(true);
-          }
+            viewModel.setIsPlaying(!isPlaying);
         }
     }
 
@@ -134,16 +222,14 @@ public class PlaylistDetailActivity extends BaseActivity implements RecyclerView
     }
 
     private Player.EventListener playerListener = new Player.EventListener() {
-
         @Override
         public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
-            //0=Player.TIMELINE_CHANGE_REASON_PREPARED;
             Logger.e(TAG, "onTimelineChanged: " + " " + reason);
         }
 
         @Override
         public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            Logger.e(TAG, "onTracksChanged");
+            Logger.e(TAG, "onTracksChanged: " + trackSelections.length);
         }
 
         @Override
@@ -153,14 +239,15 @@ public class PlaylistDetailActivity extends BaseActivity implements RecyclerView
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            if (playWhenReady && playbackState == Player.STATE_READY) {
+            Logger.e(TAG, "onPlayerStateChanged: " + playWhenReady + ", " + playbackState);
+            /*if (playWhenReady && playbackState == Player.STATE_READY) {
                 // media actually playing
-                binding.imageButtonPlay.setImageResource(R.drawable.ic_pause_circular_light);
+                viewModel.setIsPlaying(true);
             } else {
                 // player paused in any state
-                binding.imageButtonPlay.setImageResource(R.drawable.ic_play_circular_white);
-            }
-            /*switch (playbackState) {
+                viewModel.setIsPlaying(false);
+            }*/
+            switch (playbackState) {
                 case Player.STATE_BUFFERING:
                     Logger.e(TAG, "onPlayerStateChanged: buffering");
                     int percentageBuffered = exoPlayer.getBufferedPercentage();
@@ -168,6 +255,9 @@ public class PlaylistDetailActivity extends BaseActivity implements RecyclerView
                     break;
                 case Player.STATE_ENDED:
                     Logger.e(TAG, "onPlayerStateChanged: ended");
+                    if (isPlaying){
+                        viewModel.setIsPlaying(false);
+                    }
                     break;
                 case Player.STATE_IDLE:
                     Logger.e(TAG, "onPlayerStateChanged: idle");
@@ -177,7 +267,7 @@ public class PlaylistDetailActivity extends BaseActivity implements RecyclerView
                     break;
                 default:
                     break;
-            }*/
+            }
         }
 
         @Override
@@ -197,8 +287,14 @@ public class PlaylistDetailActivity extends BaseActivity implements RecyclerView
 
         @Override
         public void onPositionDiscontinuity(int reason) {
-            //1=Player.DISCONTINUITY_REASON_SEEK;
-            Logger.e(TAG, "onPositionDiscontinuity: " + reason);
+            int latestWindowIndex = exoPlayer.getCurrentWindowIndex();
+            if (latestWindowIndex != playerPosition) {
+                // item selected in playlist has changed, handle here
+                /*viewModel.setPlayerPosition(latestWindowIndex);*/
+                viewModel.setPlayerPosition(latestWindowIndex);
+                Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
+                // ...
+            }
         }
 
         @Override

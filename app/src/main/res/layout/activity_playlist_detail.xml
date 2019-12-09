@@ -49,6 +49,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView_title" />
 
             <ImageButton
+                android:visibility="gone"
                 android:id="@+id/imageButton_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -87,27 +88,65 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <TextView
+            android:id="@+id/textView_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:textColorHint="@color/gray_text1"
+            android:textColor="@color/gray_text1"
+            android:background="@drawable/edittext_bg"
+            android:drawableEnd="@android:drawable/arrow_down_float"
+            android:drawableTint="@color/gray_text1"
+            android:drawablePadding="5dp"
+            android:hint="Duration 30m"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+
+        <TextView
+            android:id="@+id/textView_songs_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:textColorHint="@color/gray_text1"
+            android:textColor="@color/gray_text1"
+            android:background="@drawable/edittext_bg"
+            android:drawableTint="@color/gray_text1"
+            android:hint="0 song • 0h 0m"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:clipToPadding="false"
+            android:layout_marginTop="16dp"
             android:paddingBottom="50dp"
-            android:scrollbarStyle="outsideOverlay"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/textView_duration" />
 
         <include
-            layout="@layout/layout_progress_bar_full_screen"
             android:id="@+id/progress_layout"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            layout="@layout/layout_progress_bar_full_screen"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/recyclerView"
             app:layout_constraintStart_toStartOf="@+id/recyclerView"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/textView_duration" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,35 +1,20 @@
 package com.pheuture.playlists.playlists.detail;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemVideoBinding;
 import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
@@ -45,25 +30,14 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
     private List<VideoEntity> oldList;
     private LinearLayoutManager layoutManager;
     private RecyclerViewInterface recyclerViewInterface;
-    private SimpleExoPlayer exoPlayer;
-    private DataSource.Factory dataSourceFactory;
     private PlayerView playerView;
     private int playerPosition = RecyclerView.NO_POSITION;
 
-    PlaylistVideosRecyclerAdapter(Context context, LinearLayoutManager layoutManager, SimpleExoPlayer exoPlayer, PlayerView playerView) {
+    PlaylistVideosRecyclerAdapter(Context context, LinearLayoutManager layoutManager, PlayerView playerView) {
         this.mContext = context;
         this.layoutManager = layoutManager;
         this.recyclerViewInterface = (RecyclerViewInterface) context;
-        this.exoPlayer = exoPlayer;
-
-        exoPlayer.setPlayWhenReady(true);
-
-        dataSourceFactory = new DefaultDataSourceFactory(mContext,
-                Util.getUserAgent(mContext, TAG));
-
         this.playerView = playerView;
-        playerView.setUseController(true);
-        playerView.setPlayer(exoPlayer);
     }
 
     @NonNull
@@ -75,6 +49,11 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder recyclerHOlder, int position) {
+        Logger.e(TAG, "onBindViewHolder: " + position);
+        if (position == RecyclerView.NO_POSITION){
+            return;
+        }
+
         MyViewHolder holder = (MyViewHolder) recyclerHOlder;
 
         VideoEntity model = oldList.get(position);
@@ -82,15 +61,15 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
 
         if (playerPosition == position){
             //add player to the frameLayout of current position
-            setVideo(holder.binding, model);
+            setPlayer(holder.binding);
 
         } else {
             //remove player from the frameLayout of current position
-            removeVideoPlayer(holder.binding, position);
+            removePlayer(holder.binding);
         }
     }
 
-    private void removeVideoPlayer(ItemVideoBinding binding, int position) {
+    private void removePlayer(ItemVideoBinding binding) {
         /*binding.frameLayout.removeAllViews();*/
         ViewGroup parent = (ViewGroup) playerView.getParent();
         if (parent != null) {
@@ -102,13 +81,8 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
         binding.imageViewThumbnail.setVisibility(View.VISIBLE);
     }
 
-    private void setVideo(ItemVideoBinding binding, VideoEntity model) {
-        MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(Uri.parse(model.getVideoUrl()));
-
-        exoPlayer.prepare(mediaSource);
-
-        playerView.setLayoutParams(binding.frameLayout.getLayoutParams());
+    private void setPlayer(ItemVideoBinding binding) {
+        playerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         ViewGroup parent = (ViewGroup) playerView.getParent();
         if (parent != null) {
@@ -118,28 +92,35 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
             }
         }
 
-        /*binding.frameLayout.removeAllViews();*/
         binding.frameLayout.addView(playerView);
         binding.imageViewThumbnail.setVisibility(View.GONE);
     }
 
     void setData(List<VideoEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList));
-        oldList = newList;
-
         diffResult.dispatchUpdatesTo(this);
+        oldList = newList;
     }
 
-    public void setPlayerState(boolean state) {
-        if (state) {
-         if (playerPosition==RecyclerView.NO_POSITION){
+    /*public void setPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        if (playWhenReady) {
+         if (playerPosition == RecyclerView.NO_POSITION){
              playerPosition = 0;
          }
 
          notifyItemChanged(playerPosition);
          layoutManager.scrollToPosition(playerPosition);
         }
-        exoPlayer.setPlayWhenReady(state);
+    }*/
+
+    public void setPlayerPosition(int newPlayerPosition) {
+        int oldPlayerPosition = this.playerPosition;
+        this.playerPosition = newPlayerPosition;
+
+        notifyItemChanged(oldPlayerPosition);
+        notifyItemChanged(newPlayerPosition);
+
+        layoutManager.scrollToPosition(newPlayerPosition);
     }
 
     class DiffCallBack extends DiffUtil.Callback{

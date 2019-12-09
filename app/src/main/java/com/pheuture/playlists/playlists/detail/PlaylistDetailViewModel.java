@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -14,6 +15,9 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 import com.pheuture.playlists.utils.ApiConstant;
@@ -40,6 +44,9 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     private MutableLiveData<List<VideoEntity>> videos;
     private SimpleExoPlayer exoPlayer;
     private PlayerView playerView;
+    private MutableLiveData<Boolean> isPlaying;
+    private MutableLiveData<Integer> playerPosition;
+    private DataSource.Factory dataSourceFactory;
 
     public PlaylistDetailViewModel(@NonNull Application application, PlaylistEntity model) {
         super(application);
@@ -49,9 +56,15 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         reachedLast = new MutableLiveData<>(false);
         searchQuery = new MutableLiveData<>("");
         showProgress = new MutableLiveData<>(true);
+        isPlaying = new MutableLiveData<>(false);
+        playerPosition = new MutableLiveData<>(RecyclerView.NO_POSITION);
         videos = new MutableLiveData<>();
+
+        dataSourceFactory = new DefaultDataSourceFactory(application, Util.getUserAgent(application, TAG));
         exoPlayer = ExoPlayerFactory.newSimpleInstance(application);
         playerView = new PlayerView(application);
+        playerView.setUseController(false);
+        playerView.setPlayer(exoPlayer);
     }
 
     public LiveData<List<VideoEntity>> getVideosLive() {
@@ -145,5 +158,25 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
 
     public PlayerView getPlayerView() {
         return playerView;
+    }
+
+    public MutableLiveData<Boolean> isPlayling() {
+        return isPlaying;
+    }
+
+    public void setIsPlaying(boolean b) {
+        isPlaying.postValue(b);
+    }
+
+    public DataSource.Factory getDataSourceFactory() {
+        return dataSourceFactory;
+    }
+
+    public MutableLiveData<Integer> getPlayerPosition() {
+        return playerPosition;
+    }
+
+    public void setPlayerPosition(int newPlayerPosition) {
+        playerPosition.setValue(newPlayerPosition);
     }
 }

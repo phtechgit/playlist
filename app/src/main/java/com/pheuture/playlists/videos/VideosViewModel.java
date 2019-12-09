@@ -212,7 +212,6 @@ public class VideosViewModel extends AndroidViewModel {
 
                     updateParent.postValue(true);
 
-
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }
