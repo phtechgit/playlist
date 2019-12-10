@@ -7,53 +7,38 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".videos.VideosActivity">
+        tools:context=".videos.VideosFragment">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?actionBarSize"
+        <include
+            android:id="@+id/layout_search_bar"
+            layout="@layout/layout_search_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-            </androidx.appcompat.widget.Toolbar>
-
-            <include
-                android:id="@+id/layout_search_bar"
-                layout="@layout/layout_search_bar" />
-
-        </com.google.android.material.appbar.AppBarLayout>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_below="@+id/appBarLayout"
+            android:layout_below="@+id/layout_search_bar"
             android:clipToPadding="false"
             android:paddingBottom="50dp"
             android:scrollbarStyle="outsideOverlay"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
+            app:layout_constraintTop_toBottomOf="@+id/layout_search_bar"
             tools:listitem="@layout/item_video"/>
 
         <include
-            layout="@layout/layout_progress_bar_full_screen"
             android:id="@+id/progress_layout"
+            layout="@layout/layout_progress_bar_full_screen"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/recyclerView"
-            app:layout_constraintStart_toStartOf="@+id/recyclerView"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_search_bar"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

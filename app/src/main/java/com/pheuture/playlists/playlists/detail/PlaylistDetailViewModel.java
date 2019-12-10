@@ -152,14 +152,6 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         showProgress.postValue(b);
     }
 
-    public SimpleExoPlayer getExoPlayer() {
-        return exoPlayer;
-    }
-
-    public PlayerView getPlayerView() {
-        return playerView;
-    }
-
     public MutableLiveData<Boolean> isPlayling() {
         return isPlaying;
     }

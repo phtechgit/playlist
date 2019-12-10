@@ -27,6 +27,7 @@
             android:id="@+id/frameLayout"
             android:layout_width="200dp"
             android:layout_height="120dp"
+            android:scaleType="center"
             android:tag="decorator_starting_view"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"

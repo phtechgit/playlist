@@ -216,21 +216,6 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                         return;
                     }
 
-                    int tempPosition = playerPosition;
-                    playerPosition = pos;
-                    notifyItemChanged(tempPosition);
-                    notifyItemChanged(playerPosition);
-                }
-            });
-
-            binding.imageViewAdd.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = getAdapterPosition();
-                    if (pos == RecyclerView.NO_POSITION){
-                        return;
-                    }
-
                     Bundle bundle = new Bundle();
                     bundle.putInt(Constants.ARG_PARAM1, pos);
                     bundle.putParcelable(Constants.ARG_PARAM2, oldList.get(pos));

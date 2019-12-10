@@ -1,7 +1,9 @@
 package com.pheuture.playlists.videos;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -10,44 +12,54 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
+import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.databinding.ActivityVideosBinding;
+import com.pheuture.playlists.databinding.FragmentVideosBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
-import com.pheuture.playlists.utils.BaseActivity;
+import com.pheuture.playlists.utils.BaseFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class VideosActivity extends BaseActivity implements TextWatcher, RecyclerViewInterface {
-    private static final String TAG = VideosActivity.class.getSimpleName();
-    private ActivityVideosBinding binding;
+public class VideosFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
+    private static final String TAG = VideosFragment.class.getSimpleName();
+    private FragmentVideosBinding binding;
     private VideosViewModel viewModel;
     private VideosRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
     private PlaylistEntity playlistModel;
+    private FragmentActivity activity;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        activity = getActivity();
+    }
+
+    @Override
+    public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_videos, container, false);
+        viewModel = ViewModelProviders.of(this, new VideosViewModelFactory(
+                activity.getApplication(), playlistModel)).get(VideosViewModel.class);
+
+        return binding.getRoot();
+    }
 
     @Override
     public void initializations() {
-        playlistModel = getIntent().getParcelableExtra(ARG_PARAM1);
-
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_videos);
-
-        setSupportActionBar(binding.toolbar);
-
-        assert playlistModel != null;
-        setTitle(playlistModel.getPlaylistName());
-
-        viewModel = ViewModelProviders.of(this, new VideosViewModelFactory(
-                this.getApplication(), playlistModel)).get(VideosViewModel.class);
+        playlistModel = getArguments().getParcelable(ARG_PARAM1);
 
         binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
         binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());
 
         recyclerAdapter = new VideosRecyclerAdapter(this);
-        layoutManager = new LinearLayoutManager(this);
+        layoutManager = new LinearLayoutManager(activity);
 
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);
@@ -70,7 +82,7 @@ public class VideosActivity extends BaseActivity implements TextWatcher, Recycle
             @Override
             public void onChanged(Boolean value) {
                 if (value) {
-                    onBackPressed();
+                    activity.onBackPressed();
                 }
             }
         });
@@ -134,19 +146,23 @@ public class VideosActivity extends BaseActivity implements TextWatcher, Recycle
             if (dy > 0 && remainingItems < visibleItemCount) {
                 viewModel.getMoreData();
             }
-
-            //update current positions in adapter
-            recyclerAdapter.setCurrentPositions(firstVisibleItemPosition, lastVisibleItemPosition);
         }
     };
 
     @Override
     public void onRecyclerViewItemClick(Bundle bundle) {
-        int position = bundle.getInt(ARG_PARAM1, -1);
-        VideoEntity model = bundle.getParcelable(ARG_PARAM2);
+        int type = bundle.getInt(ARG_PARAM1, -1);
+        int position = bundle.getInt(ARG_PARAM2, -1);
+        VideoEntity video = bundle.getParcelable(ARG_PARAM3);
 
-        assert model != null;
-        viewModel.addVideoToPlaylist(model.getId());
+        assert video != null;
+        if (type == 1){
+            List<VideoEntity> videos = new ArrayList<VideoEntity>();
+            videos.add(video);
+            ((MainActivity) activity).setMedia(null, videos);
+        } else {
+            viewModel.addVideoToPlaylist(video.getId());
+        }
     }
 
     @Override

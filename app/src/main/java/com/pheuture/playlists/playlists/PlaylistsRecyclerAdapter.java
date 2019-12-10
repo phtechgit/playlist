@@ -27,7 +27,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
     PlaylistsRecyclerAdapter(PlaylistsFragment context) {
         this.mContext = context.getContext();
-        this.recyclerViewInterface = (RecyclerViewInterface) context;
+        this.recyclerViewInterface = context;
     }
 
     @NonNull
@@ -52,20 +52,16 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
     }
 
-    public void setOnItemClickListener(RecyclerViewInterface recyclerViewInterface) {
-        this.recyclerViewInterface = recyclerViewInterface;
-    }
-
     void setData(List<PlaylistEntity> newList) {
         PlaylistEntity addNewPlaylistModel = new PlaylistEntity();
+        addNewPlaylistModel.setId(RecyclerView.NO_ID);
         addNewPlaylistModel.setPlaylistName("Create playlist");
 
         newList.add(0, addNewPlaylistModel);
 
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList));
-        oldList = newList;
-
         diffResult.dispatchUpdatesTo(this);
+        oldList = newList;
     }
 
     class DiffCallBack extends DiffUtil.Callback{

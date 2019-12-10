@@ -18,6 +18,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,10 +27,9 @@ import com.pheuture.playlists.R;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.databinding.FragmentMyPlaylistsBinding;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
-import com.pheuture.playlists.playlists.detail.PlaylistDetailActivity;
+import com.pheuture.playlists.playlists.detail.PlaylistDetailFragment;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.SimpleDividerItemDecoration;
-import com.pheuture.playlists.videos.VideosActivity;
 
 import java.util.List;
 
@@ -109,7 +109,7 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
     }
 
     @Override
-    public void handleListeners() {
+    public void setListeners() {
         binding.buttonCreatePlaylist.setOnClickListener(this);
         binding.recyclerView.addOnScrollListener(scrollListener);
         binding.layoutSearchBar.editTextSearch.addTextChangedListener(this);
@@ -172,10 +172,11 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
             showCreatePlaylistNameDialog();
 
         } else {
-            Intent intent = new Intent(activity, PlaylistDetailActivity.class);
-            intent.putExtra(ARG_PARAM1, model);
-            startActivity(intent);
+            bundle.clear();
+            bundle.putParcelable(ARG_PARAM1, model);
 
+            Navigation.findNavController(binding.getRoot())
+                    .navigate(R.id.action_navigation_playlists_to_navigation_playlists_detail, bundle);
         }
 
     }

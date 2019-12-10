@@ -172,7 +172,7 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanseState) {
         View view = myFragmentView(inflater, parent, savedInstanseState);
-        handleListeners();
+        setListeners();
         initializations();
         return view;
     }
@@ -181,7 +181,7 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
 
     public abstract void initializations();
 
-    public abstract void handleListeners();
+    public abstract void setListeners();
 
 
 }

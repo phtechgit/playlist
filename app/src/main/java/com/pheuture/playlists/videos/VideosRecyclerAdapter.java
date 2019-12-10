@@ -43,24 +43,10 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private Context mContext;
     private List<VideoEntity> oldList;
     private RecyclerViewInterface recyclerViewInterface;
-    private SimpleExoPlayer exoPlayer;
-    private DataSource.Factory dataSourceFactory;
-    private PlayerView playerView;
-    private int playerPosition = RecyclerView.NO_POSITION;
 
-    VideosRecyclerAdapter(Context context) {
-        this.mContext = context;
-        this.recyclerViewInterface = (RecyclerViewInterface) context;
-
-        exoPlayer = ExoPlayerFactory.newSimpleInstance(mContext);
-        exoPlayer.setPlayWhenReady(true);
-
-        dataSourceFactory = new DefaultDataSourceFactory(mContext,
-                Util.getUserAgent(mContext, TAG));
-
-        playerView = new PlayerView(mContext);
-        playerView.setUseController(true);
-        playerView.setPlayer(exoPlayer);
+    VideosRecyclerAdapter(VideosFragment context) {
+        this.mContext = context.getContext();
+        this.recyclerViewInterface = context;
     }
 
     @NonNull
@@ -76,69 +62,13 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         VideoEntity model = oldList.get(position);
         holder.binding.setModel(model);
-
-        if (playerPosition == position){
-            //add player to the frameLayout of current position
-            setVideo(holder.binding, model);
-
-        } else {
-            //remove player from the frameLayout of current position
-            removeVideoPlayer(holder.binding, position);
-        }
-    }
-
-    private void removeVideoPlayer(ItemVideoBinding binding, int position) {
-        /*binding.frameLayout.removeAllViews();*/
-        ViewGroup parent = (ViewGroup) playerView.getParent();
-        if (parent != null) {
-            int index = parent.indexOfChild(playerView);
-            if (index >= 0) {
-                parent.removeViewAt(index);
-            }
-        }
-
-        binding.imageViewThumbnail.setVisibility(View.VISIBLE);
-    }
-
-    private void setVideo(ItemVideoBinding binding, VideoEntity model) {
-        MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(Uri.parse(model.getVideoUrl()));
-
-        exoPlayer.prepare(mediaSource);
-
-        playerView.setLayoutParams(binding.frameLayout.getLayoutParams());
-
-        ViewGroup parent = (ViewGroup) playerView.getParent();
-        if (parent != null) {
-            int index = parent.indexOfChild(playerView);
-            if (index >= 0) {
-                parent.removeViewAt(index);
-            }
-        }
-
-        /*binding.frameLayout.removeAllViews();*/
-        binding.frameLayout.addView(playerView);
-        binding.imageViewThumbnail.setVisibility(View.GONE);
     }
 
     void setData(List<VideoEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList),
                 true);
-        oldList = newList;
-
         diffResult.dispatchUpdatesTo(this);
-    }
-
-    public void setCurrentPositions(int firstVisibleItemPosition, int lastVisibleItemPosition) {
-        if (playerPosition==-RecyclerView.NO_POSITION){
-            return;
-        }
-
-        if (playerPosition<firstVisibleItemPosition || playerPosition>lastVisibleItemPosition){
-            int tempPosition = playerPosition;
-            playerPosition = RecyclerView.NO_POSITION;
-            notifyItemChanged(tempPosition);
-        }
+        oldList = newList;
     }
 
     class DiffCallBack extends DiffUtil.Callback{
@@ -233,10 +163,11 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                         return;
                     }
 
-                    int tempPosition = playerPosition;
-                    playerPosition = pos;
-                    notifyItemChanged(tempPosition);
-                    notifyItemChanged(playerPosition);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Constants.ARG_PARAM1, 1);
+                    bundle.putInt(Constants.ARG_PARAM2, pos);
+                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
+                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
                 }
             });
 
@@ -249,8 +180,9 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     }
 
                     Bundle bundle = new Bundle();
-                    bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putParcelable(Constants.ARG_PARAM2, oldList.get(pos));
+                    bundle.putInt(Constants.ARG_PARAM1, 2);
+                    bundle.putInt(Constants.ARG_PARAM2, pos);
+                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
                     recyclerViewInterface.onRecyclerViewItemClick(bundle);
                 }

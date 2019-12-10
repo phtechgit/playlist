@@ -3,13 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_my_playlists">
+    app:startDestination="@+id/navigation_playlists">
 
     <fragment
-        android:id="@+id/navigation_my_playlists"
+        android:id="@+id/navigation_playlists"
         android:name="com.pheuture.playlists.playlists.PlaylistsFragment"
         android:label="@string/title_my_playlist"
-        tools:layout="@layout/fragment_my_playlists" />
+        tools:layout="@layout/fragment_my_playlists" >
+        <action
+            android:id="@+id/action_navigation_playlists_to_navigation_playlists_detail"
+            app:destination="@id/navigation_playlist_detail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_playlist_detail"
+        android:name="com.pheuture.playlists.playlists.detail.PlaylistDetailFragment"
+        android:label=""
+        tools:layout="@layout/fragment_playlist_detail" >
+        <action
+            android:id="@+id/action_navigation_playlist_detail_to_navigation_videos"
+            app:destination="@id/navigation_videos" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_videos"
+        android:name="com.pheuture.playlists.videos.VideosFragment"
+        tools:layout="@layout/fragment_videos" />
 
     <fragment
         android:id="@+id/navigation_trending"

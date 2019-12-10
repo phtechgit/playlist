@@ -16,12 +16,14 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentTrendingsBinding;
 import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TrendingFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
@@ -83,7 +85,7 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     }
 
     @Override
-    public void handleListeners() {
+    public void setListeners() {
         binding.recyclerView.addOnScrollListener(scrollListener);
         binding.layoutSearchBar.editTextSearch.addTextChangedListener(this);
     }
@@ -130,7 +132,12 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     @Override
     public void onRecyclerViewItemClick(Bundle bundle) {
         int position = bundle.getInt(ARG_PARAM1, -1);
-        VideoEntity model = bundle.getParcelable(ARG_PARAM2);
+        VideoEntity video = bundle.getParcelable(ARG_PARAM2);
+
+        List<VideoEntity> videos = new ArrayList<VideoEntity>();
+        videos.add(video);
+
+        ((MainActivity) activity).setMedia(null, videos);
     }
 
     @Override
