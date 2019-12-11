@@ -18,7 +18,8 @@ import java.util.List;
 public class MainViewModel extends AndroidViewModel {
     private static final String TAG = MainViewModel.class.getSimpleName();
     private DataSource.Factory dataSourceFactory;
-    private SimpleExoPlayer exoPlayer;
+    private SimpleExoPlayer exoPlayer1;
+    private SimpleExoPlayer exoPlayer2;
     private MutableLiveData<PlaylistEntity> playlist;
     private MutableLiveData<List<VideoEntity>> videos;
 
@@ -26,13 +27,14 @@ public class MainViewModel extends AndroidViewModel {
         super(application);
         dataSourceFactory = new DefaultDataSourceFactory(application,
                 Util.getUserAgent(application, TAG));
-        exoPlayer = ExoPlayerFactory.newSimpleInstance(application);
+        exoPlayer1 = ExoPlayerFactory.newSimpleInstance(application);
+        exoPlayer2 = ExoPlayerFactory.newSimpleInstance(application);
         playlist = new MutableLiveData<>();
         videos = new MutableLiveData<>();
     }
 
-    public SimpleExoPlayer getExoPlayer() {
-        return exoPlayer;
+    public SimpleExoPlayer getExoPlayer1() {
+        return exoPlayer1;
     }
 
     public void setPlaylist(PlaylistEntity newPlaylist) {
@@ -53,5 +55,9 @@ public class MainViewModel extends AndroidViewModel {
 
     public DataSource.Factory getDataSourceFactory() {
         return dataSourceFactory;
+    }
+
+    public SimpleExoPlayer getExoPlayer2() {
+        return exoPlayer2;
     }
 }
