@@ -17,6 +17,7 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -52,7 +53,8 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
     }
 
-    void setData(List<PlaylistEntity> newList) {
+    void setData(List<PlaylistEntity> newData) {
+        List<PlaylistEntity> newList = new ArrayList<>(newData);
         PlaylistEntity addNewPlaylistModel = new PlaylistEntity();
         addNewPlaylistModel.setId(RecyclerView.NO_ID);
         addNewPlaylistModel.setPlaylistName("Create playlist");
@@ -60,8 +62,8 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         newList.add(0, addNewPlaylistModel);
 
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList));
-        diffResult.dispatchUpdatesTo(this);
         oldList = newList;
+        diffResult.dispatchUpdatesTo(this);
     }
 
     class DiffCallBack extends DiffUtil.Callback{

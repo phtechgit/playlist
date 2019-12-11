@@ -2,8 +2,9 @@ package com.pheuture.playlists;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -22,10 +23,14 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 import com.pheuture.playlists.databinding.ActivityMainBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
+import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.BaseActivity;
 import com.pheuture.playlists.utils.Logger;
+import com.pheuture.playlists.utils.StringUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -42,21 +47,29 @@ public class MainActivity extends BaseActivity {
     private ActivityMainBinding binding;
     private NavController navController;
     private MainViewModel viewModel;
-    private SimpleExoPlayer exoPlayer;
+    private SimpleExoPlayer exoPlayer1;
     private PlayerView playerView;
     private PlaylistEntity playlist;
     private List<VideoEntity> videos;
     private ConcatenatingMediaSource concatenatedSource;
     private List<MediaSource> mediaSources;
-    private LinearLayout linearLayoutBottomSheet;
+    private ConstraintLayout constraintLayoutBottomSheet;
     private BottomSheetBehavior bottomSheetBehavior;
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings)
                 .build();
@@ -69,16 +82,16 @@ public class MainActivity extends BaseActivity {
     public void initializations() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        linearLayoutBottomSheet = binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer;
+        constraintLayoutBottomSheet = binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer;
         playerView = binding.layoutBottomSheet.playerView;
 
-         bottomSheetBehavior = BottomSheetBehavior.from(linearLayoutBottomSheet);
-         bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
+        bottomSheetBehavior = BottomSheetBehavior.from(constraintLayoutBottomSheet);
+        bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
 
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
-        exoPlayer = viewModel.getExoPlayer();
-        playerView.setPlayer(exoPlayer);
+        exoPlayer1 = viewModel.getExoPlayer();
+        playerView.setPlayer(exoPlayer1);
 
         viewModel.getPlaylist().observe(this, new Observer<PlaylistEntity>() {
             @Override
@@ -106,10 +119,19 @@ public class MainActivity extends BaseActivity {
 
                     concatenatedSource.addMediaSources(mediaSources);
 
-                    exoPlayer.prepare(concatenatedSource);
-                    exoPlayer.setPlayWhenReady(true);
+                    exoPlayer1.prepare(concatenatedSource);
+                    exoPlayer1.setPlayWhenReady(true);
 
                     binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer.setVisibility(View.VISIBLE);
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+                    if (playlist != null && !StringUtils.isEmpty(playlist.getPlaylistName())) {
+                        binding.layoutBottomSheet.textViewTitle.setText(playlist.getPlaylistName());
+                        binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
+                    } else {
+                        binding.layoutBottomSheet.textViewTitle.setText(videos.get(0).getVideoName());
+                        binding.layoutBottomSheet.textViewCreator.setText(videos.get(0).getVideoDescription());
+                    }
                 }
             }
         });
@@ -117,7 +139,8 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void setListeners() {
-        exoPlayer.addListener(playerListener);
+        exoPlayer1.addListener(playerListener);
+        binding.layoutBottomSheet.imageVIewClose.setOnClickListener(this);
     }
 
     private Player.EventListener playerListener = new Player.EventListener() {
@@ -151,7 +174,7 @@ public class MainActivity extends BaseActivity {
             switch (playbackState) {
                 case Player.STATE_BUFFERING:
                     /*Logger.e(TAG, "onPlayerStateChanged: buffering");
-                    int percentageBuffered = exoPlayer.getBufferedPercentage();
+                    int percentageBuffered = exoPlayer1.getBufferedPercentage();
                     Logger.e(TAG, percentageBuffered + "");*/
                     break;
                 case Player.STATE_ENDED:
@@ -178,7 +201,8 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-
+            String data = shuffleModeEnabled?"Enabled":"Disabled";
+            Toast.makeText(MainActivity.this, "Shuffle " + data , Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -188,10 +212,20 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onPositionDiscontinuity(int reason) {
-            /*int latestWindowIndex = exoPlayer.getCurrentWindowIndex();
-            if (latestWindowIndex != playerPosition) {
+            int latestWindowIndex = exoPlayer1.getCurrentWindowIndex();
+            Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
+
+            if (playlist != null && !StringUtils.isEmpty(playlist.getPlaylistName())) {
+                binding.layoutBottomSheet.textViewTitle.setText(playlist.getPlaylistName());
+                binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
+            } else {
+                binding.layoutBottomSheet.textViewTitle.setText(videos.get(latestWindowIndex).getVideoName());
+                binding.layoutBottomSheet.textViewCreator.setText(videos.get(latestWindowIndex).getVideoDescription());
+            }
+
+            /*if (latestWindowIndex != playerPosition) {
                 // item selected in playlist has changed, handle here
-                *//*viewModel.setPlayerPosition(latestWindowIndex);*//*
+                viewModel.setPlayerPosition(latestWindowIndex);
                 viewModel.setPlayerPosition(latestWindowIndex);
                 Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
                 // ...
@@ -211,7 +245,11 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onClick(View v) {
-
+        if (v.equals(binding.layoutBottomSheet.imageVIewClose)){
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            binding.navView.setVisibility(View.VISIBLE);
+            exoPlayer1.setPlayWhenReady(false);
+        }
     }
 
     public void setMedia(PlaylistEntity playlist, List<VideoEntity> videoEntityList){
@@ -229,8 +267,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (exoPlayer!=null){
-            exoPlayer.release();
+        if (exoPlayer1 !=null){
+            exoPlayer1.release();
         }
     }
 
@@ -240,23 +278,18 @@ public class MainActivity extends BaseActivity {
             Logger.e(TAG, "onStateChanged: " + newState);
             switch (newState) {
                 case BottomSheetBehavior.STATE_HIDDEN:
-                    binding.navView.setVisibility(View.VISIBLE);
-                    exoPlayer.setPlayWhenReady(false);
+                    exoPlayer1.setPlayWhenReady(false);
                     break;
                 case BottomSheetBehavior.STATE_EXPANDED:
-                    binding.navView.setVisibility(View.GONE);
+                case BottomSheetBehavior.STATE_HALF_EXPANDED:
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     break;
                 case BottomSheetBehavior.STATE_COLLAPSED:
-                    binding.navView.setVisibility(View.VISIBLE);
                     break;
                 case BottomSheetBehavior.STATE_DRAGGING:
                     break;
                 case BottomSheetBehavior.STATE_SETTLING:
                     /*bottomSheetBehavior.setHideable(false);*/
-                    break;
-                case BottomSheetBehavior.STATE_HALF_EXPANDED:
-                    binding.navView.setVisibility(View.VISIBLE);
-                    bottomSheetBehavior.setHideable(true);
                     break;
             }
         }
@@ -266,4 +299,8 @@ public class MainActivity extends BaseActivity {
 
         }
     };
+
+    public void toggleShuffleMode() {
+        exoPlayer1.setShuffleModeEnabled(!exoPlayer1.getShuffleModeEnabled());
+    }
 }

@@ -44,17 +44,15 @@ public class VideosFragment extends BaseFragment implements TextWatcher, Recycle
 
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        playlistModel = getArguments().getParcelable(ARG_PARAM1);
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_videos, container, false);
         viewModel = ViewModelProviders.of(this, new VideosViewModelFactory(
                 activity.getApplication(), playlistModel)).get(VideosViewModel.class);
-
         return binding.getRoot();
     }
 
     @Override
     public void initializations() {
-        playlistModel = getArguments().getParcelable(ARG_PARAM1);
-
         binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
         binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());
 

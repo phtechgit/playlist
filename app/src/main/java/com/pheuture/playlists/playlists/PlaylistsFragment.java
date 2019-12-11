@@ -64,9 +64,9 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
 
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);
-        binding.recyclerView.addItemDecoration(
+        /*binding.recyclerView.addItemDecoration(
                 new SimpleDividerItemDecoration(getResources().getDrawable(R.drawable.line_divider),
-                        0, 0));
+                        0, 0));*/
 
         viewModel.getPlaylists().observe(this, new Observer<List<PlaylistEntity>>() {
             @Override

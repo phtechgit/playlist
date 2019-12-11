@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,6 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
-import com.pheuture.playlists.videos.VideosFragment;
 
 import java.util.List;
 
@@ -145,6 +143,9 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         } else if (v.equals(binding.imageButtonPlay)) {
             ((MainActivity) activity).setMedia(playlist, videos);
+
+        } else if (v.equals(binding.imageButtonShuffle)) {
+            ((MainActivity) activity).toggleShuffleMode();
         }
     }
 
