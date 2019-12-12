@@ -67,8 +67,8 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     void setData(List<VideoEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList),
                 true);
+        oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
-        oldList = newList;
     }
 
     class DiffCallBack extends DiffUtil.Callback{

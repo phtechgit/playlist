@@ -62,7 +62,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         newList.add(0, addNewPlaylistModel);
 
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList));
-        oldList = newList;
+        oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
     }
 

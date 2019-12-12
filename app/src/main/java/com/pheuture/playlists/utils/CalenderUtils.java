@@ -4,8 +4,17 @@ import android.content.Context;
 
 import com.pheuture.playlists.R;
 
+import java.math.BigDecimal;
+import java.sql.Time;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.Period;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.datatype.DatatypeConstants;
 
 public class CalenderUtils {
 
@@ -154,5 +163,12 @@ public class CalenderUtils {
             stringBuilder.append(a);
         }
         return stringBuilder.toString();
+    }
+
+    public static String getFormattedTimeDuration(long playDurationInMillis) {
+        long diffInHours = TimeUnit.MILLISECONDS.toHours(playDurationInMillis);
+        long diffInMin = TimeUnit.MILLISECONDS.toMinutes((diffInHours>0)?((diffInHours * 60 * 1000) - playDurationInMillis):playDurationInMillis);
+
+        return diffInHours + "h " + diffInMin + "m";
     }
 }

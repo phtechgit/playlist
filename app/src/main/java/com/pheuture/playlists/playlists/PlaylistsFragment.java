@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +30,7 @@ import com.pheuture.playlists.databinding.FragmentMyPlaylistsBinding;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.playlists.detail.PlaylistDetailFragment;
 import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.utils.KeyboardUtils;
 import com.pheuture.playlists.utils.SimpleDividerItemDecoration;
 
 import java.util.List;
@@ -142,6 +144,7 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
 
             } else {
                 dialog.dismiss();
+                KeyboardUtils.hideKeyboard(activity);
                 viewModel.createPlaylist(textInputLayoutPlaylistName.getEditText().getText().toString());
             }
         });

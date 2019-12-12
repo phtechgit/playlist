@@ -20,7 +20,18 @@
             android:layout_height="?actionBarSize"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:use_controller="true" />
+            app:use_controller="false" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:progress="0"
+            android:progressDrawable="@drawable/progress_horizontal_drawable"
+            app:layout_constraintBottom_toBottomOf="@+id/playerView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/playerView" />
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -29,7 +40,7 @@
             android:layout_marginStart="8dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="@+id/playerView"
-            app:layout_constraintEnd_toStartOf="@+id/imageVIew_close"
+            app:layout_constraintEnd_toStartOf="@+id/imageView_togglePlay"
             app:layout_constraintStart_toEndOf="@+id/playerView"
             app:layout_constraintTop_toTopOf="@+id/playerView">
 
@@ -65,7 +76,31 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageVIew_close"
+            android:id="@+id/imageView_togglePlay"
+            android:layout_width="?actionBarSize"
+            android:layout_height="?actionBarSize"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="16dp"
+            android:src="@android:drawable/ic_media_pause"
+            app:layout_constraintEnd_toStartOf="@+id/imageView_next"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView_next"
+            android:layout_width="?actionBarSize"
+            android:layout_height="?actionBarSize"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="16dp"
+            android:src="@android:drawable/ic_media_next"
+            app:layout_constraintEnd_toStartOf="@+id/imageView_close"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView_close"
             android:layout_width="?actionBarSize"
             android:layout_height="?actionBarSize"
             android:padding="16dp"

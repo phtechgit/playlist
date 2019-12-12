@@ -28,7 +28,7 @@ import java.util.Map;
 public class VideosViewModel extends AndroidViewModel {
     private static final String TAG = VideosViewModel.class.getSimpleName();
     private MutableLiveData<Boolean> showProgress;
-    private LiveData<List<VideoEntity>> videos;
+    private MutableLiveData<List<VideoEntity>> videos;
     private VideoDao videoDao;
     private long lastID;
     private long limit;
@@ -49,7 +49,7 @@ public class VideosViewModel extends AndroidViewModel {
         updateParent = new MutableLiveData<>(false);
 
         videoDao = LocalRepository.getInstance(application).videoDao();
-        videos = videoDao.getVideosLive();
+        videos = new MutableLiveData<>();
 
         getFreshData();
     }
@@ -71,8 +71,9 @@ public class VideosViewModel extends AndroidViewModel {
                     }
 
                     List<VideoEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), VideoEntity[].class));
-                    videoDao.deleteAll();
-                    videoDao.insertAll(list);
+                    /*videoDao.deleteAll();
+                    videoDao.insertAll(list);*/
+                    videos.postValue(list);
 
                     if (list.size()>0){
                         VideoEntity videoEntity = list.get(list.size() - 1);
@@ -113,7 +114,7 @@ public class VideosViewModel extends AndroidViewModel {
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }
 
-    public LiveData<List<VideoEntity>> getVideosLive() {
+    public MutableLiveData<List<VideoEntity>> getVideosLive() {
         return videos;
     }
 
@@ -137,15 +138,18 @@ public class VideosViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    List<VideoEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), VideoEntity[].class));
+                    List<VideoEntity> newDataList = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), VideoEntity[].class));
 
-                    videoDao.insertAll(list);
+                    List<VideoEntity> oldList = videos.getValue();
+                    oldList.addAll(newDataList);
 
-                    if (list.size()>0){
-                        VideoEntity videoEntity = list.get(list.size() - 1);
+                    videos.postValue(oldList);
+
+                    if (newDataList.size()>0){
+                        VideoEntity videoEntity = newDataList.get(newDataList.size() - 1);
                         lastID = videoEntity.getId();
 
-                        if (list.size()<limit) {
+                        if (newDataList.size()<limit) {
                             reachedLast.postValue(true);
                         } else {
                             reachedLast.postValue(false);

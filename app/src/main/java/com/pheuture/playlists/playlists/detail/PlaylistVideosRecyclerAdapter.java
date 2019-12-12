@@ -15,6 +15,8 @@ import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -88,8 +90,8 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
 
     void setData(List<VideoEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList));
+        oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
-        oldList = newList;
     }
 
     /*public void setPlayerStateChanged(boolean playWhenReady, int playbackState) {

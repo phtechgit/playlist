@@ -40,10 +40,6 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.annotation.security.RunAs;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -59,8 +55,8 @@ public class MainActivity extends BaseActivity {
     private List<MediaSource> mediaSources;
     private ConstraintLayout constraintLayoutBottomSheet;
     private BottomSheetBehavior bottomSheetBehavior;
-    private static int currentPlayer = RecyclerView.NO_POSITION;
-    private static int currentVideoPosition;
+    private static int currentPlayer;
+    private static int currentMediaPosition;
     private Handler handler = new Handler();
 
     @Override
@@ -110,14 +106,11 @@ public class MainActivity extends BaseActivity {
         viewModel.getVideos().observe(this, new Observer<List<VideoEntity>>() {
             @Override
             public void onChanged(List<VideoEntity> videoEntities) {
+                resetAllPlayers();
+
                 videos = videoEntities;
 
                 if (videos.size()>0){
-                    resetAllPlayers();
-
-                    //reset current video position to play as -1
-                    currentVideoPosition = RecyclerView.NO_POSITION;
-
                     //create single instance of media source/playlist
                     concatenatedSource = new ConcatenatingMediaSource(true);
                     mediaSources = new ArrayList<>();
@@ -130,13 +123,14 @@ public class MainActivity extends BaseActivity {
                     }
                     concatenatedSource.addMediaSources(mediaSources);
 
-                    exoPlayer1.prepare(mediaSources.get(++currentVideoPosition));
+                    exoPlayer1.prepare(mediaSources.get(++currentMediaPosition));
                     exoPlayer1.setPlayWhenReady(true);
                     playerView.setPlayer(exoPlayer1);
                     currentPlayer = 1;
 
                     binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer.setVisibility(View.VISIBLE);
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    binding.layoutBottomSheet.progressBar.setProgress(0);
 
                     if (playlist != null && !StringUtils.isEmpty(playlist.getPlaylistName())) {
                         binding.layoutBottomSheet.textViewTitle.setText(playlist.getPlaylistName());
@@ -146,10 +140,8 @@ public class MainActivity extends BaseActivity {
                         binding.layoutBottomSheet.textViewCreator.setText(videos.get(0).getVideoDescription());
                     }
 
-                    if (mediaSources.size()>1) {
-                        handler.removeCallbacks(runnable);
-                        handler.postDelayed(runnable, 2000);
-                    }
+                    //set handler
+                    handler.postDelayed(runnable, 1000);
                 }
             }
         });
@@ -158,94 +150,113 @@ public class MainActivity extends BaseActivity {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
+            long totalDurationOfCurrentMedia = 0;
+            long currentDurationOfCurrentMedia = 0;
+
             try {
-                //no media available to play
-                if ((mediaSources.size() - 1) == currentVideoPosition){
-                    handler.removeCallbacks(runnable);
-                    return;
-                }
-
                 if (currentPlayer == 1) {
-                    long totalDuration = exoPlayer1.getDuration();
-                    long currentDuration = exoPlayer1.getCurrentPosition();
+                    totalDurationOfCurrentMedia = exoPlayer1.getDuration();
+                    currentDurationOfCurrentMedia = exoPlayer1.getCurrentPosition();
 
-                    if(totalDuration <= 0 || currentDuration <= 0 || (totalDuration - currentDuration) > 2000){
-                        return;
-                    }
+                    //if more media available to play
+                    if ((mediaSources.size()-1)> currentMediaPosition) {
+                        //if remaining duration of current media <= 2sec
+                        if ((totalDurationOfCurrentMedia - currentDurationOfCurrentMedia) <= 2000) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        float oldVolume = exoPlayer1.getVolume();
+                                        float newVolume = (oldVolume>0) ? oldVolume/2 : 0;
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                float oldVolume = exoPlayer1.getVolume();
-                                float newVolume = (oldVolume>0) ? oldVolume/2 : 0;
-
-                                exoPlayer2.setVolume(newVolume);
-                                exoPlayer2.prepare(mediaSources.get(++currentVideoPosition));
-                                exoPlayer2.setPlayWhenReady(true);
-                                playerView.setPlayer(exoPlayer2);
-                                currentPlayer = 2;
-
-                                Runnable runnable = new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        exoPlayer1.setVolume(newVolume);
-                                        exoPlayer2.setVolume(oldVolume);
-                                    }
-                                };
-                                new Handler().postDelayed(runnable, 1000);
-                            } catch (Exception e) {
-                                Logger.e(TAG, e.toString());
-                            }
-                        }
-                    });
-                } else {
-                    long totalDuration = exoPlayer2.getDuration();
-                    long currentDuration = exoPlayer2.getCurrentPosition();
-
-                    if(totalDuration <= 0 || currentDuration <= 0 || (totalDuration - currentDuration) > 2000){
-                        return;
-                    }
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                float oldVolume = exoPlayer2.getVolume();
-                                float newVolume = (oldVolume>0) ? oldVolume/2 : 0;
-
-                                exoPlayer1.setVolume(newVolume);
-                                exoPlayer1.prepare(mediaSources.get(++currentVideoPosition));
-                                exoPlayer1.setPlayWhenReady(true);
-                                playerView.setPlayer(exoPlayer1);
-                                currentPlayer = 1;
-
-                                Runnable runnable = new Runnable() {
-                                    @Override
-                                    public void run() {
                                         exoPlayer2.setVolume(newVolume);
-                                        exoPlayer1.setVolume(oldVolume);
+                                        exoPlayer2.prepare(mediaSources.get(++currentMediaPosition));
+                                        exoPlayer2.setPlayWhenReady(true);
+                                        playerView.setPlayer(exoPlayer2);
+                                        currentPlayer = 2;
+
+                                        Runnable runnable = new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                exoPlayer1.setVolume(newVolume);
+                                                exoPlayer2.setVolume(oldVolume);
+                                            }
+                                        };
+                                        new Handler().postDelayed(runnable, 1000);
+                                    } catch (Exception e) {
+                                        Logger.e(TAG, e.toString());
                                     }
-                                };
-                                new Handler().postDelayed(runnable, 1000);
-                            } catch (Exception e) {
-                                Logger.e(TAG, e.toString());
-                            }
+                                }
+                            });
+
                         }
-                    });
+                    }
+                } else if (currentPlayer == 2) {
+                    totalDurationOfCurrentMedia = exoPlayer2.getDuration();
+                    currentDurationOfCurrentMedia = exoPlayer2.getCurrentPosition();
+
+                    //if more media available to play
+                    if ((mediaSources.size()-1)> currentMediaPosition){
+                        //if remaining duration of current media <= 2sec
+                        if ((totalDurationOfCurrentMedia - currentDurationOfCurrentMedia) <= 2000) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        float oldVolume = exoPlayer2.getVolume();
+                                        float newVolume = (oldVolume>0) ? oldVolume/2 : 0;
+
+                                        exoPlayer1.setVolume(newVolume);
+                                        exoPlayer1.prepare(mediaSources.get(++currentMediaPosition));
+                                        exoPlayer1.setPlayWhenReady(true);
+                                        playerView.setPlayer(exoPlayer1);
+                                        currentPlayer = 1;
+
+                                        Runnable runnable = new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                exoPlayer2.setVolume(newVolume);
+                                                exoPlayer1.setVolume(oldVolume);
+                                            }
+                                        };
+                                        new Handler().postDelayed(runnable, 1000);
+                                    } catch (Exception e) {
+                                        Logger.e(TAG, e.toString());
+                                    }
+                                }
+                            });
+                        }
+                    }
                 }
+
+                //update progress bar
+                binding.layoutBottomSheet.progressBar.setProgress(calculatePercentage(totalDurationOfCurrentMedia, currentDurationOfCurrentMedia));
             } catch (Exception e) {
                 Logger.e(TAG, e.toString());
             }
-            handler.postDelayed(runnable, 2000);
+
+            //if more media available to play or current media playback time is remaining
+            if ((mediaSources.size()-1)> currentMediaPosition || totalDurationOfCurrentMedia != currentDurationOfCurrentMedia) {
+                handler.postDelayed(runnable, 1000);
+            }
         }
     };
+
+    private int calculatePercentage(long totalDuration, long currentDuration) {
+        if (totalDuration == 0){
+            return 0;
+        }
+        return (int)((currentDuration * 100)/totalDuration);
+    }
 
     private void resetAllPlayers(){
         try {
             exoPlayer1.setPlayWhenReady(false);
             exoPlayer2.setPlayWhenReady(false);
             handler.removeCallbacks(runnable);
+            //reset current video position to play as -1
+            currentPlayer = RecyclerView.NO_POSITION;
+            currentMediaPosition = RecyclerView.NO_POSITION;
         } catch (Exception ignore) {
         }
     }
@@ -254,7 +265,9 @@ public class MainActivity extends BaseActivity {
     public void setListeners() {
         exoPlayer1.addListener(playerListener1);
         exoPlayer2.addListener(playerListener2);
-        binding.layoutBottomSheet.imageVIewClose.setOnClickListener(this);
+        binding.layoutBottomSheet.imageViewTogglePlay.setOnClickListener(this);
+        binding.layoutBottomSheet.imageViewNext.setOnClickListener(this);
+        binding.layoutBottomSheet.imageViewClose.setOnClickListener(this);
     }
 
     private Player.EventListener playerListener1 = new Player.EventListener() {
@@ -276,35 +289,36 @@ public class MainActivity extends BaseActivity {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             /*Logger.e(TAG, "onPlayerStateChanged: " + playWhenReady + ", " + playbackState);*/
+            if (currentPlayer == 1) {
+                if (playWhenReady && playbackState == Player.STATE_READY) {
+                    // media actually playing
+                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
+                } else {
+                    // player paused in any state
+                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+                }
 
-            /*if (playWhenReady && playbackState == Player.STATE_READY) {
-                // media actually playing
-                viewModel.setIsPlaying(true);
-            } else {
-                // player paused in any state
-                viewModel.setIsPlaying(false);
-            }*/
-
-            switch (playbackState) {
-                case Player.STATE_BUFFERING:
-                    /*Logger.e(TAG, "onPlayerStateChanged: buffering");
-                    int percentageBuffered = exoPlayer1.getBufferedPercentage();
-                    Logger.e(TAG, percentageBuffered + "");*/
-                    break;
-                case Player.STATE_ENDED:
-                    /*Logger.e(TAG, "onPlayerStateChanged: ended");*/
-                    /*if (isPlaying){
-                        viewModel.setIsPlaying(false);
-                    }*/
-                    break;
-                case Player.STATE_IDLE:
-                    /*Logger.e(TAG, "onPlayerStateChanged: idle")*/;
-                    break;
-                case Player.STATE_READY:
-                    /*Logger.e(TAG, "onPlayerStateChanged: ready");*/
-                    break;
-                default:
-                    break;
+                switch (playbackState) {
+                    case Player.STATE_BUFFERING:
+                        /*Logger.e(TAG, "onPlayerStateChanged: buffering");
+                        int percentageBuffered = exoPlayer1.getBufferedPercentage();
+                        Logger.e(TAG, percentageBuffered + "");*/
+                        break;
+                    case Player.STATE_ENDED:
+                        /*Logger.e(TAG, "onPlayerStateChanged: ended");*/
+                        /*if (isPlaying){
+                            viewModel.setIsPlaying(false);
+                        }*/
+                        break;
+                    case Player.STATE_IDLE:
+                        /*Logger.e(TAG, "onPlayerStateChanged: idle")*/;
+                        break;
+                    case Player.STATE_READY:
+                        /*Logger.e(TAG, "onPlayerStateChanged: ready");*/
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -377,13 +391,15 @@ public class MainActivity extends BaseActivity {
             Logger.e(TAG, "ExoPlayer2: duration: " + exoPlayer2.getDuration() + "currentPosition: " + exoPlayer2.getCurrentPosition());
             /*Logger.e(TAG, "onPlayerStateChanged: " + playWhenReady + ", " + playbackState);*/
 
-            /*if (playWhenReady && playbackState == Player.STATE_READY) {
-                // media actually playing
-                viewModel.setIsPlaying(true);
-            } else {
-                // player paused in any state
-                viewModel.setIsPlaying(false);
-            }*/
+            if (currentPlayer == 2) {
+                if (playWhenReady && playbackState == Player.STATE_READY) {
+                    // media actually playing
+                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
+                } else {
+                    // player paused in any state
+                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+                }
+            }
 
             switch (playbackState) {
                 case Player.STATE_BUFFERING:
@@ -428,7 +444,6 @@ public class MainActivity extends BaseActivity {
         public void onPositionDiscontinuity(int reason) {
             int latestWindowIndex = exoPlayer1.getCurrentWindowIndex();
             Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
-
             if (playlist != null && !StringUtils.isEmpty(playlist.getPlaylistName())) {
                 binding.layoutBottomSheet.textViewTitle.setText(playlist.getPlaylistName());
                 binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
@@ -436,7 +451,6 @@ public class MainActivity extends BaseActivity {
                 binding.layoutBottomSheet.textViewTitle.setText(videos.get(latestWindowIndex).getVideoName());
                 binding.layoutBottomSheet.textViewCreator.setText(videos.get(latestWindowIndex).getVideoDescription());
             }
-
             /*if (latestWindowIndex != playerPosition) {
                 // item selected in playlist has changed, handle here
                 viewModel.setPlayerPosition(latestWindowIndex);
@@ -459,7 +473,10 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onClick(View v) {
-        if (v.equals(binding.layoutBottomSheet.imageVIewClose)){
+        if (v.equals(binding.layoutBottomSheet.imageViewNext)){
+
+
+        } else if (v.equals(binding.layoutBottomSheet.imageViewClose)){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             binding.navView.setVisibility(View.VISIBLE);
             resetAllPlayers();

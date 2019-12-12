@@ -89,6 +89,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/textView_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -118,7 +119,7 @@
             android:textColor="@color/gray_text1"
             android:background="@drawable/edittext_bg"
             android:drawableTint="@color/gray_text1"
-            android:hint="0 song • 0h 0m"
+            android:text="@{model.formattedTotalPlaybackTime}"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:paddingTop="4dp"
@@ -130,15 +131,15 @@
             android:id="@+id/recyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginTop="16dp"
             android:clipToPadding="false"
             android:paddingBottom="50dp"
             android:scrollbarStyle="outsideOverlay"
             android:scrollbars="vertical"
-            android:layout_marginTop="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_duration" />
+            app:layout_constraintTop_toBottomOf="@+id/textView_songs_count" />
 
         <include
             android:id="@+id/progress_layout"

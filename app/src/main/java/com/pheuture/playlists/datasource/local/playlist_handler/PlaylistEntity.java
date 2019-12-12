@@ -9,8 +9,8 @@ import androidx.databinding.BindingAdapter;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
+import com.pheuture.playlists.utils.CalenderUtils;
 
 @Entity
 public class PlaylistEntity implements Parcelable {
@@ -23,13 +23,13 @@ public class PlaylistEntity implements Parcelable {
 	@SerializedName("created_time")
 	private long createdDate;
 
-	@SerializedName("playDuration")
+	@SerializedName("total_duration")
 	private long playDuration;
 
 	@SerializedName("playlistName")
 	private String playlistName;
 
-	@SerializedName("songsCount")
+	@SerializedName("total_songs")
 	private int songsCount;
 
 	public PlaylistEntity() {
@@ -116,5 +116,9 @@ public class PlaylistEntity implements Parcelable {
 		} else {
 			view.setVisibility(View.VISIBLE);
 		}
+	}
+
+	public String getFormattedTotalPlaybackTime(){
+		return CalenderUtils.getFormattedTimeDuration(playDuration);
 	}
 }

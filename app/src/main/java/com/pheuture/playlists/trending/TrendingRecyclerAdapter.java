@@ -29,6 +29,7 @@ import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -118,8 +119,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     void setData(List<VideoEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList),
                 true);
-        oldList = newList;
-
+        oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
     }
 

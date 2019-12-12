@@ -20,5 +20,6 @@
     <color name="BlackC">#303030</color>
     <color name="BlackB">#404040</color>
     <color name="BlackA">#505050</color>
+    <color name="red">#D50000</color>
 
 </resources>
