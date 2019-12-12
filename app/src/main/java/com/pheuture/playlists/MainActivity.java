@@ -58,6 +58,8 @@ public class MainActivity extends BaseActivity {
     private static int currentPlayer;
     private static int currentMediaPosition;
     private Handler handler = new Handler();
+    long totalDurationOfCurrentMedia = 0;
+    long currentDurationOfCurrentMedia = 0;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -128,9 +130,20 @@ public class MainActivity extends BaseActivity {
                     playerView.setPlayer(exoPlayer1);
                     currentPlayer = 1;
 
+                    //set progress
+                    totalDurationOfCurrentMedia = exoPlayer1.getDuration();
+                    currentDurationOfCurrentMedia = exoPlayer1.getCurrentPosition();
+                    binding.layoutBottomSheet.progressBar.setProgress(0);
+
+                    //if more media available to play
+                    if ((mediaSources.size()-1)> currentMediaPosition) {
+                        binding.layoutBottomSheet.imageViewNext.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.layoutBottomSheet.imageViewNext.setVisibility(View.GONE);
+                    }
+
                     binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer.setVisibility(View.VISIBLE);
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                    binding.layoutBottomSheet.progressBar.setProgress(0);
 
                     if (playlist != null && !StringUtils.isEmpty(playlist.getPlaylistName())) {
                         binding.layoutBottomSheet.textViewTitle.setText(playlist.getPlaylistName());
@@ -150,9 +163,6 @@ public class MainActivity extends BaseActivity {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            long totalDurationOfCurrentMedia = 0;
-            long currentDurationOfCurrentMedia = 0;
-
             try {
                 if (currentPlayer == 1) {
                     totalDurationOfCurrentMedia = exoPlayer1.getDuration();
@@ -175,6 +185,10 @@ public class MainActivity extends BaseActivity {
                                         playerView.setPlayer(exoPlayer2);
                                         currentPlayer = 2;
 
+                                        //get progress
+                                        totalDurationOfCurrentMedia = exoPlayer1.getDuration();
+                                        currentDurationOfCurrentMedia = exoPlayer1.getCurrentPosition();
+
                                         Runnable runnable = new Runnable() {
                                             @Override
                                             public void run() {
@@ -188,7 +202,6 @@ public class MainActivity extends BaseActivity {
                                     }
                                 }
                             });
-
                         }
                     }
                 } else if (currentPlayer == 2) {
@@ -212,6 +225,10 @@ public class MainActivity extends BaseActivity {
                                         playerView.setPlayer(exoPlayer1);
                                         currentPlayer = 1;
 
+                                        //get progress
+                                        totalDurationOfCurrentMedia = exoPlayer2.getDuration();
+                                        currentDurationOfCurrentMedia = exoPlayer2.getCurrentPosition();
+
                                         Runnable runnable = new Runnable() {
                                             @Override
                                             public void run() {
@@ -229,10 +246,17 @@ public class MainActivity extends BaseActivity {
                     }
                 }
 
-                //update progress bar
+                //update progress
                 binding.layoutBottomSheet.progressBar.setProgress(calculatePercentage(totalDurationOfCurrentMedia, currentDurationOfCurrentMedia));
             } catch (Exception e) {
                 Logger.e(TAG, e.toString());
+            }
+
+            //if more media available to play
+            if ((mediaSources.size()-1)> currentMediaPosition) {
+                binding.layoutBottomSheet.imageViewNext.setVisibility(View.VISIBLE);
+            } else {
+                binding.layoutBottomSheet.imageViewNext.setVisibility(View.GONE);
             }
 
             //if more media available to play or current media playback time is remaining
@@ -473,9 +497,101 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onClick(View v) {
-        if (v.equals(binding.layoutBottomSheet.imageViewNext)){
+        if (v.equals(binding.layoutBottomSheet.imageViewTogglePlay)){
+            if (currentPlayer == 1){
+                if (exoPlayer1.getPlayWhenReady()) {
+                    // media actually playing, so stop it
+                    exoPlayer1.setPlayWhenReady(false);
+                } else {
+                    // player paused in any state
+                    exoPlayer1.setPlayWhenReady(true);
+                }
+            } else if (currentPlayer == 2){
+                if (exoPlayer2.getPlayWhenReady()) {
+                    // media actually playing, so stop it
+                    exoPlayer2.setPlayWhenReady(false);
+                } else {
+                    // player paused in any state
+                    exoPlayer2.setPlayWhenReady(true);
+                }
+            }
 
+        } else if (v.equals(binding.layoutBottomSheet.imageViewNext)){
+            //if more media available to play
+            if ((mediaSources.size()-1)> currentMediaPosition){
 
+                if (currentPlayer == 1){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                float oldVolume = exoPlayer1.getVolume();
+                                float newVolume = (oldVolume>0) ? oldVolume/2 : 0;
+
+                                exoPlayer2.setVolume(newVolume);
+                                exoPlayer2.prepare(mediaSources.get(++currentMediaPosition));
+                                exoPlayer2.setPlayWhenReady(true);
+                                playerView.setPlayer(exoPlayer2);
+                                currentPlayer = 2;
+
+                                totalDurationOfCurrentMedia = exoPlayer2.getDuration();
+                                currentDurationOfCurrentMedia = exoPlayer2.getCurrentPosition();
+
+                                Runnable runnable = new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        exoPlayer2.setVolume(oldVolume);
+                                        exoPlayer1.setPlayWhenReady(false);
+                                    }
+                                };
+                                new Handler().postDelayed(runnable, 1000);
+                            } catch (Exception e) {
+                                Logger.e(TAG, e.toString());
+                            }
+                        }
+                    });
+                } else  if (currentPlayer == 2) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                float oldVolume = exoPlayer2.getVolume();
+                                float newVolume = (oldVolume>0) ? oldVolume/2 : 0;
+
+                                exoPlayer1.setVolume(newVolume);
+                                exoPlayer1.prepare(mediaSources.get(++currentMediaPosition));
+                                exoPlayer1.setPlayWhenReady(true);
+                                playerView.setPlayer(exoPlayer1);
+                                currentPlayer = 1;
+
+                                totalDurationOfCurrentMedia = exoPlayer1.getDuration();
+                                currentDurationOfCurrentMedia = exoPlayer1.getCurrentPosition();
+
+                                Runnable runnable = new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        exoPlayer1.setVolume(oldVolume);
+                                        exoPlayer2.setPlayWhenReady(false);
+                                    }
+                                };
+                                new Handler().postDelayed(runnable, 1000);
+                            } catch (Exception e) {
+                                Logger.e(TAG, e.toString());
+                            }
+                        }
+                    });
+                }
+
+                //update progress bar
+                binding.layoutBottomSheet.progressBar.setProgress(calculatePercentage(totalDurationOfCurrentMedia, currentDurationOfCurrentMedia));
+            }
+
+            //if more media available to play
+            if ((mediaSources.size()-1)> currentMediaPosition) {
+                binding.layoutBottomSheet.imageViewNext.setVisibility(View.VISIBLE);
+            } else {
+                binding.layoutBottomSheet.imageViewNext.setVisibility(View.GONE);
+            }
         } else if (v.equals(binding.layoutBottomSheet.imageViewClose)){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             binding.navView.setVisibility(View.VISIBLE);
