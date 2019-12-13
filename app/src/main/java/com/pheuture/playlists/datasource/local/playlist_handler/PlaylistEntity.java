@@ -30,7 +30,7 @@ public class PlaylistEntity implements Parcelable {
 	private String playlistName;
 
 	@SerializedName("total_songs")
-	private int songsCount;
+	private long songsCount;
 
 	public PlaylistEntity() {
 	}
@@ -49,7 +49,7 @@ public class PlaylistEntity implements Parcelable {
 		dest.writeLong(createdDate);
 		dest.writeLong(playDuration);
 		dest.writeString(playlistName);
-		dest.writeInt(songsCount);
+		dest.writeLong(songsCount);
 	}
 
 	@Override
@@ -101,11 +101,11 @@ public class PlaylistEntity implements Parcelable {
 		this.playlistName = playlistName;
 	}
 
-	public int getSongsCount() {
+	public long getSongsCount() {
 		return songsCount;
 	}
 
-	public void setSongsCount(int songsCount) {
+	public void setSongsCount(long songsCount) {
 		this.songsCount = songsCount;
 	}
 
@@ -118,7 +118,7 @@ public class PlaylistEntity implements Parcelable {
 		}
 	}
 
-	public String getFormattedTotalPlaybackTime(){
-		return CalenderUtils.getFormattedTimeDuration(playDuration);
+	public String getSongsCountWithFormattedTotalPlaybackTime(){
+		return songsCount + " song \u2022 " + CalenderUtils.getFormattedTimeDuration(playDuration);
 	}
 }

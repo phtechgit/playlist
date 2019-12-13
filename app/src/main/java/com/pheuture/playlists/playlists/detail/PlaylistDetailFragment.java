@@ -53,7 +53,13 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
     @Override
     public void initializations() {
-        binding.setModel(playlist);
+        viewModel.getPlaylistEntity().observe(this, new Observer<PlaylistEntity>() {
+            @Override
+            public void onChanged(PlaylistEntity playlistEntity) {
+                playlist = playlistEntity;
+                binding.setModel(playlistEntity);
+            }
+        });
 
         layoutManager = new LinearLayoutManager(activity);
         recyclerAdapter = new PlaylistVideosRecyclerAdapter(this);
@@ -79,6 +85,8 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
                     binding.imageButtonPlay.setVisibility(View.GONE);
                     binding.imageButtonShuffle.setVisibility(View.GONE);
                 }
+
+                viewModel.addToOfflineMedia(videos);
             }
         });
 

@@ -53,8 +53,8 @@ public class VideosFragment extends BaseFragment implements TextWatcher, Recycle
 
     @Override
     public void initializations() {
-        binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
-        binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());
+        /*binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
+        binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());*/
 
         recyclerAdapter = new VideosRecyclerAdapter(this);
         layoutManager = new LinearLayoutManager(activity);

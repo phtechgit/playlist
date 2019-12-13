@@ -49,8 +49,8 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
 
     @Override
     public void initializations() {
-        binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
-        binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());
+        /*binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
+        binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());*/
 
         recyclerAdapter = new TrendingRecyclerAdapter(this);
         layoutManager = new LinearLayoutManager(activity);

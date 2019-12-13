@@ -31,6 +31,7 @@ import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.playlists.detail.PlaylistDetailFragment;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.KeyboardUtils;
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.SimpleDividerItemDecoration;
 
 import java.util.List;
@@ -58,8 +59,8 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
 
     @Override
     public void initializations() {
-        binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
-        binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());
+        /*binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
+        binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());*/
 
         recyclerAdapter = new PlaylistsRecyclerAdapter(this);
         layoutManager = new LinearLayoutManager(activity);
