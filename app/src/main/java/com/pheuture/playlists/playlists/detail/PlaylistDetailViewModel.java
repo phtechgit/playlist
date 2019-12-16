@@ -2,6 +2,7 @@ package com.pheuture.playlists.playlists.detail;
 
 import android.app.Application;
 import android.app.DownloadManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 
@@ -38,8 +39,10 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -235,11 +238,11 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                 //add media to *download manager*
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(offlineVideoEntity.getVideoUrl()))
                         .setTitle(offlineVideoEntity.getVideoName())// Title of the Download Notification
-                        .setDescription(offlineVideoEntity.getId() + ".mp4")// Description of the Download Notification
+                        .setDescription(offlineVideoEntity.getVideoDescription())// Description of the Download Notification
                         .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)// Visibility of the download Notification
                         .setDestinationUri(Uri.fromFile(new File(offlineVideoEntity.getDownloadedFilePath())))// Uri of the destination file
                         .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
-                        .setAllowedOverRoaming(false);// Set if download is allowed on roaming network
+                        .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
                 long downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
 
@@ -251,7 +254,8 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
 
     private File getFile(OfflineVideoEntity offlineVideoEntity) {
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                offlineVideoEntity.getId() + ".mp4");
+                offlineVideoEntity.getVideoName());
+
         if (!file.exists()){
             try {
                 if (!file.createNewFile()){
@@ -259,6 +263,13 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        } else {
+            try {
+                file.delete();
+                file.createNewFile();
+            } catch (Exception e) {
+                Logger.e(TAG, e.toString());
             }
         }
         return file;

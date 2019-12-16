@@ -34,4 +34,7 @@ public interface OfflineVideoDao {
 
     @Query("update OfflineVideoEntity set downloadStatus=:downloadStatus where downloadID =:downloadId")
     void updateOfflineVideoStatus(long downloadId, int downloadStatus);
+
+    @Query("update OfflineVideoEntity set downloadedFilePath=:downloadedFilePath, downloadStatus=:downloadStatus where downloadID =:downloadId")
+    void updateOfflineVideoStatus(long downloadId, String downloadedFilePath, int downloadStatus);
 }

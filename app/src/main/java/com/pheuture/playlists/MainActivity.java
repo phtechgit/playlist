@@ -188,17 +188,9 @@ public class MainActivity extends BaseActivity {
             Logger.e(TAG, "media loading Online from: " + mediaUri);
         }
 
-        int contentType = Util.inferContentType(mediaUri);
         MediaSource mediaSource;
-
-
-        Uri playingSuccess =  Uri.parse("file:///storage/emulated/0/Download/1-1.mp4");
-        Logger.e(TAG, "playing success: " + playingSuccess);
-        Uri playingError = mediaUri;
-
-
         mediaSource = new ProgressiveMediaSource.Factory(viewModel.getDataSourceFactory())
-                .createMediaSource(playingError);
+                .createMediaSource(mediaUri);
         exoPlayer.prepare(mediaSource);
     }
 
@@ -660,7 +652,7 @@ public class MainActivity extends BaseActivity {
         exoPlayer2.release();
     }
 
-    BottomSheetCallback  bottomSheetCallback = new BottomSheetCallback() {
+    private BottomSheetCallback  bottomSheetCallback = new BottomSheetCallback() {
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
             Logger.e(TAG, "onStateChanged: " + newState);
