@@ -29,7 +29,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layout_search_bar"
-            tools:listitem="@layout/item_video"/>
+            tools:listitem="@layout/item_media"/>
 
         <include
             android:id="@+id/progress_layout"

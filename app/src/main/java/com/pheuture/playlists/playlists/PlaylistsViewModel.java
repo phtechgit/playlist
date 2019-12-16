@@ -70,7 +70,9 @@ public class PlaylistsViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    PlaylistEntity playlistEntity = ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), PlaylistEntity.class);
+                    PlaylistEntity playlistEntity = ParserUtil.getInstance()
+                            .fromJson(responseJsonObject.optString(ApiConstant.DATA),
+                                    PlaylistEntity.class);
 
                     //insert newly created playlist in db
                     playlistDao.insert(playlistEntity);
@@ -147,7 +149,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
 
                     if (list.size()>0){
                         PlaylistEntity videoEntity = list.get(list.size() - 1);
-                        lastID = videoEntity.getId();
+                        lastID = videoEntity.getPlaylistID();
 
                         if (list.size()<limit) {
                             reachedLast.postValue(true);
@@ -218,7 +220,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
 
                     if (list.size()>0){
                         PlaylistEntity videoEntity = list.get(list.size() - 1);
-                        lastID = videoEntity.getId();
+                        lastID = videoEntity.getPlaylistID();
 
                         if (list.size()<limit) {
                             reachedLast.postValue(true);

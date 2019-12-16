@@ -1,4 +1,4 @@
-package com.pheuture.playlists;
+package com.pheuture.playlists.service;
 
 import android.app.DownloadManager;
 import android.app.IntentService;
@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.Context;
 
 import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineVideoDao;
+import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaDao;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 
@@ -20,7 +20,7 @@ public class FileMoveIntentService extends IntentService {
     private static final String ACTION_MOVE = "com.pheuture.playlists.action.MOVE";
     private static final String ACTION_COPY = "com.pheuture.playlists.action.COPY";
     private static final String TAG = FileMoveIntentService.class.getSimpleName();
-    private OfflineVideoDao offlineVideoDao;
+    private OfflineMediaDao offlineMediaDao;
 
     public FileMoveIntentService() {
         super("FileMoveIntentService");
@@ -29,7 +29,7 @@ public class FileMoveIntentService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        offlineVideoDao = LocalRepository.getInstance(this).offlineVideoDao();
+        offlineMediaDao = LocalRepository.getInstance(this).offlineVideoDao();
     }
 
     public static void startActionMove(Context context, long downloadID, String source) {
@@ -93,7 +93,7 @@ public class FileMoveIntentService extends IntentService {
             out.close();
 
             //update file path in room db
-            offlineVideoDao.updateOfflineVideoStatus(downloadId, destinationFile.getAbsolutePath(), DownloadManager.STATUS_SUCCESSFUL);
+            offlineMediaDao.updateOfflineVideoStatus(downloadId, destinationFile.getAbsolutePath(), DownloadManager.STATUS_SUCCESSFUL);
 
             //delete external storage downloaded file
             File sourceFile = new File(source);

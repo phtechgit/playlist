@@ -19,9 +19,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentTrendingsBinding;
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
+import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
+import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.utils.ParserUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,9 +60,9 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);
 
-        viewModel.getVideosLive().observe(this, new Observer<List<VideoEntity>>() {
+        viewModel.getVideosLive().observe(this, new Observer<List<MediaEntity>>() {
             @Override
-            public void onChanged(List<VideoEntity> videoEntities) {
+            public void onChanged(List<MediaEntity> videoEntities) {
                 recyclerAdapter.setData(videoEntities);
             }
         });
@@ -75,11 +77,11 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
         viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean show) {
-                if(show){
+                /*if(show){
                     showProgress(binding.progressLayout.progressFullscreen, true);
                 } else {
                     hideProgress(binding.progressLayout.progressFullscreen);
-                }
+                }*/
             }
         });
     }
@@ -131,13 +133,17 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
 
     @Override
     public void onRecyclerViewItemClick(Bundle bundle) {
-        int position = bundle.getInt(ARG_PARAM1, -1);
-        VideoEntity video = bundle.getParcelable(ARG_PARAM2);
+        MediaEntity mediaEntity = bundle.getParcelable(ARG_PARAM2);
 
-        List<VideoEntity> videos = new ArrayList<VideoEntity>();
-        videos.add(video);
+        String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity,
+                MediaEntity.class);
+        PlaylistMediaEntity playlistMediaEntity = ParserUtil.getInstance()
+                .fromJson(objectJsonString, PlaylistMediaEntity.class);
 
-        ((MainActivity) activity).setMedia(null, videos);
+        List<PlaylistMediaEntity> mediaEntities = new ArrayList<>();
+        mediaEntities.add(playlistMediaEntity);
+
+        ((MainActivity) activity).setMedia(null, mediaEntities);
     }
 
     @Override

@@ -18,7 +18,7 @@ public class PlaylistEntity implements Parcelable {
 	@NonNull
 	@PrimaryKey
 	@SerializedName("id")
-	private long id;
+	private long playlistID;
 
 	@SerializedName("created_time")
 	private long createdDate;
@@ -36,7 +36,7 @@ public class PlaylistEntity implements Parcelable {
 	}
 
 	protected PlaylistEntity(Parcel in) {
-		id = in.readLong();
+		playlistID = in.readLong();
 		createdDate = in.readLong();
 		playDuration = in.readLong();
 		playlistName = in.readString();
@@ -45,7 +45,7 @@ public class PlaylistEntity implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeLong(id);
+		dest.writeLong(playlistID);
 		dest.writeLong(createdDate);
 		dest.writeLong(playDuration);
 		dest.writeString(playlistName);
@@ -69,12 +69,12 @@ public class PlaylistEntity implements Parcelable {
 		}
 	};
 
-	public long getId() {
-		return id;
+	public long getPlaylistID() {
+		return playlistID;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public void setPlaylistID(long playlistID) {
+		this.playlistID = playlistID;
 	}
 
 	public long getCreatedDate() {

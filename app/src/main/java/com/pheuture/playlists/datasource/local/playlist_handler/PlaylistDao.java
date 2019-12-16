@@ -1,13 +1,10 @@
 package com.pheuture.playlists.datasource.local.playlist_handler;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 
 import java.util.List;
 
@@ -28,7 +25,7 @@ public interface PlaylistDao {
     @Query("select * from PlaylistEntity order by createdDate desc")
     LiveData<List<PlaylistEntity>> getPlaylistsLive();
 
-    @Query("select * from PlaylistEntity where id=:playlistID")
+    @Query("select * from PlaylistEntity where playlistID=:playlistID")
     LiveData<PlaylistEntity> getPlaylist(long playlistID);
 
     @Query("delete from PlaylistEntity")

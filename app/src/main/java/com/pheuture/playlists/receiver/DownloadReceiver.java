@@ -1,4 +1,4 @@
-package com.pheuture.playlists;
+package com.pheuture.playlists.receiver;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -7,22 +7,22 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.pheuture.playlists.service.FileMoveIntentService;
 import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineVideoDao;
-import com.pheuture.playlists.utils.Logger;
+import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaDao;
+
 import java.io.File;
-import java.io.IOException;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
 
 public class DownloadReceiver extends BroadcastReceiver {
     private static final String TAG = DownloadReceiver.class.getSimpleName();
-    private OfflineVideoDao offlineVideoDao;
+    private OfflineMediaDao offlineMediaDao;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);
-        offlineVideoDao = LocalRepository.getInstance(context).offlineVideoDao();
+        offlineMediaDao = LocalRepository.getInstance(context).offlineVideoDao();
 
         long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
         if (downloadId>-1){
@@ -38,7 +38,7 @@ public class DownloadReceiver extends BroadcastReceiver {
                     String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
 
                     if (statusOfTheDownload != DownloadManager.STATUS_SUCCESSFUL) {
-                        offlineVideoDao.updateOfflineVideoStatus(downloadId, new File(uriString).getPath(), statusOfTheDownload);
+                        offlineMediaDao.updateOfflineVideoStatus(downloadId, new File(uriString).getPath(), statusOfTheDownload);
                     } else {
                         Uri sourceFileUri = Uri.parse(uriString);
                         FileMoveIntentService.startActionMove(context, downloadId, sourceFileUri.getPath());

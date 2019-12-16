@@ -2,7 +2,6 @@ package com.pheuture.playlists.playlists.detail;
 
 import android.app.Application;
 import android.app.DownloadManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 
@@ -26,9 +25,11 @@ import com.google.android.exoplayer2.util.Util;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineVideoDao;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineVideoEntity;
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
+import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
+import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
+import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaDao;
+import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaEntity;
+import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
@@ -38,11 +39,7 @@ import com.pheuture.playlists.utils.VolleyClient;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,36 +53,38 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     private MutableLiveData<String> searchQuery;
     private MutableLiveData<Boolean> reachedLast;
     private MutableLiveData<Boolean> showProgress;
-    private MutableLiveData<List<VideoEntity>> videos;
+    private LiveData<List<PlaylistMediaEntity>> playlistMediaLive;
     private SimpleExoPlayer exoPlayer;
     private PlayerView playerView;
     private MutableLiveData<Boolean> isPlaying;
     private MutableLiveData<Integer> playerPosition;
     private DataSource.Factory dataSourceFactory;
-    private PlaylistDao playlistDao;
     private long playlistID;
     private LiveData<PlaylistEntity> playlistEntity;
-    private OfflineVideoDao offlineVideoDao;
-    private LiveData<List<OfflineVideoEntity>> offlineVideoEntities;
+    private PlaylistDao playlistDao;
+    private PlaylistMediaDao playlistMediaDao;
+    private OfflineMediaDao offlineMediaDao;
+    private LiveData<List<OfflineMediaEntity>> offlineVideoEntities;
     private DownloadManager downloadManager;
 
     public PlaylistDetailViewModel(@NonNull Application application, PlaylistEntity model) {
         super(application);
-        this.playlistID = model.getId();
+        this.playlistID = model.getPlaylistID();
 
         limit = 20;
         playlistDao = LocalRepository.getInstance(application).playlistDao();
-        offlineVideoDao = LocalRepository.getInstance(application).offlineVideoDao();
+        playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
+        offlineMediaDao = LocalRepository.getInstance(application).offlineVideoDao();
 
         playlistEntity = playlistDao.getPlaylist(playlistID);
-        offlineVideoEntities = offlineVideoDao.getOfflineVideos();
+        offlineVideoEntities = offlineMediaDao.getOfflineVideos();
 
         reachedLast = new MutableLiveData<>(false);
         searchQuery = new MutableLiveData<>("");
         showProgress = new MutableLiveData<>(true);
         isPlaying = new MutableLiveData<>(false);
         playerPosition = new MutableLiveData<>(RecyclerView.NO_POSITION);
-        videos = new MutableLiveData<>();
+        playlistMediaLive = playlistMediaDao.getPlaylistMediaLive(playlistID);
 
         downloadManager = (DownloadManager) application.getSystemService(DOWNLOAD_SERVICE);
         dataSourceFactory = new DefaultDataSourceFactory(application, Util.getUserAgent(application, TAG));
@@ -93,10 +92,12 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         playerView = new PlayerView(application);
         playerView.setUseController(false);
         playerView.setPlayer(exoPlayer);
+
+        getFreshData();
     }
 
-    public LiveData<List<VideoEntity>> getVideosLive() {
-        return videos;
+    public LiveData<List<PlaylistMediaEntity>> getPlaylistMediaLive() {
+        return playlistMediaLive;
     }
 
     public void getFreshData() {
@@ -120,22 +121,25 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    List<VideoEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), VideoEntity[].class));
-
                     long songsCount = responseJsonObject.optLong("total_songs", 0);
                     long playbackDuration = responseJsonObject.optLong("total_duration", 0);
 
                     //update playlist entity
                     PlaylistEntity newPlaylistEntity = playlistEntity.getValue();
+                    assert newPlaylistEntity != null;
                     newPlaylistEntity.setPlayDuration(playbackDuration);
                     newPlaylistEntity.setSongsCount(songsCount);
                     playlistDao.insert(newPlaylistEntity);
 
-                    videos.postValue(list);
+                    List<PlaylistMediaEntity> list = Arrays.asList(ParserUtil.getInstance()
+                            .fromJson(responseJsonObject.optString(ApiConstant.DATA),
+                                    PlaylistMediaEntity[].class));
+
+                    updateDbPlaylistMedia(list);
 
                     if (list.size()>0){
-                        VideoEntity videoEntity = list.get(list.size() - 1);
-                        lastID = videoEntity.getId();
+                        PlaylistMediaEntity mediaEntity = list.get(list.size() - 1);
+                        lastID = mediaEntity.getMediaID();
 
                         if (list.size()<limit) {
                             reachedLast.postValue(true);
@@ -182,6 +186,21 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }
 
+    private void updateDbPlaylistMedia(List<PlaylistMediaEntity> list) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i=0; i<list.size(); i++){
+                    PlaylistMediaEntity model = list.get(i);
+                    if (playlistMediaDao.getPlaylistMedia(model.getPlaylistID(), model.getMediaID()) == null) {
+                        playlistMediaDao.insert(model);
+                    }
+                }
+            }
+        });
+        thread.start();
+    }
+
     public MutableLiveData<Boolean> getProgressStatus() {
         return showProgress;
     }
@@ -190,48 +209,24 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         showProgress.postValue(b);
     }
 
-    public MutableLiveData<Boolean> isPlayling() {
-        return isPlaying;
-    }
-
-    public void setIsPlaying(boolean b) {
-        isPlaying.postValue(b);
-    }
-
-    public DataSource.Factory getDataSourceFactory() {
-        return dataSourceFactory;
-    }
-
-    public MutableLiveData<Integer> getPlayerPosition() {
-        return playerPosition;
-    }
-
-    public void setPlayerPosition(int newPlayerPosition) {
-        playerPosition.setValue(newPlayerPosition);
-    }
-
     public LiveData<PlaylistEntity> getPlaylistEntity() {
         return playlistEntity;
     }
 
-    public synchronized void addToOfflineMedia(List<VideoEntity> videoEntities) {
-        List<OfflineVideoEntity> mediaToDownloadList = new ArrayList<>();
-
-        List<OfflineVideoEntity> offlineVideos = offlineVideoEntities.getValue();
-        //filter media which needs to be downloaded
+    public synchronized void addToOfflineMedia(List<PlaylistMediaEntity> videoEntities) {
         for (int i = 0; i< videoEntities.size(); i++){
-            VideoEntity videoEntity = videoEntities.get(i);
+            PlaylistMediaEntity mediaEntity = videoEntities.get(i);
 
-            if (mediaNotAlreadyDownloadedOrInDownloadQueue(videoEntity.getId())){
-                OfflineVideoEntity offlineVideoEntity = new OfflineVideoEntity();
+            if (mediaNotAlreadyDownloadedOrInDownloadQueue(mediaEntity.getMediaID())){
+                OfflineMediaEntity offlineVideoEntity = new OfflineMediaEntity();
 
-                offlineVideoEntity.setId(videoEntity.getId());
-                offlineVideoEntity.setVideoName(videoEntity.getVideoName());
-                offlineVideoEntity.setVideoDescription(videoEntity.getVideoDescription());
-                offlineVideoEntity.setVideoThumbnail(videoEntity.getVideoThumbnail());
-                offlineVideoEntity.setVideoUrl(videoEntity.getVideoUrl());
-                offlineVideoEntity.setPostDate(videoEntity.getPostDate());
-                offlineVideoEntity.setStatus(videoEntity.getStatus());
+                offlineVideoEntity.setMediaID(mediaEntity.getMediaID());
+                offlineVideoEntity.setVideoName(mediaEntity.getVideoName());
+                offlineVideoEntity.setVideoDescription(mediaEntity.getVideoDescription());
+                offlineVideoEntity.setVideoThumbnail(mediaEntity.getVideoThumbnail());
+                offlineVideoEntity.setVideoUrl(mediaEntity.getVideoUrl());
+                offlineVideoEntity.setPostDate(mediaEntity.getPostDate());
+                offlineVideoEntity.setStatus(mediaEntity.getStatus());
                 offlineVideoEntity.setDownloadedFilePath(getFile(offlineVideoEntity).getPath());
                 offlineVideoEntity.setDownloadStatus(DownloadManager.STATUS_PENDING);
 
@@ -247,12 +242,12 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                 long downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
 
                 offlineVideoEntity.setDownloadID(downloadID);
-                offlineVideoDao.insert(offlineVideoEntity);
+                offlineMediaDao.insert(offlineVideoEntity);
             }
         }
     }
 
-    private File getFile(OfflineVideoEntity offlineVideoEntity) {
+    private File getFile(OfflineMediaEntity offlineVideoEntity) {
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                 offlineVideoEntity.getVideoName());
 
@@ -276,10 +271,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     }
 
     private boolean mediaNotAlreadyDownloadedOrInDownloadQueue(long id) {
-        OfflineVideoEntity offlineVideoEntity = offlineVideoDao.getOfflineMedia(id);
-        if (offlineVideoEntity==null){
-            return true;
-        }
-        return false;
+        OfflineMediaEntity offlineVideoEntity = offlineMediaDao.getOfflineMedia(id);
+        return offlineVideoEntity == null;
     }
 }

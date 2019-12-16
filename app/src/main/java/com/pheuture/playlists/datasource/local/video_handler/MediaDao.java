@@ -13,17 +13,17 @@ import java.util.List;
  */
 
 @Dao
-public interface VideoDao {
+public interface MediaDao {
 
     @Insert
-    long insert(VideoEntity video);
+    long insert(MediaEntity video);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(List<VideoEntity> videoEntities);
+    void insertAll(List<MediaEntity> mediaEntities);
 
-    @Query("select * from VideoEntity")
-    LiveData<List<VideoEntity>> getVideosLive();
+    @Query("select * from MediaEntity")
+    LiveData<List<MediaEntity>> getAllMediaLive();
 
-    @Query("delete from VideoEntity")
+    @Query("delete from MediaEntity")
     void deleteAll();
 }

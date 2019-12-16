@@ -1,50 +1,32 @@
-package com.pheuture.playlists.videos;
+package com.pheuture.playlists.media;
 
 import android.content.Context;
-import android.media.ThumbnailUtils;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ClippingMediaSource;
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
-import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.databinding.ItemVideoBinding;
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
+import com.pheuture.playlists.databinding.ItemMediaBinding;
+import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.Constants;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private static final String TAG = VideosRecyclerAdapter.class.getSimpleName();
+public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private static final String TAG = MediaRecyclerAdapter.class.getSimpleName();
     private Context mContext;
-    private List<VideoEntity> oldList;
+    private List<MediaEntity> oldList;
     private RecyclerViewInterface recyclerViewInterface;
 
-    VideosRecyclerAdapter(VideosFragment context) {
+    MediaRecyclerAdapter(MediaFragment context) {
         this.mContext = context.getContext();
         this.recyclerViewInterface = context;
     }
@@ -53,18 +35,20 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new MyViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
-                R.layout.item_video, parent, false));
+                R.layout.item_media, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder recyclerHOlder, int position) {
         MyViewHolder holder = (MyViewHolder) recyclerHOlder;
 
-        VideoEntity model = oldList.get(position);
-        holder.binding.setModel(model);
+        MediaEntity model = oldList.get(position);
+        holder.binding.setMediaTitle(model.getVideoName());
+        holder.binding.setMediaDescription(model.getVideoDescription());
+        holder.binding.setMediaThumbnail(model.getVideoThumbnail());
     }
 
-    void setData(List<VideoEntity> newList) {
+    void setData(List<MediaEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList),
                 true);
         oldList = new ArrayList<>(newList);
@@ -72,10 +56,10 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     class DiffCallBack extends DiffUtil.Callback{
-        private List<VideoEntity> oldList;
-        private List<VideoEntity> newList;
+        private List<MediaEntity> oldList;
+        private List<MediaEntity> newList;
 
-        public DiffCallBack(List<VideoEntity> oldList, List<VideoEntity> newList) {
+        public DiffCallBack(List<MediaEntity> oldList, List<MediaEntity> newList) {
             this.oldList = oldList;
             this.newList = newList;
         }
@@ -92,13 +76,13 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).getId() == newList.get(newItemPosition).getId();
+            return oldList.get(oldItemPosition).getMediaID() == newList.get(newItemPosition).getMediaID();
         }
 
         @Override
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            VideoEntity oldModel = oldList.get(oldItemPosition);
-            VideoEntity newModel = newList.get(newItemPosition);
+            MediaEntity oldModel = oldList.get(oldItemPosition);
+            MediaEntity newModel = newList.get(newItemPosition);
 
             if (contentsDifferent(oldModel.getVideoName(), newModel.getVideoName())){
                 return false;
@@ -133,9 +117,9 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        private ItemVideoBinding binding;
+        private ItemMediaBinding binding;
 
-        MyViewHolder(@NonNull ItemVideoBinding binding) {
+        MyViewHolder(@NonNull ItemMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
 

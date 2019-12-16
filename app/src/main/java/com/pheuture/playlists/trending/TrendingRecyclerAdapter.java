@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -17,15 +16,13 @@ import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.databinding.ItemVideoBinding;
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
+import com.pheuture.playlists.databinding.ItemMediaBinding;
+import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.Constants;
 
@@ -35,7 +32,7 @@ import java.util.List;
 public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = TrendingRecyclerAdapter.class.getSimpleName();
     private Context mContext;
-    private List<VideoEntity> oldList;
+    private List<MediaEntity> oldList;
     private RecyclerViewInterface recyclerViewInterface;
     private SimpleExoPlayer exoPlayer;
     private DataSource.Factory dataSourceFactory;
@@ -62,15 +59,17 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new MyViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
-                R.layout.item_video, parent, false));
+                R.layout.item_media, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder recyclerHOlder, int position) {
         MyViewHolder holder = (MyViewHolder) recyclerHOlder;
 
-        VideoEntity model = oldList.get(position);
-        holder.binding.setModel(model);
+        MediaEntity model = oldList.get(position);
+        holder.binding.setMediaTitle(model.getVideoName());
+        holder.binding.setMediaDescription(model.getVideoDescription());
+        holder.binding.setMediaThumbnail(model.getVideoThumbnail());
 
         if (playerPosition == position){
             //add player to the frameLayout of current position
@@ -82,7 +81,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private void removeVideoPlayer(ItemVideoBinding binding, int position) {
+    private void removeVideoPlayer(ItemMediaBinding binding, int position) {
         /*binding.frameLayout.removeAllViews();*/
         ViewGroup parent = (ViewGroup) playerView.getParent();
         if (parent != null) {
@@ -95,7 +94,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         binding.imageViewThumbnail.setVisibility(View.VISIBLE);
     }
 
-    private void setVideo(ItemVideoBinding binding, VideoEntity model) {
+    private void setVideo(ItemMediaBinding binding, MediaEntity model) {
         MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(Uri.parse(model.getVideoUrl()));
 
@@ -116,7 +115,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         binding.imageViewThumbnail.setVisibility(View.GONE);
     }
 
-    void setData(List<VideoEntity> newList) {
+    void setData(List<MediaEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList),
                 true);
         oldList = new ArrayList<>(newList);
@@ -124,10 +123,10 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     class DiffCallBack extends DiffUtil.Callback{
-        private List<VideoEntity> oldList;
-        private List<VideoEntity> newList;
+        private List<MediaEntity> oldList;
+        private List<MediaEntity> newList;
 
-        public DiffCallBack(List<VideoEntity> oldList, List<VideoEntity> newList) {
+        public DiffCallBack(List<MediaEntity> oldList, List<MediaEntity> newList) {
             this.oldList = oldList;
             this.newList = newList;
         }
@@ -144,13 +143,13 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).getId() == newList.get(newItemPosition).getId();
+            return oldList.get(oldItemPosition).getMediaID() == newList.get(newItemPosition).getMediaID();
         }
 
         @Override
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            VideoEntity oldModel = oldList.get(oldItemPosition);
-            VideoEntity newModel = newList.get(newItemPosition);
+            MediaEntity oldModel = oldList.get(oldItemPosition);
+            MediaEntity newModel = newList.get(newItemPosition);
 
             if (contentsDifferent(oldModel.getVideoName(), newModel.getVideoName())){
                 return false;
@@ -185,9 +184,9 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        private ItemVideoBinding binding;
+        private ItemMediaBinding binding;
 
-        MyViewHolder(@NonNull ItemVideoBinding binding) {
+        MyViewHolder(@NonNull ItemMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             binding.imageViewAdd.setVisibility(View.GONE);

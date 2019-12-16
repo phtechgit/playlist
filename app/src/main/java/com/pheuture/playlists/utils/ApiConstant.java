@@ -11,7 +11,7 @@ public final class ApiConstant {
     public static String SEARCH_QUERY = "skey";
     public static String PLAYLIST_NAME = "playlist_name";
     public static String PLAYLIST_ID = "playlist_id";
-    public static String VIDEO_ID = "videoId";
+    public static String MEDIA_ID = "videoId";
     public static String USER = "user";
     public static String DUMMY_USER = "8586076390";
 

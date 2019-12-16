@@ -56,7 +56,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
     void setData(List<PlaylistEntity> newData) {
         List<PlaylistEntity> newList = new ArrayList<>(newData);
         PlaylistEntity addNewPlaylistModel = new PlaylistEntity();
-        addNewPlaylistModel.setId(RecyclerView.NO_ID);
+        addNewPlaylistModel.setPlaylistID(RecyclerView.NO_ID);
         addNewPlaylistModel.setPlaylistName("Create playlist");
 
         newList.add(0, addNewPlaylistModel);
@@ -87,7 +87,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).getId() == newList.get(newItemPosition).getId();
+            return oldList.get(oldItemPosition).getPlaylistID() == newList.get(newItemPosition).getPlaylistID();
         }
 
         @Override

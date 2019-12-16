@@ -11,7 +11,7 @@
         android:label="@string/title_my_playlist"
         tools:layout="@layout/fragment_my_playlists" >
         <action
-            android:id="@+id/action_navigation_playlists_to_navigation_playlists_detail"
+            android:id="@+id/action_navigation_playlist_to_navigation_playlist_detail"
             app:destination="@id/navigation_playlist_detail" />
     </fragment>
 
@@ -21,15 +21,15 @@
         android:name="com.pheuture.playlists.playlists.detail.PlaylistDetailFragment"
         tools:layout="@layout/fragment_playlist_detail">
         <action
-            android:id="@+id/action_navigation_playlist_detail_to_navigation_videos"
-            app:destination="@id/navigation_videos"/>
+            android:id="@+id/action_navigation_playlist_detail_to_navigation_media"
+            app:destination="@id/navigation_media"/>
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_videos"
-        android:name="com.pheuture.playlists.videos.VideosFragment"
+        android:id="@+id/navigation_media"
+        android:name="com.pheuture.playlists.media.MediaFragment"
         android:label="Select videos"
-        tools:layout="@layout/fragment_videos" />
+        tools:layout="@layout/fragment_media" />
 
     <fragment
         android:id="@+id/navigation_trending"

@@ -1,4 +1,4 @@
-package com.pheuture.playlists.videos;
+package com.pheuture.playlists.media;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -8,30 +8,29 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.databinding.FragmentVideosBinding;
+import com.pheuture.playlists.databinding.FragmentMediaBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
+import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
+import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
-
+import com.pheuture.playlists.utils.ParserUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VideosFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
-    private static final String TAG = VideosFragment.class.getSimpleName();
-    private FragmentVideosBinding binding;
-    private VideosViewModel viewModel;
-    private VideosRecyclerAdapter recyclerAdapter;
+public class MediaFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
+    private static final String TAG = MediaFragment.class.getSimpleName();
+    private FragmentMediaBinding binding;
+    private MediaViewModel viewModel;
+    private MediaRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
     private PlaylistEntity playlistModel;
     private FragmentActivity activity;
@@ -45,26 +44,23 @@ public class VideosFragment extends BaseFragment implements TextWatcher, Recycle
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         playlistModel = getArguments().getParcelable(ARG_PARAM1);
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_videos, container, false);
-        viewModel = ViewModelProviders.of(this, new VideosViewModelFactory(
-                activity.getApplication(), playlistModel)).get(VideosViewModel.class);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_media, container, false);
+        viewModel = ViewModelProviders.of(this, new MediaViewModelFactory(
+                activity.getApplication(), playlistModel)).get(MediaViewModel.class);
         return binding.getRoot();
     }
 
     @Override
     public void initializations() {
-        /*binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
-        binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());*/
-
-        recyclerAdapter = new VideosRecyclerAdapter(this);
+        recyclerAdapter = new MediaRecyclerAdapter(this);
         layoutManager = new LinearLayoutManager(activity);
 
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);
 
-        viewModel.getVideosLive().observe(this, new Observer<List<VideoEntity>>() {
+        viewModel.getVideosLive().observe(this, new Observer<List<MediaEntity>>() {
             @Override
-            public void onChanged(List<VideoEntity> videoEntities) {
+            public void onChanged(List<MediaEntity> videoEntities) {
                 recyclerAdapter.setData(videoEntities);
             }
         });
@@ -150,16 +146,20 @@ public class VideosFragment extends BaseFragment implements TextWatcher, Recycle
     @Override
     public void onRecyclerViewItemClick(Bundle bundle) {
         int type = bundle.getInt(ARG_PARAM1, -1);
-        int position = bundle.getInt(ARG_PARAM2, -1);
-        VideoEntity video = bundle.getParcelable(ARG_PARAM3);
+        MediaEntity mediaEntity = bundle.getParcelable(ARG_PARAM3);
 
-        assert video != null;
+        String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity,
+                MediaEntity.class);
+        PlaylistMediaEntity playlistMediaEntity = ParserUtil.getInstance()
+                .fromJson(objectJsonString, PlaylistMediaEntity.class);
+
         if (type == 1){
-            List<VideoEntity> videos = new ArrayList<VideoEntity>();
-            videos.add(video);
-            ((MainActivity) activity).setMedia(null, videos);
+            List<PlaylistMediaEntity> playlistMediaEntities = new ArrayList<>();
+            playlistMediaEntities.add(playlistMediaEntity);
+            ((MainActivity) activity).setMedia(null, playlistMediaEntities);
+
         } else {
-            viewModel.addVideoToPlaylist(video.getId());
+            viewModel.addMediaToPlaylist(playlistMediaEntity);
         }
     }
 

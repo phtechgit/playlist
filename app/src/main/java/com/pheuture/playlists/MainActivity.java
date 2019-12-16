@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -19,14 +18,14 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.util.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback;
 import com.pheuture.playlists.databinding.ActivityMainBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineVideoEntity;
+import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
+import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
+import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaEntity;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.BaseActivity;
 import com.pheuture.playlists.utils.Logger;
@@ -55,7 +54,7 @@ public class MainActivity extends BaseActivity {
     private SimpleExoPlayer exoPlayer2;
     private PlayerView playerView;
     private PlaylistEntity playlistToPlay;
-    private List<VideoEntity> videosToPlay;
+    private List<PlaylistMediaEntity> mediaToPlay;
     private ConstraintLayout constraintLayoutBottomSheet;
     private BottomSheetBehavior bottomSheetBehavior;
     private static int currentPlayer;
@@ -130,14 +129,14 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        viewModel.getVideos().observe(this, new Observer<List<VideoEntity>>() {
+        viewModel.getPlaylistMediaEntities().observe(this, new Observer<List<PlaylistMediaEntity>>() {
             @Override
-            public void onChanged(List<VideoEntity> videoEntities) {
+            public void onChanged(List<PlaylistMediaEntity> videoEntities) {
                 resetAllPlayers();
 
-                videosToPlay = videoEntities;
+                mediaToPlay = videoEntities;
 
-                if (videosToPlay.size()>0){
+                if (mediaToPlay.size()>0){
                     loadNextVideoIn(exoPlayer1);
                     exoPlayer1.setPlayWhenReady(true);
                     playerView.setPlayer(exoPlayer1);
@@ -149,7 +148,7 @@ public class MainActivity extends BaseActivity {
                     binding.layoutBottomSheet.progressBar.setProgress(0);
 
                     //if more media available to play
-                    if ((videosToPlay.size()-1)> currentMediaPosition) {
+                    if ((mediaToPlay.size()-1)> currentMediaPosition) {
                         binding.layoutBottomSheet.imageViewNext.setVisibility(View.VISIBLE);
                     } else {
                         binding.layoutBottomSheet.imageViewNext.setVisibility(View.GONE);
@@ -162,8 +161,8 @@ public class MainActivity extends BaseActivity {
                         binding.layoutBottomSheet.textViewTitle.setText(playlistToPlay.getPlaylistName());
                         binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
                     } else {
-                        binding.layoutBottomSheet.textViewTitle.setText(videosToPlay.get(0).getVideoName());
-                        binding.layoutBottomSheet.textViewCreator.setText(videosToPlay.get(0).getVideoDescription());
+                        binding.layoutBottomSheet.textViewTitle.setText(mediaToPlay.get(0).getVideoName());
+                        binding.layoutBottomSheet.textViewCreator.setText(mediaToPlay.get(0).getVideoDescription());
                     }
 
                     //set handler
@@ -174,10 +173,10 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadNextVideoIn(SimpleExoPlayer exoPlayer) {
-        VideoEntity media = videosToPlay.get(++currentMediaPosition);
+        MediaEntity media = mediaToPlay.get(++currentMediaPosition);
         Uri mediaUri;
 
-        OfflineVideoEntity offlineMedia = viewModel.getOfflineMediaForMediaID(media.getId());
+        OfflineMediaEntity offlineMedia = viewModel.getOfflineMediaForMediaID(media.getMediaID());
         if (offlineMedia != null && offlineMedia.getDownloadStatus()== DownloadManager.STATUS_SUCCESSFUL) {
             File file = new File(offlineMedia.getDownloadedFilePath());
             mediaUri = Uri.fromFile(file);
@@ -203,7 +202,7 @@ public class MainActivity extends BaseActivity {
                     currentDurationOfCurrentMedia = exoPlayer1.getCurrentPosition();
 
                     //if more media available to play
-                    if ((videosToPlay.size()-1)> currentMediaPosition) {
+                    if ((mediaToPlay.size()-1)> currentMediaPosition) {
                         //if remaining duration of current media <= 2sec
                         if ((totalDurationOfCurrentMedia - currentDurationOfCurrentMedia) <= defaultRemainingSecToSwitchPlayer) {
                             runOnUiThread(new Runnable() {
@@ -236,7 +235,7 @@ public class MainActivity extends BaseActivity {
                     currentDurationOfCurrentMedia = exoPlayer2.getCurrentPosition();
 
                     //if more media available to play
-                    if ((videosToPlay.size()-1)> currentMediaPosition){
+                    if ((mediaToPlay.size()-1)> currentMediaPosition){
                         //if remaining duration of current media <= 2sec
                         if ((totalDurationOfCurrentMedia - currentDurationOfCurrentMedia) <= defaultRemainingSecToSwitchPlayer) {
                             runOnUiThread(new Runnable() {
@@ -276,7 +275,7 @@ public class MainActivity extends BaseActivity {
             // a while
             if (binding.layoutBottomSheet.imageViewNext.getVisibility()==View.VISIBLE) {
                 //if more media available to play
-                if ((videosToPlay.size()-1)> currentMediaPosition) {
+                if ((mediaToPlay.size()-1)> currentMediaPosition) {
                     binding.layoutBottomSheet.imageViewNext.setVisibility(View.VISIBLE);
                 } else {
                     binding.layoutBottomSheet.imageViewNext.setVisibility(View.GONE);
@@ -284,7 +283,7 @@ public class MainActivity extends BaseActivity {
             }
 
             //if more media available to play or current media playback time is remaining
-            if ((videosToPlay.size()-1)> currentMediaPosition || totalDurationOfCurrentMedia != currentDurationOfCurrentMedia) {
+            if ((mediaToPlay.size()-1)> currentMediaPosition || totalDurationOfCurrentMedia != currentDurationOfCurrentMedia) {
                 handler.postDelayed(runnable, defaultTimerSec);
             }
         }
@@ -394,8 +393,8 @@ public class MainActivity extends BaseActivity {
                 binding.layoutBottomSheet.textViewTitle.setText(playlistToPlay.getPlaylistName());
                 binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
             } else {
-                binding.layoutBottomSheet.textViewTitle.setText(videosToPlay.get(latestWindowIndex).getVideoName());
-                binding.layoutBottomSheet.textViewCreator.setText(videosToPlay.get(latestWindowIndex).getVideoDescription());
+                binding.layoutBottomSheet.textViewTitle.setText(mediaToPlay.get(latestWindowIndex).getVideoName());
+                binding.layoutBottomSheet.textViewCreator.setText(mediaToPlay.get(latestWindowIndex).getVideoDescription());
             }
 
             /*if (latestWindowIndex != playerPosition) {
@@ -496,8 +495,8 @@ public class MainActivity extends BaseActivity {
                 binding.layoutBottomSheet.textViewTitle.setText(playlistToPlay.getPlaylistName());
                 binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
             } else {
-                binding.layoutBottomSheet.textViewTitle.setText(videosToPlay.get(latestWindowIndex).getVideoName());
-                binding.layoutBottomSheet.textViewCreator.setText(videosToPlay.get(latestWindowIndex).getVideoDescription());
+                binding.layoutBottomSheet.textViewTitle.setText(mediaToPlay.get(latestWindowIndex).getVideoName());
+                binding.layoutBottomSheet.textViewCreator.setText(mediaToPlay.get(latestWindowIndex).getVideoDescription());
             }
             /*if (latestWindowIndex != playerPosition) {
                 // item selected in playlistToPlay has changed, handle here
@@ -542,7 +541,7 @@ public class MainActivity extends BaseActivity {
 
         } else if (v.equals(binding.layoutBottomSheet.imageViewNext)){
             //if more media available to play & no pending callbacks
-            if ((videosToPlay.size()-1)> currentMediaPosition){
+            if ((mediaToPlay.size()-1)> currentMediaPosition){
                 if (currentPlayer == 1){
                     runOnUiThread(new Runnable() {
                         @Override
@@ -613,7 +612,7 @@ public class MainActivity extends BaseActivity {
                 public void run() {
                     Logger.e(TAG, "next allowed");
                     //if more media available to play
-                    if ((videosToPlay.size()-1)> currentMediaPosition) {
+                    if ((mediaToPlay.size()-1)> currentMediaPosition) {
                         binding.layoutBottomSheet.imageViewNext.setVisibility(View.VISIBLE);
                     } else {
                         binding.layoutBottomSheet.imageViewNext.setVisibility(View.GONE);
@@ -633,9 +632,9 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    public void setMedia(PlaylistEntity playlist, List<VideoEntity> videoEntityList){
-        viewModel.setPlaylist(playlist);
-        viewModel.setVideos( videoEntityList);
+    public void setMedia(PlaylistEntity playlistEntity,  List<PlaylistMediaEntity> playlistMediaEntities){
+        viewModel.setPlaylist(playlistEntity);
+        viewModel.setPlaylistMediaEntities(playlistMediaEntities);
     }
 
     @Override

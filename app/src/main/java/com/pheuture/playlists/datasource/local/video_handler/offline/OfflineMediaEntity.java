@@ -5,18 +5,18 @@ import android.os.Parcelable;
 
 import androidx.room.Entity;
 
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
+import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 
 @Entity
-public class OfflineVideoEntity extends VideoEntity implements Parcelable {
+public class OfflineMediaEntity extends MediaEntity implements Parcelable {
     private long downloadID;
     private int downloadStatus;
     private String downloadedFilePath;
 
-    public OfflineVideoEntity() {
+    public OfflineMediaEntity() {
     }
 
-    protected OfflineVideoEntity(Parcel in) {
+    protected OfflineMediaEntity(Parcel in) {
         super(in);
         downloadID = in.readLong();
         downloadStatus = in.readInt();
@@ -36,15 +36,15 @@ public class OfflineVideoEntity extends VideoEntity implements Parcelable {
         return 0;
     }
 
-    public static final Creator<OfflineVideoEntity> CREATOR = new Creator<OfflineVideoEntity>() {
+    public static final Creator<OfflineMediaEntity> CREATOR = new Creator<OfflineMediaEntity>() {
         @Override
-        public OfflineVideoEntity createFromParcel(Parcel in) {
-            return new OfflineVideoEntity(in);
+        public OfflineMediaEntity createFromParcel(Parcel in) {
+            return new OfflineMediaEntity(in);
         }
 
         @Override
-        public OfflineVideoEntity[] newArray(int size) {
-            return new OfflineVideoEntity[size];
+        public OfflineMediaEntity[] newArray(int size) {
+            return new OfflineMediaEntity[size];
         }
     };
 

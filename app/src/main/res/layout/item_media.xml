@@ -5,9 +5,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
-            name="model"
-            type="com.pheuture.playlists.datasource.local.video_handler.VideoEntity"/>
+            name="mediaTitle"
+            type="String" />
+        <variable
+            name="mediaDescription"
+            type="String" />
+        <variable
+            name="mediaThumbnail"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -39,7 +46,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:src="@color/gray"
-            app:imageUrl="@{model.videoThumbnail}"
+            app:imageUrl="@{mediaThumbnail}"
             app:layout_constraintBottom_toBottomOf="@+id/frameLayout"
             app:layout_constraintEnd_toEndOf="@+id/frameLayout"
             app:layout_constraintStart_toStartOf="@+id/frameLayout"
@@ -52,10 +59,9 @@
             android:layout_marginStart="16dp"
             android:ellipsize="end"
             android:gravity="center_vertical"
-            android:hint="video title #"
             android:maxLines="2"
             android:tag="decorator_ending_view"
-            android:text="@{model.videoName}"
+            android:text="@{mediaTitle}"
             android:textSize="@dimen/textSizeHeadline5"
             app:layout_constraintBottom_toTopOf="@+id/textView_creator"
             app:layout_constraintEnd_toEndOf="parent"
@@ -69,9 +75,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:ellipsize="end"
-            android:hint="creator #"
             android:maxLines="1"
-            android:text="@{model.videoDescription}"
+            android:text="@{mediaDescription}"
             android:textSize="@dimen/textSizeBody1"
             app:layout_constraintBottom_toTopOf="@+id/imageView_add"
             app:layout_constraintEnd_toEndOf="parent"

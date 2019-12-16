@@ -1,7 +1,6 @@
 package com.pheuture.playlists.playlists;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -11,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,11 +26,8 @@ import com.pheuture.playlists.R;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.databinding.FragmentMyPlaylistsBinding;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
-import com.pheuture.playlists.playlists.detail.PlaylistDetailFragment;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.KeyboardUtils;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.SimpleDividerItemDecoration;
 
 import java.util.List;
 
@@ -102,11 +97,11 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
         viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean show) {
-                if(show){
+                /*if(show){
                     showProgress(binding.progressLayout.progressFullscreen, true);
                 } else {
                     hideProgress(binding.progressLayout.progressFullscreen);
-                }
+                }*/
             }
         });
     }
@@ -180,7 +175,7 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
             bundle.putParcelable(ARG_PARAM1, model);
 
             Navigation.findNavController(binding.getRoot())
-                    .navigate(R.id.action_navigation_playlists_to_navigation_playlists_detail, bundle);
+                    .navigate(R.id.action_navigation_playlist_to_navigation_playlist_detail, bundle);
         }
 
     }

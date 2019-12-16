@@ -17,7 +17,7 @@ import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentPlaylistDetailBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
+import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
 
@@ -30,7 +30,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     private PlaylistVideosRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
     private PlaylistEntity playlist;
-    private List<VideoEntity> videos;
+    private List<PlaylistMediaEntity> playlistMediaEntities;
     private FragmentActivity activity;
 
     @Override
@@ -67,16 +67,16 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);
 
-        viewModel.getVideosLive().observe(this, new Observer<List<VideoEntity>>() {
+        viewModel.getPlaylistMediaLive().observe(this, new Observer<List<PlaylistMediaEntity>>() {
             @Override
-            public void onChanged(List<VideoEntity> videoEntities) {
-                videos = videoEntities;
-                recyclerAdapter.setData(videoEntities);
+            public void onChanged(List<PlaylistMediaEntity> newPalylistMediaEntities) {
+                playlistMediaEntities = newPalylistMediaEntities;
+                recyclerAdapter.setData(playlistMediaEntities);
 
                 //show/hide play pause button
-                if (videoEntities.size()>0){
+                if (newPalylistMediaEntities.size()>0){
                     binding.imageButtonPlay.setVisibility(View.VISIBLE);
-                    if (videoEntities.size()>2) {
+                    if (newPalylistMediaEntities.size()>2) {
                         binding.imageButtonShuffle.setVisibility(View.VISIBLE);
                     } else {
                         binding.imageButtonShuffle.setVisibility(View.GONE);
@@ -86,45 +86,20 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
                     binding.imageButtonShuffle.setVisibility(View.GONE);
                 }
 
-                viewModel.addToOfflineMedia(videos);
+                viewModel.addToOfflineMedia(playlistMediaEntities);
             }
         });
 
         viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean show) {
-                if(show){
+                /*if(show){
                     showProgress(binding.progressLayout.progressFullscreen, true);
                 } else {
                     hideProgress(binding.progressLayout.progressFullscreen);
-                }
+                }*/
             }
         });
-
-        /*viewModel.isPlayling().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean value) {
-                isPlaying = value;
-                exoPlayer.setPlayWhenReady(isPlaying);
-                if (isPlaying){
-                    binding.imageButtonPlay.setImageResource(R.drawable.ic_pause_circular_light);
-                } else {
-                    binding.imageButtonPlay.setImageResource(R.drawable.ic_play_circular_white);
-                }
-
-                if (isPlaying && playerPosition== RecyclerView.NO_POSITION){
-                    viewModel.setPlayerPosition(0);
-                }
-            }
-        });
-
-        viewModel.getPlayerPosition().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer value) {
-                playerPosition = value;
-                recyclerAdapter.setPlayerPosition(playerPosition);
-            }
-        });*/
     }
 
     @Override
@@ -135,22 +110,16 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        viewModel.getFreshData();
-    }
-
-    @Override
     public void onClick(View v) {
         if (v.equals(binding.imageButtonAddNewSong)){
             Bundle bundle = new Bundle();
             bundle.putParcelable(ARG_PARAM1, playlist);
 
             Navigation.findNavController(binding.getRoot())
-                    .navigate(R.id.action_navigation_playlist_detail_to_navigation_videos, bundle);
+                    .navigate(R.id.action_navigation_playlist_detail_to_navigation_media, bundle);
 
         } else if (v.equals(binding.imageButtonPlay)) {
-            ((MainActivity) activity).setMedia(playlist, videos);
+            ((MainActivity) activity).setMedia(playlist, playlistMediaEntities);
 
         } else if (v.equals(binding.imageButtonShuffle)) {
             ((MainActivity) activity).toggleShuffleMode();

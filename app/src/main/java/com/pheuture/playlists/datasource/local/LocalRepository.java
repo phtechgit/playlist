@@ -8,11 +8,13 @@ import androidx.room.TypeConverters;
 
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineVideoDao;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineVideoEntity;
-import com.pheuture.playlists.datasource.local.video_handler.VideoDao;
+import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
+import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
+import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaDao;
+import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaEntity;
+import com.pheuture.playlists.datasource.local.video_handler.MediaDao;
 import com.pheuture.playlists.utils.Converters;
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
+import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 
 /**
  * creator: Shashank
@@ -22,8 +24,9 @@ import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
 @Database(version = 1,
         entities = {
                 PlaylistEntity.class,
-                VideoEntity.class,
-                OfflineVideoEntity.class
+                PlaylistMediaEntity.class,
+                MediaEntity.class,
+                OfflineMediaEntity.class
         }, exportSchema = false)
 
 @TypeConverters({Converters.class})
@@ -31,8 +34,9 @@ public abstract class LocalRepository extends RoomDatabase {
     private static LocalRepository mLocalRepository;
 
     public abstract PlaylistDao playlistDao();
-    public abstract OfflineVideoDao offlineVideoDao();
-    public abstract VideoDao videoDao();
+    public abstract PlaylistMediaDao playlistMediaDao();
+    public abstract OfflineMediaDao offlineVideoDao();
+    public abstract MediaDao videoDao();
 
     public static LocalRepository getInstance(Context context) {
         if (mLocalRepository == null) {

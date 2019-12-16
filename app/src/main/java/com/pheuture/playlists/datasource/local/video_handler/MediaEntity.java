@@ -11,11 +11,12 @@ import com.bumptech.glide.Glide;
 import com.google.gson.annotations.SerializedName;
 
 @Entity
-public class VideoEntity implements Parcelable {
+public class MediaEntity implements Parcelable {
 
 	@NonNull
 	@PrimaryKey
-	private long id;
+	@SerializedName("id")
+	private long mediaID;
 
 	@SerializedName("videoDescription")
 	private String videoDescription;
@@ -35,11 +36,11 @@ public class VideoEntity implements Parcelable {
 	@SerializedName("status")
 	private String status;
 
-	public VideoEntity() {
+	public MediaEntity() {
 	}
 
-	protected VideoEntity(Parcel in) {
-		id = in.readLong();
+	protected MediaEntity(Parcel in) {
+		mediaID = in.readLong();
 		videoDescription = in.readString();
 		videoUrl = in.readString();
 		videoThumbnail = in.readString();
@@ -50,7 +51,7 @@ public class VideoEntity implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeLong(id);
+		dest.writeLong(mediaID);
 		dest.writeString(videoDescription);
 		dest.writeString(videoUrl);
 		dest.writeString(videoThumbnail);
@@ -64,15 +65,15 @@ public class VideoEntity implements Parcelable {
 		return 0;
 	}
 
-	public static final Creator<VideoEntity> CREATOR = new Creator<VideoEntity>() {
+	public static final Creator<MediaEntity> CREATOR = new Creator<MediaEntity>() {
 		@Override
-		public VideoEntity createFromParcel(Parcel in) {
-			return new VideoEntity(in);
+		public MediaEntity createFromParcel(Parcel in) {
+			return new MediaEntity(in);
 		}
 
 		@Override
-		public VideoEntity[] newArray(int size) {
-			return new VideoEntity[size];
+		public MediaEntity[] newArray(int size) {
+			return new MediaEntity[size];
 		}
 	};
 
@@ -83,12 +84,12 @@ public class VideoEntity implements Parcelable {
 				.into(view);
 	}
 
-	public long getId() {
-		return id;
+	public long getMediaID() {
+		return mediaID;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public void setMediaID(long mediaID) {
+		this.mediaID = mediaID;
 	}
 
 	public String getVideoDescription() {

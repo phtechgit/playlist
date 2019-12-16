@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -14,8 +13,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.video_handler.VideoDao;
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
+import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
+import com.pheuture.playlists.datasource.local.video_handler.MediaDao;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
@@ -32,8 +31,8 @@ import java.util.Map;
 public class TrendingViewModel extends AndroidViewModel {
     private static final String TAG = TrendingViewModel.class.getSimpleName();
     private MutableLiveData<Boolean> showProgress;
-    private LiveData<List<VideoEntity>> videos;
-    private VideoDao videoDao;
+    private LiveData<List<MediaEntity>> videos;
+    private MediaDao mediaDao;
     private long lastID;
     private long limit;
     private MutableLiveData<String> searchQuery;
@@ -47,8 +46,8 @@ public class TrendingViewModel extends AndroidViewModel {
 
         showProgress = new MutableLiveData<>(false);
 
-        videoDao = LocalRepository.getInstance(application).videoDao();
-        videos = videoDao.getVideosLive();
+        mediaDao = LocalRepository.getInstance(application).videoDao();
+        videos = mediaDao.getAllMediaLive();
     }
 
     public void getFreshData() {
@@ -67,13 +66,13 @@ public class TrendingViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    List<VideoEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), VideoEntity[].class));
-                    videoDao.deleteAll();
-                    videoDao.insertAll(list);
+                    List<MediaEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), MediaEntity[].class));
+                    mediaDao.deleteAll();
+                    mediaDao.insertAll(list);
 
                     if (list.size()>0){
-                        VideoEntity videoEntity = list.get(list.size() - 1);
-                        lastID = videoEntity.getId();
+                        MediaEntity mediaEntity = list.get(list.size() - 1);
+                        lastID = mediaEntity.getMediaID();
 
                         if (list.size()<limit) {
                             reachedLast.postValue(true);
@@ -110,7 +109,7 @@ public class TrendingViewModel extends AndroidViewModel {
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }
 
-    public LiveData<List<VideoEntity>> getVideosLive() {
+    public LiveData<List<MediaEntity>> getVideosLive() {
         return videos;
     }
 
@@ -134,13 +133,13 @@ public class TrendingViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    List<VideoEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), VideoEntity[].class));
+                    List<MediaEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), MediaEntity[].class));
 
-                    videoDao.insertAll(list);
+                    mediaDao.insertAll(list);
 
                     if (list.size()>0){
-                        VideoEntity videoEntity = list.get(list.size() - 1);
-                        lastID = videoEntity.getId();
+                        MediaEntity mediaEntity = list.get(list.size() - 1);
+                        lastID = mediaEntity.getMediaID();
 
                         if (list.size()<limit) {
                             reachedLast.postValue(true);

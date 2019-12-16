@@ -1,10 +1,9 @@
-package com.pheuture.playlists.videos;
+package com.pheuture.playlists.media;
 
 import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -14,8 +13,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.datasource.local.video_handler.VideoDao;
-import com.pheuture.playlists.datasource.local.video_handler.VideoEntity;
+import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
+import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
+import com.pheuture.playlists.datasource.local.video_handler.MediaDao;
+import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
@@ -27,11 +28,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class VideosViewModel extends AndroidViewModel {
-    private static final String TAG = VideosViewModel.class.getSimpleName();
+public class MediaViewModel extends AndroidViewModel {
+    private static final String TAG = MediaViewModel.class.getSimpleName();
     private MutableLiveData<Boolean> showProgress;
-    private MutableLiveData<List<VideoEntity>> videos;
-    private VideoDao videoDao;
+    private MutableLiveData<List<MediaEntity>> videos;
+    private PlaylistMediaDao playlistMediaDao;
     private long lastID;
     private long limit;
     private MutableLiveData<String> searchQuery;
@@ -39,7 +40,7 @@ public class VideosViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> updateParent;
     private PlaylistEntity playlistEntity;
 
-    public VideosViewModel(@NonNull Application application, PlaylistEntity playlistEntity) {
+    public MediaViewModel(@NonNull Application application, PlaylistEntity playlistEntity) {
         super(application);
         this.playlistEntity = playlistEntity;
 
@@ -50,7 +51,7 @@ public class VideosViewModel extends AndroidViewModel {
         showProgress = new MutableLiveData<>(false);
         updateParent = new MutableLiveData<>(false);
 
-        videoDao = LocalRepository.getInstance(application).videoDao();
+        playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
         videos = new MutableLiveData<>();
     }
 
@@ -70,14 +71,14 @@ public class VideosViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    List<VideoEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), VideoEntity[].class));
+                    List<MediaEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), MediaEntity[].class));
                     /*videoDao.deleteAll();
                     videoDao.insertAll(list);*/
                     videos.postValue(list);
 
                     if (list.size()>0){
-                        VideoEntity videoEntity = list.get(list.size() - 1);
-                        lastID = videoEntity.getId();
+                        MediaEntity mediaEntity = list.get(list.size() - 1);
+                        lastID = mediaEntity.getMediaID();
 
                         if (list.size()<limit) {
                             reachedLast.postValue(true);
@@ -101,7 +102,7 @@ public class VideosViewModel extends AndroidViewModel {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getId()));
+                params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getPlaylistID()));
                 params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
                 params.put(ApiConstant.SEARCH_QUERY, searchQuery.getValue());
                 params.put(ApiConstant.LIMIT, String.valueOf(limit));
@@ -115,7 +116,7 @@ public class VideosViewModel extends AndroidViewModel {
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }
 
-    public MutableLiveData<List<VideoEntity>> getVideosLive() {
+    public MutableLiveData<List<MediaEntity>> getVideosLive() {
         return videos;
     }
 
@@ -139,16 +140,16 @@ public class VideosViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    List<VideoEntity> newDataList = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), VideoEntity[].class));
+                    List<MediaEntity> newDataList = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), MediaEntity[].class));
 
-                    List<VideoEntity> oldList = videos.getValue();
+                    List<MediaEntity> oldList = videos.getValue();
                     oldList.addAll(newDataList);
 
                     videos.postValue(oldList);
 
                     if (newDataList.size()>0){
-                        VideoEntity videoEntity = newDataList.get(newDataList.size() - 1);
-                        lastID = videoEntity.getId();
+                        MediaEntity mediaEntity = newDataList.get(newDataList.size() - 1);
+                        lastID = mediaEntity.getMediaID();
 
                         if (newDataList.size()<limit) {
                             reachedLast.postValue(true);
@@ -197,10 +198,10 @@ public class VideosViewModel extends AndroidViewModel {
         return searchQuery;
     }
 
-    public void addVideoToPlaylist(long videoId) {
+    public void addMediaToPlaylist(PlaylistMediaEntity playlistMediaEntity) {
         showProgress.postValue(true);
 
-        final String url = Url.PLAYLIST_VIDEO_ADD;
+        final String url = Url.PLAYLIST_MEDIA_ADD;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -216,6 +217,8 @@ public class VideosViewModel extends AndroidViewModel {
                         return;
                     }
 
+                    playlistMediaEntity.setPlaylistID(playlistEntity.getPlaylistID());
+                    playlistMediaDao.insert(playlistMediaEntity);
                     updateParent.postValue(true);
 
                 } catch (Exception e) {
@@ -237,8 +240,8 @@ public class VideosViewModel extends AndroidViewModel {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 try {
-                    params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getId()));
-                    params.put(ApiConstant.VIDEO_ID, String.valueOf(videoId));
+                    params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getPlaylistID()));
+                    params.put(ApiConstant.MEDIA_ID, String.valueOf(playlistMediaEntity.getMediaID()));
                     params.put(ApiConstant.USER, ApiConstant.DUMMY_USER);
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
