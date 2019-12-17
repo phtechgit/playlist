@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -10,11 +10,10 @@
 
         <item name="android:textSize">@dimen/textSizeBody1</item>
         <item name="android:textColor">@color/colorAccent</item>
-        <item name="android:textColorHint">@color/gray_text1</item>
+        <item name="android:textColorHint">@color/gray1</item>
         <item name="materialButtonStyle">@style/MaterialButtonStyle</item>
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
         <item name="editTextStyle">@style/EditTextStyle</item>
-
         <item name="toolbarStyle">@style/ToolbarStyle</item>
 
     </style>
@@ -40,12 +39,16 @@
     <!--button style-->
     <style name="MaterialButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textSize">@dimen/textSizeBody2</item>
     </style>
 
     <!--textInputLayout style-->
     <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-        <item name="boxStrokeColor">@color/gray</item>
-        <item name="android:textColorHint">@color/gray</item>
+        <item name="android:textColorHint">@color/gray2</item>
+        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
+        <item name="colorAccent">@color/gray2</item>
+        <item name="colorControlNormal">@color/gray1</item>
+        <item name="colorControlActivated">@color/gray0</item>
     </style>
 
     <!--editText style-->
@@ -53,13 +56,29 @@
         <item name="android:padding">5dp</item>
         <item name="android:background">@null</item>
         <item name="android:textAllCaps">false</item>
+        <item name="android:strokeColor">@color/gray3</item>
     </style>
 
     <!--Toolbar Styling-->
     <style name="ToolbarStyle" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:windowTitleSize">@dimen/textSizeOverline</item>
         <item name="titleTextColor">@color/WhiteF</item>
         <item name="subtitleTextColor">@color/WhiteF</item>
-        <item name="android:titleTextStyle">@style/TextAppearance.AppCompat.Title</item>
+        <!--<item name="android:titleTextStyle">@style/tootlbarTitleStyle</item>-->
     </style>
+
+    <!--<style name="tootlbarTitleStyle">
+        <item name="test"
+    </style>-->
+
+   <!-- <style name="TextAppearance.MyApp.Headline1" parent="TextAppearance.MaterialComponents.Headline1">
+        ...
+        <item name="fontFamily">@font/custom_font</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">64sp</item>
+        <item name="android:letterSpacing">0</item>
+        ...
+    </style>-->
 
 </resources>

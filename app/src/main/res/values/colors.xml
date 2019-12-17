@@ -4,9 +4,13 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#ffffff</color>
 
-    <color name="gray">#282828</color>
-    <color name="gray_text1">#b3b3b3</color>
+    <color name="gray0">#282828</color>
+    <color name="gray1">#505050</color>
+    <color name="gray2">#666666</color>
+    <color name="gray3">#a0a0a0</color>
+    <color name="gray4">#b3b3b3</color>
 
+    <color name="silver">#c6c6c6</color>
     <color name="WhiteF">#ffffff</color>
     <color name="WhiteE">#fefefe</color>
     <color name="WhiteD">#fdfdfd</color>
@@ -21,5 +25,7 @@
     <color name="BlackB">#404040</color>
     <color name="BlackA">#505050</color>
     <color name="red">#D50000</color>
+
+    <color name="blue_text">#3478f6</color>
 
 </resources>

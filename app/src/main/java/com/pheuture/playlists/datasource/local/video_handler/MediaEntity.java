@@ -30,6 +30,9 @@ public class MediaEntity implements Parcelable {
 	@SerializedName("videoName")
 	private String videoName;
 
+	@SerializedName("total_duration")
+	private long playDuration;
+
 	@SerializedName("postDate")
 	private String postDate;
 
@@ -45,6 +48,7 @@ public class MediaEntity implements Parcelable {
 		videoUrl = in.readString();
 		videoThumbnail = in.readString();
 		videoName = in.readString();
+		playDuration = in.readLong();
 		postDate = in.readString();
 		status = in.readString();
 	}
@@ -56,6 +60,7 @@ public class MediaEntity implements Parcelable {
 		dest.writeString(videoUrl);
 		dest.writeString(videoThumbnail);
 		dest.writeString(videoName);
+		dest.writeLong(playDuration);
 		dest.writeString(postDate);
 		dest.writeString(status);
 	}
@@ -77,7 +82,7 @@ public class MediaEntity implements Parcelable {
 		}
 	};
 
-	@BindingAdapter({"bind:imageUrl"})
+	@BindingAdapter({"imageUrl"})
 	public static void loadImage(ImageView view, String imageUrl) {
 		Glide.with(view.getContext())
 				.load(imageUrl)
@@ -138,5 +143,13 @@ public class MediaEntity implements Parcelable {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public long getPlayDuration() {
+		return playDuration;
+	}
+
+	public void setPlayDuration(long playDuration) {
+		this.playDuration = playDuration;
 	}
 }

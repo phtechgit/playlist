@@ -72,23 +72,23 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
             }
         });
 
-        viewModel.getNeedToUpdateParent().observe(this, new Observer<Boolean>() {
+        /*viewModel.getNeedToUpdateParent().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean value) {
                 if (value) {
                     activity.onBackPressed();
                 }
             }
-        });
+        });*/
 
         viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean show) {
-                if(show){
+                /*if(show){
                     showProgress(binding.progressLayout.progressFullscreen, true);
                 } else {
                     hideProgress(binding.progressLayout.progressFullscreen);
-                }
+                }*/
             }
         });
     }
@@ -146,6 +146,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
     @Override
     public void onRecyclerViewItemClick(Bundle bundle) {
         int type = bundle.getInt(ARG_PARAM1, -1);
+        int position = bundle.getInt(ARG_PARAM2, -1);
         MediaEntity mediaEntity = bundle.getParcelable(ARG_PARAM3);
 
         String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity,
@@ -159,7 +160,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
             ((MainActivity) activity).setMedia(null, playlistMediaEntities);
 
         } else {
-            viewModel.addMediaToPlaylist(playlistMediaEntity);
+            viewModel.addMediaToPlaylist(position, playlistMediaEntity);
         }
     }
 

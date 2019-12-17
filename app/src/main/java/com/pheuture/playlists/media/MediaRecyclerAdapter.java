@@ -122,6 +122,7 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         MyViewHolder(@NonNull ItemMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+            binding.imageViewAdd.setVisibility(View.VISIBLE);
 
             /*binding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override

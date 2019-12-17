@@ -10,7 +10,9 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
+import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.CalenderUtils;
+import com.pheuture.playlists.utils.Constants;
 
 @Entity
 public class PlaylistEntity implements Parcelable {
@@ -22,6 +24,9 @@ public class PlaylistEntity implements Parcelable {
 
 	@SerializedName("created_time")
 	private long createdDate;
+
+	@SerializedName("created_by")
+	private long createdBy;
 
 	@SerializedName("total_duration")
 	private long playDuration;
@@ -38,15 +43,17 @@ public class PlaylistEntity implements Parcelable {
 	protected PlaylistEntity(Parcel in) {
 		playlistID = in.readLong();
 		createdDate = in.readLong();
+		createdBy = in.readLong();
 		playDuration = in.readLong();
 		playlistName = in.readString();
-		songsCount = in.readInt();
+		songsCount = in.readLong();
 	}
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(playlistID);
 		dest.writeLong(createdDate);
+		dest.writeLong(createdBy);
 		dest.writeLong(playDuration);
 		dest.writeString(playlistName);
 		dest.writeLong(songsCount);
@@ -109,7 +116,7 @@ public class PlaylistEntity implements Parcelable {
 		this.songsCount = songsCount;
 	}
 
-	@BindingAdapter({"bind:showOrHide"})
+	@BindingAdapter({"showOrHide"})
 	public static void showOrHide(View view, int position) {
 		if (position == 0){
 			view.setVisibility(View.GONE);
@@ -120,5 +127,17 @@ public class PlaylistEntity implements Parcelable {
 
 	public String getSongsCountWithFormattedTotalPlaybackTime(){
 		return songsCount + " song \u2022 " + CalenderUtils.getFormattedTimeDuration(playDuration);
+	}
+
+	public String getCreatedByFormatted(){
+		return "by " + ApiConstant.DUMMY_USER;
+	}
+
+	public long getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(long createdBy) {
+		this.createdBy = createdBy;
 	}
 }

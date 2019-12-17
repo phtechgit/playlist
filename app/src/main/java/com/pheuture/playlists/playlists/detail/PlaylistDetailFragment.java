@@ -1,6 +1,7 @@
 package com.pheuture.playlists.playlists.detail;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
@@ -8,10 +9,15 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
@@ -20,6 +26,7 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.utils.KeyboardUtils;
 
 import java.util.List;
 
@@ -128,7 +135,57 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
     @Override
     public void onRecyclerViewItemClick(Bundle bundle) {
+        int position = bundle.getInt(ARG_PARAM1, -1);
+        int type = bundle.getInt(ARG_PARAM2, -1);
+        PlaylistMediaEntity model = bundle.getParcelable(ARG_PARAM3);
 
+        assert model != null;
+        if (type == 2){
+            showRemoveMediaFromPlaylistAlert(position, model);
+        }
+    }
+
+    private void showRemoveMediaFromPlaylistAlert(int position, PlaylistMediaEntity model) {
+        Dialog dialog = new Dialog(activity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.setContentView(R.layout.layout_create_playlist_name);
+        dialog.show();
+
+        TextView textViewTitle = dialog.findViewById(R.id.textView_title);
+        TextView textViewSubtitle = dialog.findViewById(R.id.textView_subtitle);
+        EditText editText = dialog.findViewById(R.id.ediText);
+        TextView textViewLeft = dialog.findViewById(R.id.textView_left);
+        TextView textViewRight = dialog.findViewById(R.id.textView_right);
+
+        textViewTitle.setText("Are you sure?");
+        textViewSubtitle.setText("Do you want to delete " + model.getVideoName() + " from the playlist?");
+        textViewSubtitle.setVisibility(View.VISIBLE);
+        textViewRight.setText("Delete");
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                KeyboardUtils.hideKeyboard(activity, editText);
+            }
+        });
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                KeyboardUtils.hideKeyboard(activity, editText);
+            }
+        });
+
+        textViewLeft.setOnClickListener(view -> {
+            dialog.cancel();
+        });
+
+        textViewRight.setOnClickListener(view -> {
+            dialog.dismiss();
+            viewModel.removeMediaFromPlaylist(position, model);
+        });
+        /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/
     }
 
     @Override

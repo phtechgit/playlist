@@ -25,15 +25,15 @@
 
         <ImageView
             android:id="@+id/imageView_thumbnail"
-            android:tag="decorator_starting_view"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
-            android:padding="16dp"
             android:layout_marginBottom="4dp"
-            android:background="@color/gray"
-            android:src="@drawable/exo_controls_play"
+            android:background="@color/gray0"
+            android:padding="16dp"
+            android:src="@drawable/ic_music"
+            android:tag="decorator_starting_view"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -46,15 +46,13 @@
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:gravity="center_vertical"
-            android:hint="playlist title #"
             android:maxLines="1"
             android:tag="decorator_ending_view"
             android:text="@{model.playlistName}"
-            android:textSize="@dimen/textSizeHeadline5"
+            android:textSize="@dimen/textSizeBody1"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/textView_creator"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintEnd_toStartOf="@+id/imageView_remove"
             app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed" />
@@ -67,14 +65,26 @@
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:hint=" creator #"
-            app:showOrHide="@{position}"
             android:textSize="@dimen/textSizeBody1"
+            android:textColor="@color/gray3"
+            android:text="@{model.createdByFormatted}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/imageView_remove"
+            app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail"
+            app:layout_constraintTop_toBottomOf="@+id/textView_title"
+            app:showOrHide="@{position}" />
+
+        <ImageView
+            android:id="@+id/imageView_remove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_remove_circle"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail"
-            app:layout_constraintTop_toBottomOf="@+id/textView_title" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,6 +1,7 @@
 package com.pheuture.playlists.datasource.local.playlist_handler;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -26,8 +27,11 @@ public interface PlaylistDao {
     LiveData<List<PlaylistEntity>> getPlaylistsLive();
 
     @Query("select * from PlaylistEntity where playlistID=:playlistID")
-    LiveData<PlaylistEntity> getPlaylist(long playlistID);
+    LiveData<PlaylistEntity> getPlaylistLive(long playlistID);
 
     @Query("delete from PlaylistEntity")
     void deleteAll();
+
+    @Query("delete from PlaylistEntity where playlistID=:playlistID")
+    void deletePlaylist(long playlistID);
 }

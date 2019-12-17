@@ -117,7 +117,7 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
         MyViewHolder(@NonNull ItemMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            binding.imageViewAdd.setVisibility(View.GONE);
+            binding.imageViewRemove.setVisibility(View.VISIBLE);
 
             /*binding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -142,10 +142,15 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
                     if (pos == RecyclerView.NO_POSITION){
                         return;
                     }
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Constants.ARG_PARAM1, pos);
+                    bundle.putInt(Constants.ARG_PARAM2, 1);
+                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
                 }
             });
 
-            binding.imageViewAdd.setOnClickListener(new View.OnClickListener() {
+            binding.imageViewRemove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int pos = getAdapterPosition();
@@ -155,12 +160,12 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
 
                     Bundle bundle = new Bundle();
                     bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putParcelable(Constants.ARG_PARAM2, oldList.get(pos));
+                    bundle.putInt(Constants.ARG_PARAM2, 2);
+                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
                     recyclerViewInterface.onRecyclerViewItemClick(bundle);
                 }
             });
-
         }
     }
 

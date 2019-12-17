@@ -31,7 +31,6 @@ public class PlaylistsViewModel extends AndroidViewModel {
     private long lastID;
     private long limit;
     private PlaylistDao playlistDao;
-    private boolean shouldShowPlaylists;
     private MutableLiveData<String> searchQuery;
     private MutableLiveData<Boolean> reachedLast;
     private MutableLiveData<Boolean> showProgress;
@@ -40,12 +39,11 @@ public class PlaylistsViewModel extends AndroidViewModel {
     public PlaylistsViewModel(@NonNull Application application) {
         super(application);
         limit = 20;
-        shouldShowPlaylists = false;
 
         reachedLast = new MutableLiveData<>(false);
         searchQuery = new MutableLiveData<>("");
 
-        showProgress = new MutableLiveData<>(true);
+        showProgress = new MutableLiveData<>(false);
 
         playlistDao = LocalRepository.getInstance(application).playlistDao();
         playlists = playlistDao.getPlaylistsLive();
@@ -106,7 +104,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
             }
         };
         stringRequest.setTag(TAG);
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }
 
@@ -125,8 +123,6 @@ public class PlaylistsViewModel extends AndroidViewModel {
     public void getFreshData() {
         //reset the last Id
         lastID = 0;
-
-        showProgress.postValue(true);
 
         final String url = Url.PLAYLIST_LIST;
 
@@ -191,7 +187,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
             }
         };
         stringRequest.setTag(TAG);
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }
@@ -257,24 +253,64 @@ public class PlaylistsViewModel extends AndroidViewModel {
             }
         };
         stringRequest.setTag(TAG);
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
-    }
-
-    public void setShouldShowPlaylists(boolean b) {
-        shouldShowPlaylists = b;
     }
 
     public MutableLiveData<Boolean> getProgressStatus() {
         return showProgress;
     }
 
-    public void setProgressStatus(boolean b) {
-        showProgress.postValue(b);
-    }
+    public void deletePlaylist(PlaylistEntity model) {
+        showProgress.postValue(true);
 
-    public boolean getShouldShowPlaylists() {
-        return shouldShowPlaylists;
+        final String url = Url.PLAYLIST_DELETE;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    showProgress.postValue(false);
+
+                    Logger.e(url + ApiConstant.RESPONSE, response);
+
+                    JSONObject responseJsonObject = new JSONObject(response);
+
+                    if (!responseJsonObject.optBoolean(ApiConstant.MESSAGE, false)) {
+                        return;
+                    }
+                    playlistDao.deletePlaylist(model.getPlaylistID());
+
+                } catch (Exception e) {
+                    Logger.e(TAG, e.toString());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError e) {
+                try {
+                    showProgress.postValue(false);
+                    Logger.e(TAG, e.toString());
+                } catch (Exception ex) {
+                    Logger.e(TAG, ex.toString());
+                }
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                try {
+                    params.put(ApiConstant.PLAYLIST_ID, String.valueOf(model.getPlaylistID()));
+                    params.put(ApiConstant.USER, ApiConstant.DUMMY_USER);
+                } catch (Exception e) {
+                    Logger.e(TAG, e.toString());
+                }
+                Logger.e(url + ApiConstant.PARAMS, params.toString());
+                return params;
+            }
+        };
+        stringRequest.setTag(TAG);
+        VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }
 }

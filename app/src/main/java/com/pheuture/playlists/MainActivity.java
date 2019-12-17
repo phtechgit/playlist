@@ -682,4 +682,12 @@ public class MainActivity extends BaseActivity {
     public void toggleShuffleMode() {
         exoPlayer1.setShuffleModeEnabled(!exoPlayer1.getShuffleModeEnabled());
     }
+
+    public void updateActionBarStatus(boolean visible){
+        if (visible){
+            getSupportActionBar().show();
+        } else {
+            getSupportActionBar().hide();
+        }
+    }
 }

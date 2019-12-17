@@ -47,8 +47,10 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         holder.binding.setPosition(position);
         if (position == 0){
             holder.binding.imageViewThumbnail.setImageResource(R.drawable.ic_plus_light);
+            holder.binding.imageViewRemove.setVisibility(View.GONE);
         } else {
-            holder.binding.imageViewThumbnail.setImageResource(R.drawable.exo_controls_play);
+            holder.binding.imageViewThumbnail.setImageResource(R.drawable.ic_music);
+            holder.binding.imageViewRemove.setVisibility(View.VISIBLE);
         }
 
     }
@@ -138,8 +140,24 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
                     Bundle bundle = new Bundle();
                     bundle.putInt(Constants.ARG_PARAM1, adapterPosition);
-                    bundle.putParcelable(Constants.ARG_PARAM2, oldList.get(adapterPosition));
+                    bundle.putInt(Constants.ARG_PARAM2, 1);
+                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(adapterPosition));
+                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
+                }
+            });
 
+            binding.imageViewRemove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int adapterPosition = getAdapterPosition();
+                    if (adapterPosition == RecyclerView.NO_POSITION) {
+                        return;
+                    }
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Constants.ARG_PARAM1, adapterPosition);
+                    bundle.putInt(Constants.ARG_PARAM2, 2);
+                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(adapterPosition));
                     recyclerViewInterface.onRecyclerViewItemClick(bundle);
                 }
             });

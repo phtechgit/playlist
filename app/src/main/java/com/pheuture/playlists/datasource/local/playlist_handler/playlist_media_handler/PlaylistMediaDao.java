@@ -1,6 +1,7 @@
 package com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -26,6 +27,9 @@ public interface PlaylistMediaDao {
 
     @Query("select * from PlaylistMediaEntity where playlistID=:playlistID")
     LiveData<List<PlaylistMediaEntity>> getPlaylistMediaLive(long playlistID);
+
+    @Query("delete from PlaylistMediaEntity where playlistID=:playlistID and mediaID=:mediaID")
+    void deleteMediaFromPlaylist(long playlistID, long mediaID);
 
     @Query("delete from PlaylistMediaEntity")
     void deleteAll();

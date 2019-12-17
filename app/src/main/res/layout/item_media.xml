@@ -24,16 +24,16 @@
         android:clickable="true"
         android:focusable="true"
         android:paddingStart="12dp"
-        android:paddingTop="4dp"
         android:paddingEnd="12dp"
-        android:paddingBottom="4dp"
+        android:paddingBottom="2dp"
+        android:paddingTop="2dp"
         app:layout_constraintEnd_toStartOf="@+id/textView_title"
         app:layout_constraintStart_toStartOf="@+id/textView_title">
 
         <FrameLayout
             android:id="@+id/frameLayout"
-            android:layout_width="200dp"
-            android:layout_height="120dp"
+            android:layout_width="140dp"
+            android:layout_height="90dp"
             android:scaleType="center"
             android:tag="decorator_starting_view"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -45,54 +45,84 @@
             android:id="@+id/imageView_thumbnail"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@color/gray"
+            android:src="@color/gray0"
+            android:scaleType="center"
             app:imageUrl="@{mediaThumbnail}"
             app:layout_constraintBottom_toBottomOf="@+id/frameLayout"
             app:layout_constraintEnd_toEndOf="@+id/frameLayout"
             app:layout_constraintStart_toStartOf="@+id/frameLayout"
             app:layout_constraintTop_toTopOf="@+id/frameLayout" />
 
-        <TextView
-            android:id="@+id/textView_title"
+        <LinearLayout
+            android:id="@+id/linear_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:maxLines="2"
-            android:tag="decorator_ending_view"
-            android:text="@{mediaTitle}"
-            android:textSize="@dimen/textSizeHeadline5"
-            app:layout_constraintBottom_toTopOf="@+id/textView_creator"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@+id/frameLayout"
+            app:layout_constraintEnd_toStartOf="@+id/linearLayout_2"
             app:layout_constraintStart_toEndOf="@+id/frameLayout"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:layout_constraintTop_toTopOf="@+id/frameLayout">
 
-        <TextView
-            android:id="@+id/textView_creator"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@{mediaDescription}"
-            android:textSize="@dimen/textSizeBody1"
-            app:layout_constraintBottom_toTopOf="@+id/imageView_add"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/frameLayout"
-            app:layout_constraintTop_toBottomOf="@+id/textView_title" />
+            <TextView
+                android:id="@+id/textView_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="2"
+                android:tag="decorator_ending_view"
+                android:text="@{mediaTitle}"
+                android:textSize="@dimen/textSizeBody2"
+                app:layout_constraintBottom_toTopOf="@+id/textView_creator"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/frameLayout"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
 
-        <ImageView
-            android:id="@+id/imageView_add"
+            <TextView
+                android:id="@+id/textView_creator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{mediaDescription}"
+                android:textColor="@color/gray3"
+                android:textSize="@dimen/textSizeCaption"
+                app:layout_constraintBottom_toTopOf="@+id/imageView_add"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/frameLayout"
+                app:layout_constraintTop_toBottomOf="@+id/textView_title" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:src="@drawable/ic_add_light"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/frameLayout"
-            app:layout_constraintTop_toBottomOf="@+id/textView_creator" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/imageView_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_add_light" />
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/imageView_remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:src="@drawable/ic_remove_circle" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

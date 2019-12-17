@@ -19,18 +19,19 @@
                 android:id="@+id/textView_dummy_text1"
                 android:layout_width="match_parent"
                 android:gravity="center"
-                android:layout_height="wrap_content"
                 android:textStyle="bold"
-                android:textSize="@dimen/textSizeHeadline4"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textSizeHeadline5"
                 android:text="Create your first playlist" />
 
             <TextView
                 android:id="@+id/textView_dummy_text2"
                 android:textColor="@color/WhiteA"
+                android:layout_marginTop="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textSize="@dimen/textSizeHeadline5"
+                android:textSize="@dimen/textSizeCaption"
                 android:text="Its easy, we'll help you." />
 
             <com.google.android.material.button.MaterialButton
