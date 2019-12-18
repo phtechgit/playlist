@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.databinding.FragmentMyPlaylistsBinding;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.utils.EditTextInputFilter;
 import com.pheuture.playlists.utils.KeyboardUtils;
 
 import java.util.List;
@@ -135,6 +138,8 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
         textViewTitle.setText("Give your playlist a name");
+
+        editText.setFilters(new InputFilter[]{new EditTextInputFilter()});
         editText.setVisibility(View.VISIBLE);
         textViewRight.setText("Create");
 
@@ -223,9 +228,9 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
         textViewTitle.setText("Are you sure?");
-        textViewSubtitle.setText("Do you want to delete this playlist containing " + model.getSongsCount() + " songs?");
+        textViewSubtitle.setText("Do you want to remove this playlist containing " + model.getSongsCount() + " songs?");
         textViewSubtitle.setVisibility(View.VISIBLE);
-        textViewRight.setText("Delete");
+        textViewRight.setText("Remove");
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override

@@ -46,6 +46,7 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         holder.binding.setMediaTitle(model.getVideoName());
         holder.binding.setMediaDescription(model.getVideoDescription());
         holder.binding.setMediaThumbnail(model.getVideoThumbnail());
+        holder.binding.setMediaDuration(model.getFormattedPlayDuration());
     }
 
     void setData(List<MediaEntity> newList) {

@@ -12,7 +12,6 @@ import androidx.room.PrimaryKey;
 import com.google.gson.annotations.SerializedName;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.CalenderUtils;
-import com.pheuture.playlists.utils.Constants;
 
 @Entity
 public class PlaylistEntity implements Parcelable, Cloneable {
@@ -133,7 +132,7 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 	}
 
 	public String getSongsCountWithFormattedTotalPlaybackTime(){
-		return songsCount + " song \u2022 " + CalenderUtils.getFormattedTimeDuration(playDuration);
+		return songsCount + " song \u2022 " + CalenderUtils.getTimeDurationFormat2(playDuration);
 	}
 
 	public String getCreatedByFormatted(){

@@ -166,9 +166,9 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
         textViewTitle.setText("Are you sure?");
-        textViewSubtitle.setText("Do you want to delete " + model.getVideoName() + " from the playlist?");
+        textViewSubtitle.setText("Do you want to remove " + model.getVideoName() + " from the playlist?");
         textViewSubtitle.setVisibility(View.VISIBLE);
-        textViewRight.setText("Delete");
+        textViewRight.setText("Remove");
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override

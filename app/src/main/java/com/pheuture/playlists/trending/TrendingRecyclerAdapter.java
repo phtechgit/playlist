@@ -1,7 +1,6 @@
 package com.pheuture.playlists.trending;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -70,15 +67,16 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.binding.setMediaTitle(model.getVideoName());
         holder.binding.setMediaDescription(model.getVideoDescription());
         holder.binding.setMediaThumbnail(model.getVideoThumbnail());
+        holder.binding.setMediaDuration(model.getFormattedPlayDuration());
 
-        if (playerPosition == position){
+        /*if (playerPosition == position){
             //add player to the frameLayout of current position
             setVideo(holder.binding, model);
 
         } else {
             //remove player from the frameLayout of current position
             removeVideoPlayer(holder.binding, position);
-        }
+        }*/
     }
 
     private void removeVideoPlayer(ItemMediaBinding binding, int position) {
@@ -94,7 +92,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         binding.imageViewThumbnail.setVisibility(View.VISIBLE);
     }
 
-    private void setVideo(ItemMediaBinding binding, MediaEntity model) {
+    /*private void setVideo(ItemMediaBinding binding, MediaEntity model) {
         MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(Uri.parse(model.getVideoUrl()));
 
@@ -110,10 +108,10 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
-        /*binding.frameLayout.removeAllViews();*/
+        *//*binding.frameLayout.removeAllViews();*//*
         binding.frameLayout.addView(playerView);
         binding.imageViewThumbnail.setVisibility(View.GONE);
-    }
+    }*/
 
     void setData(List<MediaEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList),

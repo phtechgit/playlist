@@ -164,13 +164,13 @@ public class MainActivity extends BaseActivity {
                     binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer.setVisibility(View.VISIBLE);
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-                    if (playlistToPlay != null && !StringUtils.isEmpty(playlistToPlay.getPlaylistName())) {
+                    /*if (playlistToPlay != null && !StringUtils.isEmpty(playlistToPlay.getPlaylistName())) {
                         binding.layoutBottomSheet.textViewTitle.setText(playlistToPlay.getPlaylistName());
                         binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
                     } else {
                         binding.layoutBottomSheet.textViewTitle.setText(mediaToPlay.get(0).getVideoName());
                         binding.layoutBottomSheet.textViewCreator.setText(mediaToPlay.get(0).getVideoDescription());
-                    }
+                    }*/
 
                     //set handler
                     handler.postDelayed(runnable, defaultTimerSec);
@@ -198,6 +198,9 @@ public class MainActivity extends BaseActivity {
         mediaSource = new ProgressiveMediaSource.Factory(viewModel.getDataSourceFactory())
                 .createMediaSource(mediaUri);
         exoPlayer.prepare(mediaSource);
+
+        binding.layoutBottomSheet.textViewTitle.setText(media.getVideoName());
+        binding.layoutBottomSheet.textViewCreator.setText(media.getVideoDescription());
     }
 
     private Runnable runnable = new Runnable() {
@@ -396,13 +399,13 @@ public class MainActivity extends BaseActivity {
         public void onPositionDiscontinuity(int reason) {
             int latestWindowIndex = exoPlayer1.getCurrentWindowIndex();
             Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
-            if (playlistToPlay != null && !StringUtils.isEmpty(playlistToPlay.getPlaylistName())) {
+            /*if (playlistToPlay != null && !StringUtils.isEmpty(playlistToPlay.getPlaylistName())) {
                 binding.layoutBottomSheet.textViewTitle.setText(playlistToPlay.getPlaylistName());
                 binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
             } else {
                 binding.layoutBottomSheet.textViewTitle.setText(mediaToPlay.get(latestWindowIndex).getVideoName());
                 binding.layoutBottomSheet.textViewCreator.setText(mediaToPlay.get(latestWindowIndex).getVideoDescription());
-            }
+            }*/
 
             /*if (latestWindowIndex != playerPosition) {
                 // item selected in playlistToPlay has changed, handle here
@@ -498,13 +501,14 @@ public class MainActivity extends BaseActivity {
         public void onPositionDiscontinuity(int reason) {
             int latestWindowIndex = exoPlayer1.getCurrentWindowIndex();
             Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
-            if (playlistToPlay != null && !StringUtils.isEmpty(playlistToPlay.getPlaylistName())) {
+            /*if (playlistToPlay != null && !StringUtils.isEmpty(playlistToPlay.getPlaylistName())) {
                 binding.layoutBottomSheet.textViewTitle.setText(playlistToPlay.getPlaylistName());
                 binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
             } else {
                 binding.layoutBottomSheet.textViewTitle.setText(mediaToPlay.get(latestWindowIndex).getVideoName());
                 binding.layoutBottomSheet.textViewCreator.setText(mediaToPlay.get(latestWindowIndex).getVideoDescription());
-            }
+            }*/
+
             /*if (latestWindowIndex != playerPosition) {
                 // item selected in playlistToPlay has changed, handle here
                 viewModel.setPlayerPosition(latestWindowIndex);

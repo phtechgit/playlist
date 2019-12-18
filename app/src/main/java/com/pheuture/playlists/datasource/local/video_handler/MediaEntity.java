@@ -9,6 +9,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import com.bumptech.glide.Glide;
 import com.google.gson.annotations.SerializedName;
+import com.pheuture.playlists.utils.CalenderUtils;
 
 @Entity
 public class MediaEntity implements Parcelable {
@@ -30,7 +31,7 @@ public class MediaEntity implements Parcelable {
 	@SerializedName("videoName")
 	private String videoName;
 
-	@SerializedName("total_duration")
+	@SerializedName("video_duration")
 	private long playDuration;
 
 	@SerializedName("postDate")
@@ -152,4 +153,8 @@ public class MediaEntity implements Parcelable {
 	public void setPlayDuration(long playDuration) {
 		this.playDuration = playDuration;
 	}
+
+    public String getFormattedPlayDuration() {
+		return CalenderUtils.getTimeDurationInFormat1(playDuration);
+    }
 }

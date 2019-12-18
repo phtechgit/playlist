@@ -4,17 +4,9 @@ import android.content.Context;
 
 import com.pheuture.playlists.R;
 
-import java.math.BigDecimal;
-import java.sql.Time;
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.Period;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-
-import javax.xml.datatype.DatatypeConstants;
 
 public class CalenderUtils {
 
@@ -151,7 +143,7 @@ public class CalenderUtils {
         return value == 0 ? 12 : value;
     }
 
-    public static String addZeroPrefixIfOneDigitValue(int a) {
+    public static String addZeroPrefixIfOneDigitValue(long a) {
         StringBuilder stringBuilder = new StringBuilder();
         String data = String.valueOf(a);
 
@@ -165,10 +157,20 @@ public class CalenderUtils {
         return stringBuilder.toString();
     }
 
-    public static String getFormattedTimeDuration(long playDurationInMillis) {
+    public static String getTimeDurationFormat2(long playDurationInMillis) {
         long diffInHours = TimeUnit.MILLISECONDS.toHours(playDurationInMillis);
-        long diffInMin = TimeUnit.MILLISECONDS.toMinutes((diffInHours>0)?((diffInHours * 60 * 1000) - playDurationInMillis):playDurationInMillis);
+        long diffInMin = TimeUnit.MILLISECONDS.toMinutes((diffInHours>0)?((diffInHours * 60 * 60 * 1000) - playDurationInMillis):playDurationInMillis);
 
         return diffInHours + "h " + diffInMin + "m";
+    }
+
+    public static String getTimeDurationInFormat1(long playDurationInMillis) {
+        long diffInHours = TimeUnit.MILLISECONDS.toHours(playDurationInMillis);
+        long diffInMin = TimeUnit.MILLISECONDS.toMinutes((diffInHours>0)?((diffInHours * 60 * 60 * 1000) - playDurationInMillis):playDurationInMillis);
+        long diffInSec = TimeUnit.MILLISECONDS.toSeconds((diffInMin>0)?((diffInMin * 60 * 1000) - playDurationInMillis):playDurationInMillis);
+        if (diffInHours>0){
+            return addZeroPrefixIfOneDigitValue(diffInHours) + ":" + addZeroPrefixIfOneDigitValue(diffInMin) + ":" + addZeroPrefixIfOneDigitValue(diffInSec);
+        }
+        return addZeroPrefixIfOneDigitValue(diffInMin) + ":" + addZeroPrefixIfOneDigitValue(diffInSec);
     }
 }

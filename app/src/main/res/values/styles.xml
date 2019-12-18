@@ -51,7 +51,6 @@
     <style name="EditTextDialogStyle" parent="Widget.Design.TextInputLayout">
         <item name="android:background">@drawable/edittext_background_white</item>
         <item name="android:textCursorDrawable">@null</item>
-
     </style>
 
     <style name="myToolbar">

@@ -41,13 +41,13 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
         if (position == RecyclerView.NO_POSITION){
             return;
         }
-
         MyViewHolder holder = (MyViewHolder) recyclerHOlder;
 
         PlaylistMediaEntity model = oldList.get(position);
         holder.binding.setMediaTitle(model.getVideoName());
         holder.binding.setMediaDescription(model.getVideoDescription());
         holder.binding.setMediaThumbnail(model.getVideoThumbnail());
+        holder.binding.setMediaDuration(model.getFormattedPlayDuration());
     }
 
     void setData(List<PlaylistMediaEntity> newList) {
