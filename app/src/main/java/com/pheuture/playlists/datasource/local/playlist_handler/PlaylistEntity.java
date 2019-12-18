@@ -15,7 +15,8 @@ import com.pheuture.playlists.utils.CalenderUtils;
 import com.pheuture.playlists.utils.Constants;
 
 @Entity
-public class PlaylistEntity implements Parcelable {
+public class PlaylistEntity implements Parcelable, Cloneable {
+
 
 	@NonNull
 	@PrimaryKey
@@ -47,6 +48,12 @@ public class PlaylistEntity implements Parcelable {
 		playDuration = in.readLong();
 		playlistName = in.readString();
 		songsCount = in.readLong();
+	}
+
+	@NonNull
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 
 	@Override

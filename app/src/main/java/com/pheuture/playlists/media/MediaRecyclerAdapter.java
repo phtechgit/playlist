@@ -55,6 +55,11 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         diffResult.dispatchUpdatesTo(this);
     }
 
+    public void removeItem(int position) {
+        oldList.remove(position);
+        notifyItemRemoved(position);
+    }
+
     class DiffCallBack extends DiffUtil.Callback{
         private List<MediaEntity> oldList;
         private List<MediaEntity> newList;

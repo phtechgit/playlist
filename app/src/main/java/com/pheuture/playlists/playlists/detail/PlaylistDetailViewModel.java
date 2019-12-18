@@ -268,9 +268,9 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    PlaylistEntity newPlaylistEntity = playlistEntity.getValue();
+                    /*PlaylistEntity newPlaylistEntity = playlistEntity.getValue();
                     newPlaylistEntity.setSongsCount(newPlaylistEntity.getSongsCount() - 1);
-                    newPlaylistEntity.setPlayDuration(newPlaylistEntity.getPlayDuration() - model.getPlayDuration());
+                    newPlaylistEntity.setPlayDuration(newPlaylistEntity.getPlayDuration() - model.getPlayDuration());*/
 
                     //save changes in persistent storage finally after API response
                     playlistMediaDao.deleteMediaFromPlaylist(playlistID, model.getMediaID());

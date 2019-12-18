@@ -1,7 +1,6 @@
 package com.pheuture.playlists.playlists.detail;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
@@ -60,11 +59,13 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
     @Override
     public void initializations() {
+        ((MainActivity) activity).setupToolbar(true, "");
+
         viewModel.getPlaylistEntity().observe(this, new Observer<PlaylistEntity>() {
             @Override
             public void onChanged(PlaylistEntity playlistEntity) {
                 playlist = playlistEntity;
-                binding.setModel(playlistEntity);
+                binding.setModel(playlist);
             }
         });
 
@@ -82,15 +83,15 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
                 //show/hide play pause button
                 if (newPalylistMediaEntities.size()>0){
-                    binding.imageButtonPlay.setVisibility(View.VISIBLE);
+                    binding.imageButtonPlay.setImageResource(R.drawable.ic_play_circular_white);
                     if (newPalylistMediaEntities.size()>2) {
-                        binding.imageButtonShuffle.setVisibility(View.VISIBLE);
+                        binding.imageButtonShuffle.setImageResource(R.drawable.ic_shuffle_light);
                     } else {
-                        binding.imageButtonShuffle.setVisibility(View.GONE);
+                        binding.imageButtonShuffle.setImageResource(R.drawable.ic_shuffle_grey);
                     }
                 } else {
-                    binding.imageButtonPlay.setVisibility(View.GONE);
-                    binding.imageButtonShuffle.setVisibility(View.GONE);
+                    binding.imageButtonPlay.setImageResource(R.drawable.ic_play_circular_grey);
+                    binding.imageButtonShuffle.setImageResource(R.drawable.ic_shuffle_grey);
                 }
 
                 viewModel.addToOfflineMedia(playlistMediaEntities);
@@ -121,15 +122,20 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         if (v.equals(binding.imageButtonAddNewSong)){
             Bundle bundle = new Bundle();
             bundle.putParcelable(ARG_PARAM1, playlist);
+            bundle.putString("title", playlist.getPlaylistName());
 
             Navigation.findNavController(binding.getRoot())
                     .navigate(R.id.action_navigation_playlist_detail_to_navigation_media, bundle);
 
         } else if (v.equals(binding.imageButtonPlay)) {
-            ((MainActivity) activity).setMedia(playlist, playlistMediaEntities);
+            if (playlistMediaEntities.size()>0) {
+                ((MainActivity) activity).setMedia(playlist, playlistMediaEntities);
+            }
 
         } else if (v.equals(binding.imageButtonShuffle)) {
-            ((MainActivity) activity).toggleShuffleMode();
+            if (playlistMediaEntities.size()>2) {
+                ((MainActivity) activity).toggleShuffleMode();
+            }
         }
     }
 
@@ -150,7 +156,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialog.setContentView(R.layout.layout_create_playlist_name);
+        dialog.setContentView(R.layout.layout_create_playlist);
         dialog.show();
 
         TextView textViewTitle = dialog.findViewById(R.id.textView_title);
@@ -183,6 +189,14 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         textViewRight.setOnClickListener(view -> {
             dialog.dismiss();
+
+            //make changes to be shown immediately
+            recyclerAdapter.removeItem(position);
+
+            playlist.setSongsCount(playlist.getSongsCount() - 1);
+            playlist.setPlayDuration(playlist.getPlayDuration() - model.getPlayDuration());
+            binding.setModel(playlist);
+
             viewModel.removeMediaFromPlaylist(position, model);
         });
         /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/

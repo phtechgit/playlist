@@ -1,5 +1,6 @@
 package com.pheuture.playlists;
 
+import android.app.ActionBar;
 import android.app.DownloadManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.StringUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
@@ -110,6 +112,11 @@ public class MainActivity extends BaseActivity {
         proceedWithPermissions(null, true);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        setSupportActionBar(binding.toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        binding.toolbar.setNavigationIcon(R.drawable.ic_add_light);
 
         constraintLayoutBottomSheet = binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer;
         playerView = binding.layoutBottomSheet.playerView;
@@ -685,9 +692,19 @@ public class MainActivity extends BaseActivity {
 
     public void updateActionBarStatus(boolean visible){
         if (visible){
-            getSupportActionBar().show();
+            binding.toolbar.setVisibility(View.VISIBLE);
         } else {
-            getSupportActionBar().hide();
+            binding.toolbar.setVisibility(View.GONE);
         }
+    }
+
+    public void setupToolbar(boolean homeAsUpEnabled, String title){
+        /*if (homeAsUpEnabled){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
+*/
+        binding.toolbar.setTitle(title);
     }
 }

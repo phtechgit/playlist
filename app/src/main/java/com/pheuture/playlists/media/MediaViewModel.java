@@ -209,11 +209,6 @@ public class MediaViewModel extends AndroidViewModel {
     }
 
     public void addMediaToPlaylist(final int adapterPosition, final PlaylistMediaEntity playlistMediaEntity) {
-        //change non persistent data for removing delay in data update from API
-        List<MediaEntity> mediaEntities = new ArrayList<>(mediaEntitiesLive.getValue());
-        mediaEntities.remove(adapterPosition);
-        mediaEntitiesLive.setValue(mediaEntities);
-
         final String url = Url.PLAYLIST_MEDIA_ADD;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -229,6 +224,11 @@ public class MediaViewModel extends AndroidViewModel {
                     if (!responseJsonObject.optBoolean(ApiConstant.MESSAGE, false)) {
                         return;
                     }
+
+                    //change non persistent data for removing delay in data update from API
+                    List<MediaEntity> mediaEntities = new ArrayList<>(mediaEntitiesLive.getValue());
+                    mediaEntities.remove(adapterPosition);
+                    mediaEntitiesLive.setValue(mediaEntities);
 
                     //save changes in persistet storage finally after API response
                     playlistMediaEntity.setPlaylistID(playlistEntity.getPlaylistID());

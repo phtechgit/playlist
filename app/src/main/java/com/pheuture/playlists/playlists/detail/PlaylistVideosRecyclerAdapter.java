@@ -56,6 +56,11 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
         diffResult.dispatchUpdatesTo(this);
     }
 
+    public void removeItem(int position) {
+        oldList.remove(position);
+        notifyItemRemoved(position);
+    }
+
     class DiffCallBack extends DiffUtil.Callback{
         private List<PlaylistMediaEntity> oldList;
         private List<PlaylistMediaEntity> newList;

@@ -28,8 +28,12 @@
     <fragment
         android:id="@+id/navigation_media"
         android:name="com.pheuture.playlists.media.MediaFragment"
-        android:label="Select videos"
-        tools:layout="@layout/fragment_media" />
+        android:label="{title}"
+        tools:layout="@layout/fragment_media">
+        <argument
+            android:name="title"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_trending"

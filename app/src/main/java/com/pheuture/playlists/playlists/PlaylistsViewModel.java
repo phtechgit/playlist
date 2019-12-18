@@ -263,8 +263,6 @@ public class PlaylistsViewModel extends AndroidViewModel {
     }
 
     public void deletePlaylist(PlaylistEntity model) {
-        showProgress.postValue(true);
-
         final String url = Url.PLAYLIST_DELETE;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {

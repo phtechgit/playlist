@@ -52,6 +52,10 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
 
     @Override
     public void initializations() {
+        ((MainActivity) activity).setupToolbar(true, playlistModel.getPlaylistName());
+
+        binding.layoutSearchBar.editTextSearch.setHint("Search new Videos");
+
         recyclerAdapter = new MediaRecyclerAdapter(this);
         layoutManager = new LinearLayoutManager(activity);
 
@@ -160,6 +164,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
             ((MainActivity) activity).setMedia(null, playlistMediaEntities);
 
         } else {
+            recyclerAdapter.removeItem(position);
             viewModel.addMediaToPlaylist(position, playlistMediaEntity);
         }
     }

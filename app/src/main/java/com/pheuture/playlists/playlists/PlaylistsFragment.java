@@ -10,13 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
@@ -25,7 +23,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.textfield.TextInputLayout;
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
@@ -59,6 +56,7 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
 
     @Override
     public void initializations() {
+        ((MainActivity) activity).setupToolbar(false, "Playlists");
         binding.layoutSearchBar.editTextSearch.setHint("Find in playlist");
         /*binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
         binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());*/
@@ -127,7 +125,7 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialog.setContentView(R.layout.layout_create_playlist_name);
+        dialog.setContentView(R.layout.layout_create_playlist);
         dialog.show();
 
         TextView textViewTitle = dialog.findViewById(R.id.textView_title);
@@ -205,17 +203,17 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
                         .navigate(R.id.action_navigation_playlist_to_navigation_playlist_detail, bundle);
             }
         } else {
-            showDeletePlaylistDialog(model);
+            showDeletePlaylistDialog(position, model);
         }
 
     }
 
-    private void showDeletePlaylistDialog(PlaylistEntity model) {
+    private void showDeletePlaylistDialog(int position, PlaylistEntity model) {
         Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialog.setContentView(R.layout.layout_create_playlist_name);
+        dialog.setContentView(R.layout.layout_create_playlist);
         dialog.show();
 
         TextView textViewTitle = dialog.findViewById(R.id.textView_title);
@@ -248,6 +246,7 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
 
         textViewRight.setOnClickListener(view -> {
             dialog.dismiss();
+            recyclerAdapter.removeItem(position);
             viewModel.deletePlaylist(model);
         });
         /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/

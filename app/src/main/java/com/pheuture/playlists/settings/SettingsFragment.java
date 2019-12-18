@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.utils.BaseFragment;
 
@@ -18,7 +19,7 @@ public class SettingsFragment extends BaseFragment {
 
     @Override
     public void initializations() {
-
+        ((MainActivity) getActivity()).setupToolbar(false, "Settings");
     }
 
     @Override
