@@ -25,12 +25,11 @@
     </style>
 
     <!--textInputLayout style-->
-    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-        <item name="android:textColorHint">@color/gray2</item>
-        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
-        <item name="colorAccent">@color/gray2</item>
-        <item name="colorControlNormal">@color/gray1</item>
-        <item name="colorControlActivated">@color/gray0</item>
+    <style name="TextInputLayoutStyle" parent="Widget.Design.TextInputLayout">
+        <item name="hintTextAppearance">@style/TextAppearance.AppCompat.Light.SearchResult.Title</item>
+        <item name="android:textColorHint">@color/gray4</item>
+        <item name="boxBackgroundMode">outline</item>
+        <item name="boxStrokeColor">@color/gray4</item>
     </style>
 
     <!--editText style-->
@@ -48,7 +47,7 @@
         <item name="subtitleTextColor">@color/WhiteF</item>
     </style>
 
-    <style name="EditTextDialogStyle" parent="Widget.Design.TextInputLayout">
+    <style name="EditTextDialogStyle" parent="Widget.AppCompat.EditText">
         <item name="android:background">@drawable/edittext_background_white</item>
         <item name="android:textCursorDrawable">@null</item>
     </style>

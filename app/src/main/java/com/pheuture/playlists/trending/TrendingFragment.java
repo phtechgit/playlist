@@ -1,9 +1,17 @@
 package com.pheuture.playlists.trending;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -13,6 +21,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,10 +32,16 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.utils.ContentProvider;
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.pheuture.playlists.utils.RequestCodeConstant.REQUEST_CODE_FILE_SELECT;
 
 public class TrendingFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
     private static final String TAG = TrendingFragment.class.getSimpleName();
@@ -37,8 +52,28 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     private LinearLayoutManager layoutManager;
 
     @Override
+    public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.findItem(R.id.action_upload).setVisible(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NotNull MenuItem item) {
+        if (item.getItemId() == R.id.action_upload) {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.setType("video/*");
+            if (intent.resolveActivity(activity.getPackageManager()) != null) {
+                startActivityForResult(intent, REQUEST_CODE_FILE_SELECT);
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         activity = getActivity();
     }
 
@@ -52,7 +87,7 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     @Override
     public void initializations() {
         ((MainActivity) activity).setupToolbar(false, "Trending");
-        binding.layoutSearchBar.editTextSearch.setHint("Find in trendings");
+        binding.layoutSearchBar.editTextSearch.setHint("Find in trending");
         /*binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
         binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());*/
 
@@ -152,4 +187,21 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     public void onRecyclerViewItemLongClick(Bundle bundle) {
 
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        if (requestCode == REQUEST_CODE_FILE_SELECT && resultCode == Activity.RESULT_OK) {
+            if (resultData != null) {
+                Uri returnUri = resultData.getData();
+                if (returnUri != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(ARG_PARAM1, String.valueOf(returnUri));
+
+                    Navigation.findNavController(binding.getRoot())
+                            .navigate(R.id.action_navigation_trending_to_navigation_uploads, bundle);
+                }
+            }
+        }
+    }
+
 }

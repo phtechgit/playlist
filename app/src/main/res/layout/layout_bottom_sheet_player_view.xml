@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-
+        android:visibility="gone"
         android:background="@color/colorPrimaryDark"
         android:id="@+id/constraintLayout_bottom_sheet_player"
         android:layout_width="match_parent"
@@ -65,9 +65,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:hint="creator #"
                 android:lines="1"
                 android:textSize="@dimen/textSizeBody2"
+                android:textColor="@color/gray3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/playerView"
@@ -95,7 +95,7 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="16dp"
-            android:src="@android:drawable/ic_media_next"
+            android:src="@drawable/ic_next_grey"
             app:layout_constraintEnd_toStartOf="@+id/imageView_close"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -107,7 +107,7 @@
             android:clickable="true"
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:src="@drawable/ic_close_black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

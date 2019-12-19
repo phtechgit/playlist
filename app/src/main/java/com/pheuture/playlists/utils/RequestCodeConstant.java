@@ -6,5 +6,6 @@ public final class RequestCodeConstant {
         throw new IllegalStateException("utility class should not be instantiated ");
     }
 
-    public static final int REQUEST_CODE_DEFAULT = 101;
+    public static final int REQUEST_CODE_DEFAULT = 100;
+    public static final int REQUEST_CODE_FILE_SELECT = 101;
 }

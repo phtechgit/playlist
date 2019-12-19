@@ -12,50 +12,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout"
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/playerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/gray0"
-                android:padding="32dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:context=".playlists.detail.PlaylistDetailFragment">
+                app:surface_type="texture_view"
+                app:use_controller="true" />
 
-                <ImageView
-                    android:id="@+id/imageView_upload"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_upload"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_videoName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/playerView">
 
-                <TextView
-                    android:id="@+id/textView_upload_dummy"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:text="Upload your video here"
-                    android:textColor="@color/gray1"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView_upload" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/textView_guidline1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+
                 android:gravity="center"
                 android:padding="16dp"
                 android:text="By submitting your videos, you acknowledge that you agree to our Terms of Service and Comunity Guidlines"
-                android:textColor="@color/gray1"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+                android:textColor="@color/gray2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout_videoName" />
 
             <TextView
                 android:id="@+id/textView_guidline2"
@@ -65,7 +57,7 @@
                 android:gravity="center"
                 android:padding="16dp"
                 android:text="Please be sure not to violate others' Copyright or privacy rights."
-                android:textColor="@color/gray1"
+                android:textColor="@color/gray2"
                 app:layout_constraintTop_toBottomOf="@+id/textView_guidline1" />
 
             <Button

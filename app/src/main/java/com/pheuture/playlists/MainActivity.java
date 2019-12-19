@@ -5,6 +5,7 @@ import android.app.DownloadManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -86,6 +87,12 @@ public class MainActivity extends BaseActivity {
     };
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.master_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
@@ -156,9 +163,9 @@ public class MainActivity extends BaseActivity {
 
                     //if more media available to play
                     if ((mediaToPlay.size()-1)> currentMediaPosition) {
-                        binding.layoutBottomSheet.imageViewNext.setVisibility(View.VISIBLE);
+                        binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_light);
                     } else {
-                        binding.layoutBottomSheet.imageViewNext.setVisibility(View.GONE);
+                        binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_grey);
                     }
 
                     binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer.setVisibility(View.VISIBLE);
@@ -286,9 +293,9 @@ public class MainActivity extends BaseActivity {
             if (binding.layoutBottomSheet.imageViewNext.getVisibility()==View.VISIBLE) {
                 //if more media available to play
                 if ((mediaToPlay.size()-1)> currentMediaPosition) {
-                    binding.layoutBottomSheet.imageViewNext.setVisibility(View.VISIBLE);
+                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_light);
                 } else {
-                    binding.layoutBottomSheet.imageViewNext.setVisibility(View.GONE);
+                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_grey);
                 }
             }
 
@@ -624,16 +631,16 @@ public class MainActivity extends BaseActivity {
                     Logger.e(TAG, "next allowed");
                     //if more media available to play
                     if ((mediaToPlay.size()-1)> currentMediaPosition) {
-                        binding.layoutBottomSheet.imageViewNext.setVisibility(View.VISIBLE);
+                        binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_light);
                     } else {
-                        binding.layoutBottomSheet.imageViewNext.setVisibility(View.GONE);
+                        binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_grey);
                     }
                 }
             };
             new Handler().postDelayed(runnable, 1500);
 
             //hide next button to complete all pending callbacks before allowing to next again
-            binding.layoutBottomSheet.imageViewNext.setVisibility(View.GONE);
+            binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_grey);
             Logger.e(TAG, "next hidden");
 
         } else if (v.equals(binding.layoutBottomSheet.imageViewClose)){
