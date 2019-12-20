@@ -7,7 +7,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -31,7 +30,7 @@ import java.util.Map;
 public class TrendingViewModel extends AndroidViewModel {
     private static final String TAG = TrendingViewModel.class.getSimpleName();
     private MutableLiveData<Boolean> showProgress;
-    private LiveData<List<MediaEntity>> videos;
+    private LiveData<List<MediaEntity>> mediaEntitiesLive;
     private MediaDao mediaDao;
     private long lastID;
     private long limit;
@@ -40,21 +39,21 @@ public class TrendingViewModel extends AndroidViewModel {
 
     public TrendingViewModel(@NonNull Application application) {
         super(application);
-        limit = 20;
+        limit = 10;
         reachedLast = new MutableLiveData<>(false);
         searchQuery = new MutableLiveData<>("");
 
         showProgress = new MutableLiveData<>(false);
 
         mediaDao = LocalRepository.getInstance(application).videoDao();
-        videos = mediaDao.getAllMediaLive();
+        mediaEntitiesLive = mediaDao.getAllMediaLive();
     }
 
     public void getFreshData() {
         //reset the last Id
         lastID = 0;
 
-        final String url = Url.VIDEOS_TRENDING;
+        final String url = Url.MEDIA_TRENDING;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -110,7 +109,7 @@ public class TrendingViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<MediaEntity>> getVideosLive() {
-        return videos;
+        return mediaEntitiesLive;
     }
 
     public void getMoreData() {
@@ -119,7 +118,7 @@ public class TrendingViewModel extends AndroidViewModel {
             return;
         }
 
-        final String url = Url.VIDEOS_TRENDING;
+        final String url = Url.MEDIA_TRENDING;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override

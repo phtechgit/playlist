@@ -192,10 +192,10 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         if (requestCode == REQUEST_CODE_FILE_SELECT && resultCode == Activity.RESULT_OK) {
             if (resultData != null) {
-                Uri returnUri = resultData.getData();
-                if (returnUri != null) {
+                Uri mediaUri = resultData.getData();
+                if (mediaUri != null) {
                     Bundle bundle = new Bundle();
-                    bundle.putString(ARG_PARAM1, String.valueOf(returnUri));
+                    bundle.putParcelable(ARG_PARAM1, mediaUri);
 
                     Navigation.findNavController(binding.getRoot())
                             .navigate(R.id.action_navigation_trending_to_navigation_uploads, bundle);

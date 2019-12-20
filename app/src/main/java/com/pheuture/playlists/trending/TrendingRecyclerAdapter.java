@@ -68,54 +68,11 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.binding.setMediaDescription(model.getVideoDescription());
         holder.binding.setMediaThumbnail(model.getVideoThumbnail());
         holder.binding.setMediaDuration(model.getFormattedPlayDuration());
-
-        /*if (playerPosition == position){
-            //add player to the frameLayout of current position
-            setVideo(holder.binding, model);
-
-        } else {
-            //remove player from the frameLayout of current position
-            removeVideoPlayer(holder.binding, position);
-        }*/
     }
-
-    private void removeVideoPlayer(ItemMediaBinding binding, int position) {
-        /*binding.frameLayout.removeAllViews();*/
-        ViewGroup parent = (ViewGroup) playerView.getParent();
-        if (parent != null) {
-            int index = parent.indexOfChild(playerView);
-            if (index >= 0) {
-                parent.removeViewAt(index);
-            }
-        }
-
-        binding.imageViewThumbnail.setVisibility(View.VISIBLE);
-    }
-
-    /*private void setVideo(ItemMediaBinding binding, MediaEntity model) {
-        MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(Uri.parse(model.getVideoUrl()));
-
-        exoPlayer.prepare(mediaSource);
-
-        playerView.setLayoutParams(binding.frameLayout.getLayoutParams());
-
-        ViewGroup parent = (ViewGroup) playerView.getParent();
-        if (parent != null) {
-            int index = parent.indexOfChild(playerView);
-            if (index >= 0) {
-                parent.removeViewAt(index);
-            }
-        }
-
-        *//*binding.frameLayout.removeAllViews();*//*
-        binding.frameLayout.addView(playerView);
-        binding.imageViewThumbnail.setVisibility(View.GONE);
-    }*/
 
     void setData(List<MediaEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList),
-                true);
+                false);
         oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
     }

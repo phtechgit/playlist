@@ -62,7 +62,7 @@ public class MediaViewModel extends AndroidViewModel {
         //reset the last Id
         lastID = 0;
 
-        final String url = Url.VIDEOS_TRENDING;
+        final String url = Url.MEDIA_TRENDING;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -136,7 +136,7 @@ public class MediaViewModel extends AndroidViewModel {
             return;
         }
 
-        final String url = Url.VIDEOS_TRENDING;
+        final String url = Url.MEDIA_TRENDING;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override

@@ -11,6 +11,7 @@ public final class Url {
     public static final String PLAYLIST_VIDEOS = "http://111.118.180.237/testing_d/praveen/playlist/playlist_videos.php";
     public static final String PLAYLIST_MEDIA_ADD = "http://111.118.180.237/testing_d/praveen/playlist/addVideo_playlist.php";
     public static final String PLAYLIST_MEDIA_REMOVE = "http://111.118.180.237/testing_d/praveen/playlist/delete_playlistvideo.php";
-    public static final String VIDEOS_TRENDING = "http://111.118.180.237/testing_d/praveen/playlist/list.php";
+    public static final String MEDIA_TRENDING = "http://111.118.180.237/testing_d/praveen/playlist/list.php";
+    public static final String MEDIA_UPLOAD = "http://111.118.180.237/testing_d/praveen/playlist/addVideo.php";
 
 }
