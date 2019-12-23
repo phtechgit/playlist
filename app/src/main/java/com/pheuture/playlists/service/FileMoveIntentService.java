@@ -12,6 +12,7 @@ import com.pheuture.playlists.utils.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Calendar;
@@ -67,7 +68,7 @@ public class FileMoveIntentService extends IntentService {
     private void handleActionMove(long downloadId, String source) {
         try {
             Calendar calendar = Calendar.getInstance();
-            File destinationFile = new File(getFilesDir(), String.valueOf(calendar.getTimeInMillis()));
+            File destinationFile = new File(getFilesDir(), String.valueOf(calendar.getTimeInMillis()) + source.substring(source.lastIndexOf(".")));
             if (!destinationFile.exists()){
                 if (!destinationFile.createNewFile()) {
                     Logger.e(TAG, "failed to create destination file");

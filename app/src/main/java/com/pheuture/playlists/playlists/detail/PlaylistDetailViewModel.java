@@ -59,9 +59,9 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
 
         playlistEntity = playlistDao.getPlaylistLive(playlistID);
 
-        reachedLast = new MutableLiveData<>(false);
-        searchQuery = new MutableLiveData<>("");
-        showProgress = new MutableLiveData<>(false);
+        reachedLast = new MutableLiveData<>();
+        searchQuery = new MutableLiveData<>();
+        showProgress = new MutableLiveData<>();
         playlistMediaLive = playlistMediaDao.getPlaylistMediaLive(playlistID);
 
         downloadManager = (DownloadManager) application.getSystemService(DOWNLOAD_SERVICE);
@@ -92,7 +92,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    long songsCount = responseJsonObject.optLong("total_songs", 0);
+                    /*long songsCount = responseJsonObject.optLong("total_songs", 0);
                     long playbackDuration = responseJsonObject.optLong("total_duration", 0);
 
                     //update playlist entity
@@ -100,7 +100,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                     assert newPlaylistEntity != null;
                     newPlaylistEntity.setPlayDuration(playbackDuration);
                     newPlaylistEntity.setSongsCount(songsCount);
-                    playlistDao.insert(newPlaylistEntity);
+                    playlistDao.insert(newPlaylistEntity);*/
 
                     List<PlaylistMediaEntity> list = Arrays.asList(ParserUtil.getInstance()
                             .fromJson(responseJsonObject.optString(ApiConstant.DATA),
@@ -152,7 +152,6 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
             }
         };
         stringRequest.setTag(TAG);
-
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }
@@ -185,36 +184,40 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     }
 
     public synchronized void addToOfflineMedia(List<PlaylistMediaEntity> videoEntities) {
-        for (int i = 0; i< videoEntities.size(); i++){
-            PlaylistMediaEntity mediaEntity = videoEntities.get(i);
+        try {
+            for (int i = 0; i< videoEntities.size(); i++){
+                PlaylistMediaEntity mediaEntity = videoEntities.get(i);
 
-            if (mediaNotAlreadyDownloadedOrInDownloadQueue(mediaEntity.getMediaID())){
-                OfflineMediaEntity offlineVideoEntity = new OfflineMediaEntity();
+                if (mediaNotAlreadyDownloadedOrInDownloadQueue(mediaEntity.getMediaID())){
+                    OfflineMediaEntity offlineVideoEntity = new OfflineMediaEntity();
 
-                offlineVideoEntity.setMediaID(mediaEntity.getMediaID());
-                offlineVideoEntity.setVideoName(mediaEntity.getVideoName());
-                offlineVideoEntity.setVideoDescription(mediaEntity.getVideoDescription());
-                offlineVideoEntity.setVideoThumbnail(mediaEntity.getVideoThumbnail());
-                offlineVideoEntity.setVideoUrl(mediaEntity.getVideoUrl());
-                offlineVideoEntity.setPostDate(mediaEntity.getPostDate());
-                offlineVideoEntity.setStatus(mediaEntity.getStatus());
-                offlineVideoEntity.setDownloadedFilePath(getFile(offlineVideoEntity).getPath());
-                offlineVideoEntity.setDownloadStatus(DownloadManager.STATUS_PENDING);
+                    offlineVideoEntity.setMediaID(mediaEntity.getMediaID());
+                    offlineVideoEntity.setVideoName(mediaEntity.getVideoName());
+                    offlineVideoEntity.setVideoDescription(mediaEntity.getVideoDescription());
+                    offlineVideoEntity.setVideoThumbnail(mediaEntity.getVideoThumbnail());
+                    offlineVideoEntity.setVideoUrl(mediaEntity.getVideoUrl());
+                    offlineVideoEntity.setPostDate(mediaEntity.getPostDate());
+                    offlineVideoEntity.setStatus(mediaEntity.getStatus());
+                    offlineVideoEntity.setDownloadedFilePath(getFile(offlineVideoEntity).getPath());
+                    offlineVideoEntity.setDownloadStatus(DownloadManager.STATUS_PENDING);
 
-                //add media to *download manager*
-                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(offlineVideoEntity.getVideoUrl()))
-                        .setTitle(offlineVideoEntity.getVideoName())// Title of the Download Notification
-                        .setDescription(offlineVideoEntity.getVideoDescription())// Description of the Download Notification
-                        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)// Visibility of the download Notification
-                        .setDestinationUri(Uri.fromFile(new File(offlineVideoEntity.getDownloadedFilePath())))// Uri of the destination file
-                        .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
-                        .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
+                    //add media to *download manager*
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(offlineVideoEntity.getVideoUrl()))
+                            .setTitle(offlineVideoEntity.getVideoName())// Title of the Download Notification
+                            .setDescription(offlineVideoEntity.getVideoDescription())// Description of the Download Notification
+                            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)// Visibility of the download Notification
+                            .setDestinationUri(Uri.fromFile(new File(offlineVideoEntity.getDownloadedFilePath())))// Uri of the destination file
+                            .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
+                            .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
-                long downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
+                    long downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
 
-                offlineVideoEntity.setDownloadID(downloadID);
-                offlineMediaDao.insert(offlineVideoEntity);
+                    offlineVideoEntity.setDownloadID(downloadID);
+                    offlineMediaDao.insert(offlineVideoEntity);
+                }
             }
+        } catch (Exception e) {
+            Logger.e(TAG, e.toString());
         }
     }
 
@@ -246,11 +249,14 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         return offlineVideoEntity == null;
     }
 
-    public void removeMediaFromPlaylist(int position, PlaylistMediaEntity model) {
-        /*//change non persistent data for removing delay in data update from API
-        List<PlaylistMediaEntity> playlistMediaEntities = new ArrayList<>(playlistMediaLive.getValue());
-        playlistMediaEntities.remove(position);
-        playlistMediaLive.setValue(playlistMediaEntities);*/
+    public void removeMediaFromPlaylist(PlaylistMediaEntity model) {
+        //save changes in persistent storage finally after API response
+        playlistMediaDao.deleteMediaFromPlaylist(playlistID, model.getMediaID());
+
+        PlaylistEntity newPlaylistEntity = playlistEntity.getValue();
+        newPlaylistEntity.setSongsCount(newPlaylistEntity.getSongsCount() - 1);
+        newPlaylistEntity.setPlayDuration(newPlaylistEntity.getPlayDuration() - model.getPlayDuration());
+        playlistDao.insert(newPlaylistEntity);
 
         final String url = Url.PLAYLIST_MEDIA_REMOVE;
 
@@ -267,14 +273,6 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                     if (!responseJsonObject.optBoolean(ApiConstant.MESSAGE, false)) {
                         return;
                     }
-
-                    /*PlaylistEntity newPlaylistEntity = playlistEntity.getValue();
-                    newPlaylistEntity.setSongsCount(newPlaylistEntity.getSongsCount() - 1);
-                    newPlaylistEntity.setPlayDuration(newPlaylistEntity.getPlayDuration() - model.getPlayDuration());*/
-
-                    //save changes in persistent storage finally after API response
-                    playlistMediaDao.deleteMediaFromPlaylist(playlistID, model.getMediaID());
-                    playlistDao.insert(playlistEntity.getValue());
 
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());

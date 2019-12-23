@@ -31,6 +31,10 @@ public interface PlaylistMediaDao {
     @Query("delete from PlaylistMediaEntity where playlistID=:playlistID and mediaID=:mediaID")
     void deleteMediaFromPlaylist(long playlistID, long mediaID);
 
+    @Query("delete from PlaylistMediaEntity where playlistID=:playlistID")
+    void deleteAllMediaFromPlaylist(long playlistID);
+
+
     @Query("delete from PlaylistMediaEntity")
     void deleteAll();
 

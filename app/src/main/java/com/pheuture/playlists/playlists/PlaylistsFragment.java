@@ -251,7 +251,6 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
 
         textViewRight.setOnClickListener(view -> {
             dialog.dismiss();
-            recyclerAdapter.removeItem(position);
             viewModel.deletePlaylist(model);
         });
         /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/

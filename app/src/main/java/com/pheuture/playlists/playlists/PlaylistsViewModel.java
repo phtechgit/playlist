@@ -14,6 +14,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
+import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
@@ -35,6 +36,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> reachedLast;
     private MutableLiveData<Boolean> showProgress;
     private LiveData<List<PlaylistEntity>> playlists;
+    private PlaylistMediaDao playlistMediaDao;
 
     public PlaylistsViewModel(@NonNull Application application) {
         super(application);
@@ -46,6 +48,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
         showProgress = new MutableLiveData<>(false);
 
         playlistDao = LocalRepository.getInstance(application).playlistDao();
+        playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
         playlists = playlistDao.getPlaylistsLive();
     }
 
@@ -263,6 +266,9 @@ public class PlaylistsViewModel extends AndroidViewModel {
     }
 
     public void deletePlaylist(PlaylistEntity model) {
+        playlistMediaDao.deleteAllMediaFromPlaylist(model.getPlaylistID());
+        playlistDao.deletePlaylist(model.getPlaylistID());
+
         final String url = Url.PLAYLIST_DELETE;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -278,7 +284,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
                     if (!responseJsonObject.optBoolean(ApiConstant.MESSAGE, false)) {
                         return;
                     }
-                    playlistDao.deletePlaylist(model.getPlaylistID());
+
 
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());

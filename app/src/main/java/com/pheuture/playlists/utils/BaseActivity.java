@@ -1,6 +1,7 @@
 package com.pheuture.playlists.utils;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,8 +9,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -22,6 +27,8 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.pheuture.playlists.R;
+
 import java.util.List;
 
 public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener {
@@ -98,7 +105,52 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
                                 runnable.run();
                             }
                         } else {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(BaseActivity.this);
+                            Dialog dialog = new Dialog(BaseActivity.this);
+                            dialog.setCanceledOnTouchOutside(false);
+                            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                            dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
+                            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                            dialog.setContentView(R.layout.layout_create_playlist);
+                            dialog.show();
+
+                            TextView textViewTitle = dialog.findViewById(R.id.textView_title);
+                            TextView textViewSubtitle = dialog.findViewById(R.id.textView_subtitle);
+                            EditText editText = dialog.findViewById(R.id.ediText);
+                            TextView textViewLeft = dialog.findViewById(R.id.textView_left);
+                            TextView textViewRight = dialog.findViewById(R.id.textView_right);
+
+                            textViewTitle.setText("Need Permissions");
+                            textViewSubtitle.setText("This app needs permission to use this feature. You can grant them in Setting.");
+                            textViewSubtitle.setVisibility(View.VISIBLE);
+                            textViewRight.setText("Goto Settings");
+
+                            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    Toast.makeText(BaseActivity.this, "Required permissions are rejected. You cannot proceed.", Toast.LENGTH_SHORT).show();
+                                    if (finishActivityOnReject) {
+                                        onBackPressed();
+                                    }
+                                }
+                            });
+                            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+
+                                }
+                            });
+
+                            textViewLeft.setOnClickListener(view -> {
+                                dialog.cancel();
+                            });
+
+                            textViewRight.setOnClickListener(view -> {
+                                dialog.dismiss();
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                intent.setData(Uri.fromParts("package", getPackageName(), null));
+                                startActivityForResult(intent, 0);
+                            });
+                            /*AlertDialog.Builder builder = new AlertDialog.Builder(BaseActivity.this, android.R.style.ThemeOverlay_Material_Dialog_Alert);
                             builder.setTitle("Need Permissions");
                             builder.setMessage("This app needs permission to use this feature. You can grant them in Setting.");
                             builder.setCancelable(false);
@@ -118,7 +170,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
                                     onBackPressed();
                                 }
                             });
-                            builder.show();
+                            builder.show();*/
                         }
                     }
 

@@ -2,6 +2,7 @@ package com.pheuture.playlists;
 
 import android.app.ActionBar;
 import android.app.DownloadManager;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +29,7 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaEntity;
+import com.pheuture.playlists.utils.AlerterUtils;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.BaseActivity;
 import com.pheuture.playlists.utils.Logger;
@@ -337,12 +339,12 @@ public class MainActivity extends BaseActivity {
     private Player.EventListener playerListener1 = new Player.EventListener() {
         @Override
         public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
-            Logger.e(TAG, "onTimelineChanged: " + reason);
+            /*Logger.e(TAG, "onTimelineChanged: " + reason);*/
         }
 
         @Override
         public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            Logger.e(TAG, "onTracksChanged: " + trackSelections.length);
+            /*Logger.e(TAG, "onTracksChanged: " + trackSelections.length);*/
         }
 
         @Override
@@ -425,24 +427,24 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-            Logger.e(TAG, "onPlaybackParametersChanged");
+            /*Logger.e(TAG, "onPlaybackParametersChanged");*/
         }
 
         @Override
         public void onSeekProcessed() {
-            Logger.e(TAG, "onSeekProcessed");
+            /*Logger.e(TAG, "onSeekProcessed");*/
         }
     };
 
     private Player.EventListener playerListener2 = new Player.EventListener() {
         @Override
         public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
-            Logger.e(TAG, "onTimelineChanged: " + reason);
+            /*Logger.e(TAG, "onTimelineChanged: " + reason);*/
         }
 
         @Override
         public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            Logger.e(TAG, "onTracksChanged: " + trackSelections.length);
+            /*Logger.e(TAG, "onTracksChanged: " + trackSelections.length);*/
         }
 
         @Override
@@ -717,5 +719,15 @@ public class MainActivity extends BaseActivity {
         }
 */
         binding.toolbar.setTitle(title);
+    }
+
+    public void showSnack(String message) {
+        AlerterUtils.showSnack(binding.coordinatorLayout, message);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        proceedWithPermissions(null, true);
     }
 }

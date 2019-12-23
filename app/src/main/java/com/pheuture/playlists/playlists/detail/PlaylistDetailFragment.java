@@ -26,6 +26,7 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.KeyboardUtils;
+import com.pheuture.playlists.utils.Logger;
 
 import java.util.List;
 
@@ -64,6 +65,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         viewModel.getPlaylistEntity().observe(this, new Observer<PlaylistEntity>() {
             @Override
             public void onChanged(PlaylistEntity playlistEntity) {
+                Logger.e(TAG, "playlist entity changed");
                 playlist = playlistEntity;
                 binding.setModel(playlist);
             }
@@ -147,11 +149,11 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         assert model != null;
         if (type == 2){
-            showRemoveMediaFromPlaylistAlert(position, model);
+            showRemoveMediaFromPlaylistAlert(model);
         }
     }
 
-    private void showRemoveMediaFromPlaylistAlert(int position, PlaylistMediaEntity model) {
+    private void showRemoveMediaFromPlaylistAlert(PlaylistMediaEntity model) {
         Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -189,17 +191,9 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         textViewRight.setOnClickListener(view -> {
             dialog.dismiss();
-
-            //make changes to be shown immediately
-            recyclerAdapter.removeItem(position);
-
-            playlist.setSongsCount(playlist.getSongsCount() - 1);
-            playlist.setPlayDuration(playlist.getPlayDuration() - model.getPlayDuration());
-            binding.setModel(playlist);
-
-            viewModel.removeMediaFromPlaylist(position, model);
+            ((MainActivity) activity).showSnack("removed from " + playlist.getPlaylistName());
+            viewModel.removeMediaFromPlaylist(model);
         });
-        /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/
     }
 
     @Override

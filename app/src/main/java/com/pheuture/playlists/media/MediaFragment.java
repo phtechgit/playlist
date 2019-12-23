@@ -21,6 +21,7 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
+import com.pheuture.playlists.utils.AlerterUtils;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.ParserUtil;
 import java.util.ArrayList;
@@ -57,10 +58,12 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
         binding.layoutSearchBar.editTextSearch.setHint("Search new Videos");
 
         recyclerAdapter = new MediaRecyclerAdapter(this);
+        recyclerAdapter.setHasStableIds(true);
         layoutManager = new LinearLayoutManager(activity);
 
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);
+        binding.recyclerView.setHasFixedSize(true);
 
         viewModel.getVideosLive().observe(this, new Observer<List<MediaEntity>>() {
             @Override
@@ -76,14 +79,14 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
             }
         });
 
-        /*viewModel.getNeedToUpdateParent().observe(this, new Observer<Boolean>() {
+        viewModel.getNeedToUpdateParent().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean value) {
                 if (value) {
-                    activity.onBackPressed();
+
                 }
             }
-        });*/
+        });
 
         viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
             @Override
@@ -164,7 +167,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
             ((MainActivity) activity).setMedia(null, playlistMediaEntities);
 
         } else {
-            recyclerAdapter.removeItem(position);
+            ((MainActivity) activity).showSnack("added to " + playlistModel.getPlaylistName());
             viewModel.addMediaToPlaylist(position, playlistMediaEntity);
         }
     }

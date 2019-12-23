@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -46,6 +47,7 @@ public class UploadFragment extends BaseFragment {
     private Uri mediaUri;
     private Uri thumbnailUri;
     private long lastProgress = 0;
+    private Dialog alertDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,9 +97,10 @@ public class UploadFragment extends BaseFragment {
             @Override
             public void onChanged(Boolean show) {
                 if(show){
-                    AlerterUtils.progressDeterminateShow(activity, "Uploading Video");
+                    alertDialog = AlerterUtils.progressDeterminateShow(activity, "Uploading Video");
                 } else {
-                    AlerterUtils.progressDeterminateDismiss();
+                    AlerterUtils.progressDeterminateDismiss(alertDialog);
+                    activity.onBackPressed();
                 }
             }
         });
@@ -128,13 +131,23 @@ public class UploadFragment extends BaseFragment {
     @Override
     public void onClick(View v) {
         if (v.equals(binding.imageViewThumbnail)){
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.setType("image/*");
-            if (intent.resolveActivity(activity.getPackageManager()) != null) {
-                startActivityForResult(intent, REQUEST_CODE_FILE_SELECT);
-            }
+            Runnable runnable = new Runnable() {
+                public void run() {
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.setType("image/*");
+                    if (intent.resolveActivity(activity.getPackageManager()) != null) {
+                        startActivityForResult(intent, REQUEST_CODE_FILE_SELECT);
+                    }
+                }
+            };
+            proceedWithPermissions(activity, runnable, false);
         } else if (v.equals(binding.buttonSubmit)){
-            viewModel.submitMedia(new File(RealPathUtil.getRealPath(activity, mediaUri)), new File(RealPathUtil.getRealPath(activity, thumbnailUri)), binding.ediTextTitle.getText().toString(), binding.ediTextDescription.getText().toString());
+            Runnable runnable = new Runnable() {
+                public void run() {
+                    viewModel.submitMedia(new File(RealPathUtil.getRealPath(activity, mediaUri)), new File(RealPathUtil.getRealPath(activity, thumbnailUri)), binding.ediTextTitle.getText().toString(), binding.ediTextDescription.getText().toString());
+                }
+            };
+            proceedWithPermissions(activity, runnable, false);
         }
     }
 

@@ -2,31 +2,31 @@ package com.pheuture.playlists.utils;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.R;
-
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 import java.util.Objects;
 
 public class AlerterUtils {
-    private static AlertDialog alertDialog;
     private static ProgressBar progressBar ;
     private static TextView textViewPercentage;
     private static TextView textViewMessage;
 
-    public static void showSnack(FragmentActivity activity, String message){
-        Snackbar mySnack = Snackbar.make(activity.findViewById(android.R.id.content),  message, Snackbar.LENGTH_SHORT);
+    public static void showSnack(View view, String message){
+        //activity.findViewById(android.R.id.content)
+        Snackbar mySnack = Snackbar.make(view, message, Snackbar.LENGTH_SHORT);
         mySnack.show();
     }
 
-    public static void progressDeterminateShow(Context context, String msg) {
+    public static Dialog progressDeterminateShow(Context context, String msg) {
+        Dialog alertDialog = null;
         try {
-            Dialog alertDialog = new Dialog(context);
+            alertDialog = new Dialog(context);
             alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             alertDialog.setCancelable(false);
             Objects.requireNonNull(alertDialog.getWindow()).getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -44,6 +44,7 @@ public class AlerterUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return alertDialog;
     }
 
     public static void progressDeterminateUpdateMessage(String msg) {
@@ -69,13 +70,11 @@ public class AlerterUtils {
         }
     }
 
-    public static void progressDeterminateDismiss() {
+    public static void progressDeterminateDismiss(Dialog alertDialog) {
         try {
             if (alertDialog != null) {
                 alertDialog.dismiss();
-                alertDialog = null;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

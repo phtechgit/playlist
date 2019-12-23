@@ -31,6 +31,11 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         this.recyclerViewInterface = context;
     }
 
+    @Override
+    public long getItemId(int position) {
+        return oldList.get(position).getMediaID();
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -56,10 +61,11 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         diffResult.dispatchUpdatesTo(this);
     }
 
-    public void removeItem(int position) {
-        oldList.remove(position);
-        notifyItemRemoved(position);
-    }
+    /*public void removeItem(int position) {
+        List newData = new ArrayList<>(oldList);
+        newData.remove(position);
+        setData(newData);
+    }*/
 
     class DiffCallBack extends DiffUtil.Callback{
         private List<MediaEntity> oldList;
