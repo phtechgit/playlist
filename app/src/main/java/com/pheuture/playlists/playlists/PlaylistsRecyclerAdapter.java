@@ -68,11 +68,6 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         diffResult.dispatchUpdatesTo(this);
     }
 
-    public void removeItem(int position) {
-        oldList.remove(position);
-        notifyItemRemoved(position);
-    }
-
     class DiffCallBack extends DiffUtil.Callback{
         private List<PlaylistEntity> oldList;
         private List<PlaylistEntity> newList;
@@ -125,7 +120,10 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         if (oldData != null && newData == null){
             return false;
         }
-        return oldData == null || oldData.equals(newData);
+        if (oldData == null){
+            return false;
+        }
+        return !oldData.equals(newData);
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

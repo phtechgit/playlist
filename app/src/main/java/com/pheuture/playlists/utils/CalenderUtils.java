@@ -159,15 +159,15 @@ public class CalenderUtils {
 
     public static String getTimeDurationFormat2(long playDurationInMillis) {
         long diffInHours = TimeUnit.MILLISECONDS.toHours(playDurationInMillis);
-        long diffInMin = TimeUnit.MILLISECONDS.toMinutes((diffInHours>0)?((diffInHours * 60 * 60 * 1000) - playDurationInMillis):playDurationInMillis);
+        long diffInMin = TimeUnit.MILLISECONDS.toMinutes((diffInHours>0)?(playDurationInMillis - (diffInHours * 60 * 60 * 1000)):playDurationInMillis);
 
         return diffInHours + "h " + diffInMin + "m";
     }
 
     public static String getTimeDurationInFormat1(long playDurationInMillis) {
         long diffInHours = TimeUnit.MILLISECONDS.toHours(playDurationInMillis);
-        long diffInMin = TimeUnit.MILLISECONDS.toMinutes((diffInHours>0)?((diffInHours * 60 * 60 * 1000) - playDurationInMillis):playDurationInMillis);
-        long diffInSec = TimeUnit.MILLISECONDS.toSeconds((diffInMin>0)?((diffInMin * 60 * 1000) - playDurationInMillis):playDurationInMillis);
+        long diffInMin = TimeUnit.MILLISECONDS.toMinutes((diffInHours>0)?(playDurationInMillis - (diffInHours * 60 * 60 * 1000)):playDurationInMillis);
+        long diffInSec = TimeUnit.MILLISECONDS.toSeconds((diffInMin>0)?(playDurationInMillis - (diffInMin * 60 * 1000)):playDurationInMillis);
         if (diffInHours>0){
             return addZeroPrefixIfOneDigitValue(diffInHours) + ":" + addZeroPrefixIfOneDigitValue(diffInMin) + ":" + addZeroPrefixIfOneDigitValue(diffInSec);
         }

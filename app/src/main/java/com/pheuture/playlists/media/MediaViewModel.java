@@ -115,7 +115,7 @@ public class MediaViewModel extends AndroidViewModel {
                 Map<String, String> params = new HashMap<>();
                 params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getPlaylistID()));
                 params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
-                params.put(ApiConstant.SEARCH_QUERY, searchQuery.getValue());
+                params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
                 params.put(ApiConstant.LIMIT, String.valueOf(limit));
                 Logger.e(url + ApiConstant.PARAMS, params.toString());
                 return params;
@@ -131,8 +131,7 @@ public class MediaViewModel extends AndroidViewModel {
     }
 
     public void getMoreData() {
-        assert reachedLast.getValue()!=null;
-        if (reachedLast.getValue()){
+        if (reachedLast.getValue()!=null && reachedLast.getValue()){
             return;
         }
 
@@ -186,7 +185,7 @@ public class MediaViewModel extends AndroidViewModel {
                 try {
                     params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
                     params.put(ApiConstant.LIMIT, String.valueOf(limit));
-                    params.put(ApiConstant.SEARCH_QUERY, searchQuery.getValue());
+                    params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }

@@ -135,7 +135,10 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (oldData != null && newData == null){
             return false;
         }
-        return oldData == null || oldData.equals(newData);
+        if (oldData == null){
+            return false;
+        }
+        return !oldData.equals(newData);
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

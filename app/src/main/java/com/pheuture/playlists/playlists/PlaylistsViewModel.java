@@ -42,14 +42,16 @@ public class PlaylistsViewModel extends AndroidViewModel {
         super(application);
         limit = 20;
 
-        reachedLast = new MutableLiveData<>(false);
-        searchQuery = new MutableLiveData<>("");
+        reachedLast = new MutableLiveData<>();
+        searchQuery = new MutableLiveData<>();
 
-        showProgress = new MutableLiveData<>(false);
+        showProgress = new MutableLiveData<>();
 
         playlistDao = LocalRepository.getInstance(application).playlistDao();
         playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
         playlists = playlistDao.getPlaylistsLive();
+
+        getFreshData();
     }
 
     public void createPlaylist(String playlistName) {
@@ -179,7 +181,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
                 Map<String, String> params = new HashMap<>();
                 try {
                     params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
-                    params.put(ApiConstant.SEARCH_QUERY, searchQuery.getValue());
+                    params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
                     params.put(ApiConstant.LIMIT, String.valueOf(limit));
                     params.put(ApiConstant.USER, ApiConstant.DUMMY_USER);
                 } catch (Exception e) {
@@ -196,8 +198,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
     }
 
     public void getMoreData() {
-        assert reachedLast.getValue()!=null;
-        if (reachedLast.getValue()){
+        if (reachedLast.getValue()!=null && reachedLast.getValue()){
             return;
         }
 
@@ -246,7 +247,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
                 try {
                     params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
                     params.put(ApiConstant.LIMIT, String.valueOf(limit));
-                    params.put(ApiConstant.SEARCH_QUERY, searchQuery.getValue());
+                    params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
                     params.put(ApiConstant.USER, ApiConstant.DUMMY_USER);
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
