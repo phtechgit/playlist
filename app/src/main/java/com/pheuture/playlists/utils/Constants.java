@@ -10,6 +10,7 @@ public final class Constants {
         throw new IllegalStateException("utility class should not be instantiated ");
     }
 
+    public static final String USER = "user";
     public static final String ARG_PARAM1 = "param1";
     public static final String ARG_PARAM2 = "param2";
     public static final String ARG_PARAM3 = "param3";

@@ -16,9 +16,11 @@ import androidx.annotation.Nullable;
 import androidx.navigation.Navigation;
 
 import android.provider.OpenableColumns;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -142,9 +144,19 @@ public class UploadFragment extends BaseFragment {
             };
             proceedWithPermissions(activity, runnable, false);
         } else if (v.equals(binding.buttonSubmit)){
+            if (TextUtils.getTrimmedLength(binding.ediTextTitle.getText().toString()) == 0){
+                Toast.makeText(activity, "Please provide video title", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (TextUtils.getTrimmedLength(binding.ediTextDescription.getText().toString()) == 0){
+                Toast.makeText(activity, "Please provide video description", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Runnable runnable = new Runnable() {
                 public void run() {
-                    viewModel.submitMedia(new File(RealPathUtil.getRealPath(activity, mediaUri)), new File(RealPathUtil.getRealPath(activity, thumbnailUri)), binding.ediTextTitle.getText().toString(), binding.ediTextDescription.getText().toString());
+                    viewModel.submitMedia(mediaUri, thumbnailUri, binding.ediTextTitle.getText().toString(), binding.ediTextDescription.getText().toString());
                 }
             };
             proceedWithPermissions(activity, runnable, false);

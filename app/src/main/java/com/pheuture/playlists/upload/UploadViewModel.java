@@ -1,7 +1,9 @@
 package com.pheuture.playlists.upload;
 
 import android.app.Application;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -18,11 +20,14 @@ import com.loopj.android.http.RequestParams;
 import com.pheuture.playlists.utils.AlerterUtils;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Logger;
+import com.pheuture.playlists.utils.RealPathUtil;
 import com.pheuture.playlists.utils.Url;
 
 import cz.msebera.android.httpclient.Header;
 import java.io.File;
 import java.io.FileNotFoundException;
+
+import static android.provider.MediaStore.Video.Thumbnails.MINI_KIND;
 
 public class UploadViewModel extends AndroidViewModel {
     private static final String TAG = UploadViewModel.class.getSimpleName();
@@ -48,7 +53,9 @@ public class UploadViewModel extends AndroidViewModel {
         return dataSourceFactory;
     }
 
-    public void submitMedia(File media, File thumbnail, String title, String description) {
+    public void submitMedia(Uri mediaUri, Uri thumbnailUri, String title, String description) {
+        File media = new File(RealPathUtil.getRealPath(getApplication(), mediaUri));
+
         showProgress.setValue(true);
 
         final String url = Url.MEDIA_UPLOAD;
@@ -56,7 +63,14 @@ public class UploadViewModel extends AndroidViewModel {
         RequestParams params = new RequestParams();
         try {
             params.put("videofile", media);
-            params.put("videoThumbnail", thumbnail);
+            if (thumbnailUri == null){
+                params.put("videoThumbnail", ThumbnailUtils.createVideoThumbnail(
+                        RealPathUtil.getRealPath(getApplication(), mediaUri), MINI_KIND));
+
+            } else {
+                File thumbnail = new File(RealPathUtil.getRealPath(getApplication(), thumbnailUri));
+                params.put("videoThumbnail", thumbnail);
+            }
             params.put("videoTitle", title);
             params.put("videoDescription", description);
             params.put("videoDuration", getExoPlayer().getDuration());

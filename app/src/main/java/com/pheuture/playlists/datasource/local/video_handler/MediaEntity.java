@@ -85,6 +85,9 @@ public class MediaEntity implements Parcelable {
 
 	@BindingAdapter({"imageUrl"})
 	public static void loadImage(ImageView view, String imageUrl) {
+		if (imageUrl==null || imageUrl.length()==0){
+			return;
+		}
 		Glide.with(view.getContext())
 				.load(imageUrl)
 				.into(view);

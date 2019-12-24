@@ -8,6 +8,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;

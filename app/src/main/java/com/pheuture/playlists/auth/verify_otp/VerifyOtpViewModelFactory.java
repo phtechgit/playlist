@@ -1,27 +1,25 @@
-package com.pheuture.playlists.media;
+package com.pheuture.playlists.auth.verify_otp;
 
 import android.app.Application;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-
 import org.jetbrains.annotations.NotNull;
 
-class MediaViewModelFactory implements ViewModelProvider.Factory {
+class VerifyOtpViewModelFactory implements ViewModelProvider.Factory {
     private Application mApplication;
-    private PlaylistEntity model;
+    private String phone;
 
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NotNull Class<T> modelClass) {
-        return (T) new MediaViewModel(mApplication, model);
+        return (T) new VerifyOtpViewModel(mApplication, phone);
     }
 
-    public MediaViewModelFactory(Application application, PlaylistEntity model) {
+    public VerifyOtpViewModelFactory(Application application, String phone) {
         this.mApplication = application;
-        this.model = model;
+        this.phone = phone;
     }
 }

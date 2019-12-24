@@ -18,18 +18,20 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
 
-        <service
-            android:name=".service.FileMoveIntentService"
-            android:exported="false"></service>
-
-        <activity
-            android:screenOrientation="portrait"
-            android:name=".MainActivity">
+        <activity android:name=".auth.AuthActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".service.FileMoveIntentService"
+            android:exported="false" />
+
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
 
         <receiver
             android:name=".receiver.DownloadReceiver"

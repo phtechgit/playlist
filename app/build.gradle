@@ -48,8 +48,14 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.2.2'
     implementation 'com.google.android.exoplayer:exoplayer:2.10.5'
     implementation 'com.loopj.android:android-async-http:1.4.9'
+    implementation 'com.google.android.gms:play-services-base:17.1.0'
+    implementation 'com.google.android.gms:play-services-identity:17.0.0'
+    implementation 'com.google.android.gms:play-services-auth:17.0.0'
+    implementation 'com.google.android.gms:play-services-auth-api-phone:17.3.0'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
     annotationProcessor 'androidx.room:room-compiler:2.2.3'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 
