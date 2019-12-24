@@ -10,6 +10,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.pheuture.playlists.auth.user_detail.UserModel;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
@@ -17,8 +18,10 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.utils.ApiConstant;
+import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
+import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
 import com.pheuture.playlists.utils.VolleyClient;
 import org.json.JSONObject;
@@ -41,10 +44,13 @@ public class MediaViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> reachedLast;
     private MutableLiveData<Boolean> updateParent;
     private PlaylistEntity playlistEntity;
+    private UserModel user;
 
     public MediaViewModel(@NonNull Application application, PlaylistEntity playlistEntity) {
         super(application);
         this.playlistEntity = playlistEntity;
+        user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
+                getApplication(), Constants.USER, ""), UserModel.class);
 
         limit = 20;
         reachedLast = new MutableLiveData<>(false);
@@ -260,7 +266,7 @@ public class MediaViewModel extends AndroidViewModel {
                 try {
                     params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getPlaylistID()));
                     params.put(ApiConstant.MEDIA_ID, String.valueOf(playlistMediaEntity.getMediaID()));
-                    params.put(ApiConstant.USER, ApiConstant.DUMMY_USER);
+                    params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }

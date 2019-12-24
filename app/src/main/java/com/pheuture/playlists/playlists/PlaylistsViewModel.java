@@ -11,13 +11,16 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.pheuture.playlists.auth.user_detail.UserModel;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
 import com.pheuture.playlists.utils.ApiConstant;
+import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
+import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
 import com.pheuture.playlists.utils.VolleyClient;
 import org.json.JSONObject;
@@ -37,9 +40,13 @@ public class PlaylistsViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> showProgress;
     private LiveData<List<PlaylistEntity>> playlists;
     private PlaylistMediaDao playlistMediaDao;
+    private UserModel user;
 
     public PlaylistsViewModel(@NonNull Application application) {
         super(application);
+        user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
+                getApplication(), Constants.USER, ""), UserModel.class);
+
         limit = 20;
 
         reachedLast = new MutableLiveData<>();
@@ -100,7 +107,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
                 Map<String, String> params = new HashMap<>();
                 try {
                     params.put(ApiConstant.PLAYLIST_NAME, playlistName);
-                    params.put(ApiConstant.USER, ApiConstant.DUMMY_USER);
+                    params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }
@@ -183,7 +190,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
                     params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
                     params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
                     params.put(ApiConstant.LIMIT, String.valueOf(limit));
-                    params.put(ApiConstant.USER, ApiConstant.DUMMY_USER);
+                    params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }
@@ -248,7 +255,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
                     params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
                     params.put(ApiConstant.LIMIT, String.valueOf(limit));
                     params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
-                    params.put(ApiConstant.USER, ApiConstant.DUMMY_USER);
+                    params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }
@@ -307,7 +314,7 @@ public class PlaylistsViewModel extends AndroidViewModel {
                 Map<String, String> params = new HashMap<>();
                 try {
                     params.put(ApiConstant.PLAYLIST_ID, String.valueOf(model.getPlaylistID()));
-                    params.put(ApiConstant.USER, ApiConstant.DUMMY_USER);
+                    params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }

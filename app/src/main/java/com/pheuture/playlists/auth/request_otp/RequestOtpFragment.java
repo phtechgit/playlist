@@ -1,6 +1,7 @@
 package com.pheuture.playlists.auth.request_otp;
 
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.databinding.DataBindingUtil;
@@ -9,6 +10,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +20,19 @@ import com.pheuture.playlists.auth.AuthActivity;
 import com.pheuture.playlists.databinding.FragmentRequestOtpBinding;
 import com.pheuture.playlists.interfaces.ButtonClickInterface;
 import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.utils.Logger;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RequestOtpFragment extends BaseFragment implements ButtonClickInterface {
+public class RequestOtpFragment extends BaseFragment implements TextWatcher, ButtonClickInterface {
     private static final String TAG = RequestOtpFragment.class.getSimpleName();
     private FragmentActivity activity;
     private FragmentRequestOtpBinding binding;
     private RequestOtpViewModel viewModel;
+    private Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +55,7 @@ public class RequestOtpFragment extends BaseFragment implements ButtonClickInter
 
     @Override
     public void setListeners() {
-
+        binding.ediTextPhone.addTextChangedListener(this);
     }
 
     @Override
@@ -57,7 +64,24 @@ public class RequestOtpFragment extends BaseFragment implements ButtonClickInter
     }
 
     @Override
+    public void onAttach(@NotNull Context context) {
+        mContext = context;
+        Logger.e(TAG, "onAttach");
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onDetach() {
+        mContext = null;
+        Logger.e(TAG, "onDetach");
+        super.onDetach();
+    }
+
+    @Override
     public void onButtonClick() {
+        if (mContext==null){
+            return;
+        }
         String phone = binding.ediTextPhone.getText().toString();
         viewModel.requestOTP(phone);
 
@@ -66,5 +90,24 @@ public class RequestOtpFragment extends BaseFragment implements ButtonClickInter
 
         Navigation.findNavController(binding.getRoot())
                 .navigate(R.id.action_navigation_request_otp_to_navigation_verify_otp, bundle);
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        if (binding.ediTextPhone.getText().length()==10) {
+            ((AuthActivity)activity).showNextButton(true);
+        } else {
+            ((AuthActivity)activity).showNextButton(false);
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }

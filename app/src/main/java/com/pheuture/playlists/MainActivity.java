@@ -1,6 +1,5 @@
 package com.pheuture.playlists;
 
-import android.app.ActionBar;
 import android.app.DownloadManager;
 import android.content.Intent;
 import android.net.Uri;
@@ -30,13 +29,11 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaEntity;
 import com.pheuture.playlists.utils.AlerterUtils;
-import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.BaseActivity;
 import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.StringUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
@@ -106,14 +103,14 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
+        BottomNavigationView bottomNavView = findViewById(R.id.bottomNav_view);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings)
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
+        NavigationUI.setupWithNavController(bottomNavView, navController);
     }
 
     @Override
@@ -172,14 +169,6 @@ public class MainActivity extends BaseActivity {
 
                     binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer.setVisibility(View.VISIBLE);
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
-                    /*if (playlistToPlay != null && !StringUtils.isEmpty(playlistToPlay.getPlaylistName())) {
-                        binding.layoutBottomSheet.textViewTitle.setText(playlistToPlay.getPlaylistName());
-                        binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
-                    } else {
-                        binding.layoutBottomSheet.textViewTitle.setText(mediaToPlay.get(0).getVideoName());
-                        binding.layoutBottomSheet.textViewCreator.setText(mediaToPlay.get(0).getVideoDescription());
-                    }*/
 
                     //set handler
                     handler.postDelayed(runnable, defaultTimerSec);
@@ -408,21 +397,6 @@ public class MainActivity extends BaseActivity {
         public void onPositionDiscontinuity(int reason) {
             int latestWindowIndex = exoPlayer1.getCurrentWindowIndex();
             Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
-            /*if (playlistToPlay != null && !StringUtils.isEmpty(playlistToPlay.getPlaylistName())) {
-                binding.layoutBottomSheet.textViewTitle.setText(playlistToPlay.getPlaylistName());
-                binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
-            } else {
-                binding.layoutBottomSheet.textViewTitle.setText(mediaToPlay.get(latestWindowIndex).getVideoName());
-                binding.layoutBottomSheet.textViewCreator.setText(mediaToPlay.get(latestWindowIndex).getVideoDescription());
-            }*/
-
-            /*if (latestWindowIndex != playerPosition) {
-                // item selected in playlistToPlay has changed, handle here
-                viewModel.setPlayerPosition(latestWindowIndex);
-                viewModel.setPlayerPosition(latestWindowIndex);
-                Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
-                // ...
-            }*/
         }
 
         @Override
@@ -510,21 +484,6 @@ public class MainActivity extends BaseActivity {
         public void onPositionDiscontinuity(int reason) {
             int latestWindowIndex = exoPlayer1.getCurrentWindowIndex();
             Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
-            /*if (playlistToPlay != null && !StringUtils.isEmpty(playlistToPlay.getPlaylistName())) {
-                binding.layoutBottomSheet.textViewTitle.setText(playlistToPlay.getPlaylistName());
-                binding.layoutBottomSheet.textViewCreator.setText(ApiConstant.DUMMY_USER);
-            } else {
-                binding.layoutBottomSheet.textViewTitle.setText(mediaToPlay.get(latestWindowIndex).getVideoName());
-                binding.layoutBottomSheet.textViewCreator.setText(mediaToPlay.get(latestWindowIndex).getVideoDescription());
-            }*/
-
-            /*if (latestWindowIndex != playerPosition) {
-                // item selected in playlistToPlay has changed, handle here
-                viewModel.setPlayerPosition(latestWindowIndex);
-                viewModel.setPlayerPosition(latestWindowIndex);
-                Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
-                // ...
-            }*/
         }
 
         @Override
@@ -647,7 +606,7 @@ public class MainActivity extends BaseActivity {
 
         } else if (v.equals(binding.layoutBottomSheet.imageViewClose)){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-            binding.navView.setVisibility(View.VISIBLE);
+            binding.bottomNavView.setVisibility(View.VISIBLE);
             resetAllPlayers();
         }
     }

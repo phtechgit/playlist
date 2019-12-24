@@ -42,7 +42,7 @@ public class UserDetailViewModel extends AndroidViewModel {
         SharedPrefsUtils.setStringPreference(getApplication(), Constants.USER,
                 ParserUtil.getInstance().toJson(userModel, UserModel.class));
 
-        final String url = Url.VERIFY_OTP;
+        final String url = Url.UPDATE_USER_DETAIL;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -74,7 +74,7 @@ public class UserDetailViewModel extends AndroidViewModel {
                 try {
                     params.put(ApiConstant.FIRST_NAME, firstName);
                     params.put(ApiConstant.LAST_NAME, lastName);
-                    params.put(ApiConstant.USER, String.valueOf(userModel.getUserId()));
+                    params.put(ApiConstant.USER_ID, String.valueOf(userModel.getUserId()));
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }

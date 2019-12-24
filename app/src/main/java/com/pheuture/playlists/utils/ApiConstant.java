@@ -13,12 +13,13 @@ public final class ApiConstant {
     public static String PLAYLIST_ID = "playlist_id";
     public static String MEDIA_ID = "videoId";
     public static String USER = "user";
+    public static String USER_ID = "userId";
     public static String DUMMY_USER = "8586076390";
     public static String PHONE = "mobileNo";
     public static String HASHTAG = "hashtag";
     public static String OTP = "otp";
-    public static String FIRST_NAME = "firstName";
-    public static String LAST_NAME = "lastName";
+    public static String FIRST_NAME = "userFirstName";
+    public static String LAST_NAME = "userLastName";
 
 
 

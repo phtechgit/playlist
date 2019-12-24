@@ -17,10 +17,14 @@ import com.google.android.exoplayer2.util.Util;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.pheuture.playlists.auth.user_detail.UserModel;
 import com.pheuture.playlists.utils.AlerterUtils;
 import com.pheuture.playlists.utils.ApiConstant;
+import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
+import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.RealPathUtil;
+import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
 
 import cz.msebera.android.httpclient.Header;
@@ -35,9 +39,13 @@ public class UploadViewModel extends AndroidViewModel {
     private SimpleExoPlayer exoPlayer;
     private MutableLiveData<Boolean> showProgress;
     private MutableLiveData<Integer> progressPercentage;
+    private UserModel user;
 
     public UploadViewModel(@NonNull Application application) {
         super(application);
+        user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
+                getApplication(), Constants.USER, ""), UserModel.class);
+
         dataSourceFactory = new DefaultDataSourceFactory(application,
                 Util.getUserAgent(application, TAG));
         exoPlayer = ExoPlayerFactory.newSimpleInstance(application);
@@ -79,7 +87,7 @@ public class UploadViewModel extends AndroidViewModel {
             params.put("movieName", "dummy");
             params.put("artists", "dummy");
             params.put("movieDirector", "dummy");
-            params.put(ApiConstant.USER, ApiConstant.DUMMY_USER);
+            params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
         } catch (Exception e) {
             Logger.e(TAG, e.toString());
         }

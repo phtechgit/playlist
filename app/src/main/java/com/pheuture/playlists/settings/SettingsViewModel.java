@@ -1,14 +1,26 @@
 package com.pheuture.playlists.settings;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class SettingsViewModel extends ViewModel {
+import com.pheuture.playlists.auth.user_detail.UserModel;
+import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.utils.ParserUtil;
+import com.pheuture.playlists.utils.SharedPrefsUtils;
 
+public class SettingsViewModel extends AndroidViewModel {
     private MutableLiveData<String> mText;
+    private UserModel user;
 
-    public SettingsViewModel() {
+    public SettingsViewModel(@NonNull Application application) {
+        super(application);
+        user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
+                getApplication(), Constants.USER, ""), UserModel.class);
         mText = new MutableLiveData<>();
         mText.postValue("This is notifications fragment");
     }

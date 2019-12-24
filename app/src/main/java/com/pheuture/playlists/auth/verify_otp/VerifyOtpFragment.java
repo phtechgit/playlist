@@ -13,6 +13,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
+import com.pheuture.playlists.auth.AuthActivity;
 import com.pheuture.playlists.auth.user_detail.UserModel;
 import com.pheuture.playlists.auth.request_otp.RequestOtpFragment;
 import com.pheuture.playlists.databinding.FragmentVerifyOtpBinding;
@@ -35,8 +38,7 @@ import com.pheuture.playlists.utils.StringUtils;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class VerifyOtpFragment extends BaseFragment implements
-        SMSReceiver.OTPReceiveListener{
+public class VerifyOtpFragment extends BaseFragment implements TextWatcher, SMSReceiver.OTPReceiveListener{
     private static final String TAG = RequestOtpFragment.class.getSimpleName();
     private FragmentActivity activity;
     private FragmentVerifyOtpBinding binding;
@@ -48,6 +50,7 @@ public class VerifyOtpFragment extends BaseFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = getActivity();
+        ((AuthActivity)activity).setOnButtonClickListener(this);
     }
 
     @Override
@@ -70,11 +73,8 @@ public class VerifyOtpFragment extends BaseFragment implements
             @Override
             public void onChanged(UserModel user) {
                 if (StringUtils.isEmpty(user.getUserName())){
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable(ARG_PARAM1, user);
-
                     Navigation.findNavController(binding.getRoot())
-                            .navigate(R.id.action_navigation_verify_otp_to_navigation_user_detail, bundle);
+                            .navigate(R.id.action_navigation_verify_otp_to_navigation_user_detail);
 
                 } else {
                     Intent intent = new Intent(activity, MainActivity.class);
@@ -88,7 +88,7 @@ public class VerifyOtpFragment extends BaseFragment implements
 
     @Override
     public void setListeners() {
-
+        binding.ediTextOtp.addTextChangedListener(this);
     }
 
     @Override
@@ -139,6 +139,9 @@ public class VerifyOtpFragment extends BaseFragment implements
             smsReceiver = null;
         }
 
+        String[] data = otp.split(" ");
+        otp = data[data.length-2];
+
         binding.ediTextOtp.setText(otp);
         binding.ediTextOtp.setSelection(otp.length());
 
@@ -167,5 +170,24 @@ public class VerifyOtpFragment extends BaseFragment implements
 
     private void showToast(String msg) {
         Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        if (binding.ediTextOtp.getText().length()==6) {
+            ((AuthActivity)activity).showNextButton(true);
+        } else {
+            ((AuthActivity)activity).showNextButton(false);
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }

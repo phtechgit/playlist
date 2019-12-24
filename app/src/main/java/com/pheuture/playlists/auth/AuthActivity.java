@@ -1,16 +1,20 @@
 package com.pheuture.playlists.auth;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.user_detail.UserModel;
@@ -19,6 +23,7 @@ import com.pheuture.playlists.interfaces.ButtonClickInterface;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.BaseActivity;
 import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.StringUtils;
@@ -26,8 +31,8 @@ import com.pheuture.playlists.utils.StringUtils;
 public class AuthActivity extends BaseActivity {
     private static final String TAG = AuthActivity.class.getSimpleName();
     private ActivityAuthBinding binding;
-    private FragmentManager fragmentManager;
     private ButtonClickInterface buttonClickInterface;
+    private NavController navController;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -36,22 +41,35 @@ public class AuthActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public void initializations() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_auth);
+        setSupportActionBar(binding.toolbar);
 
-        UserModel user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(this, Constants.USER, ""), UserModel.class);
-        if (user == null || user.getUserId()==0){
-            Navigation.findNavController(binding.getRoot())
-                    .navigate(R.id.navigation_request_otp);
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_request_otp, R.id.navigation_verify_otp, R.id.navigation_user_detail)
+                .build();
 
-        } else if (StringUtils.isEmpty(user.getUserName())){
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(ARG_PARAM1, user);
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment_auth);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-            Navigation.findNavController(binding.getRoot())
-                    .navigate(R.id.action_navigation_verify_otp_to_navigation_user_detail);
+        UserModel user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
+                this, Constants.USER, ""), UserModel.class);
 
-        } else {
+        if (user != null && user.getUserId()!=0){
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -60,7 +78,7 @@ public class AuthActivity extends BaseActivity {
 
     @Override
     public void setListeners() {
-
+        binding.button.setOnClickListener(this);
     }
 
     @Override
@@ -71,9 +89,20 @@ public class AuthActivity extends BaseActivity {
     }
 
     public void setOnButtonClickListener(Fragment fragment){
+        Logger.e(TAG, "setOnButtonClickListener");
         if (fragment instanceof ButtonClickInterface) {
             this.buttonClickInterface = (ButtonClickInterface) fragment;
         }
     }
 
+    public void showNextButton(boolean status) {
+        binding.button.setEnabled(status);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!navController.popBackStack()) {
+            super.onBackPressed();
+        }
+    }
 }
