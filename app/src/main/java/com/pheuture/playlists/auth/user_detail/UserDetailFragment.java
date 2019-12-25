@@ -46,7 +46,11 @@ public class UserDetailFragment extends BaseFragment implements TextWatcher, But
 
     @Override
     public void initializations() {
-
+        if (binding.ediTextFirstName.getText().length()>0) {
+            ((AuthActivity)activity).showNextButton(true);
+        } else {
+            ((AuthActivity)activity).showNextButton(false);
+        }
     }
 
     @Override
@@ -66,7 +70,11 @@ public class UserDetailFragment extends BaseFragment implements TextWatcher, But
 
     @Override
     public void onButtonClick() {
+        viewModel.updateUserDetail(binding.ediTextFirstName.getText().toString(), binding.ediTextLastName.getText().toString());
 
+        Intent intent = new Intent(activity, MainActivity.class);
+        startActivity(intent);
+        activity.finish();
     }
 
     @Override

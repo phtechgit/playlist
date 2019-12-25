@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -57,6 +58,7 @@ public class AuthActivity extends BaseActivity {
     @Override
     public void initializations() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_auth);
+
         setSupportActionBar(binding.toolbar);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -69,7 +71,7 @@ public class AuthActivity extends BaseActivity {
         UserModel user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 this, Constants.USER, ""), UserModel.class);
 
-        if (user != null && user.getUserId()!=0){
+        if (user != null && user.getUserId()!=0 && !StringUtils.isEmpty(user.getUserName())){
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -78,12 +80,12 @@ public class AuthActivity extends BaseActivity {
 
     @Override
     public void setListeners() {
-        binding.button.setOnClickListener(this);
+        binding.fab.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        if (v.equals(binding.button)) {
+        if (v.equals(binding.fab)) {
             buttonClickInterface.onButtonClick();
         }
     }
@@ -96,12 +98,19 @@ public class AuthActivity extends BaseActivity {
     }
 
     public void showNextButton(boolean status) {
-        binding.button.setEnabled(status);
+        if (status) {
+            binding.fab.show();
+        } else {
+            binding.fab.hide();
+        }
     }
 
     @Override
     public void onBackPressed() {
-        if (!navController.popBackStack()) {
+        if (navController.getCurrentDestination().getId() == R.id.navigation_user_detail) {
+            finish();
+
+        } else if (!navController.popBackStack()) {
             super.onBackPressed();
         }
     }

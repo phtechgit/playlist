@@ -50,7 +50,11 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
 
     @Override
     public void initializations() {
-
+        if (binding.ediTextPhone.getText().length()==10) {
+            ((AuthActivity)activity).showNextButton(true);
+        } else {
+            ((AuthActivity)activity).showNextButton(false);
+        }
     }
 
     @Override

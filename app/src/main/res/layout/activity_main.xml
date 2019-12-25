@@ -11,7 +11,6 @@
             android:id="@+id/toolbar"
             style="@style/myToolbar"
             app:titleTextAppearance="@style/Toolbar.TitleText"
-            app:title="hello"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"

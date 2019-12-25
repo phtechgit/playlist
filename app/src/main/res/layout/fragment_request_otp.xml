@@ -28,7 +28,7 @@
             android:lines="1"
             android:maxLength="10"
             android:inputType="phone"
-            android:imeOptions="actionNext"
+            android:imeOptions="actionDone"
             android:textColor="@color/gray3"
             android:background="@drawable/edittext_background_gray"
             app:layout_constraintEnd_toEndOf="parent"

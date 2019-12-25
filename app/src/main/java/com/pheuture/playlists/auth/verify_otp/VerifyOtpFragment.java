@@ -83,6 +83,13 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher, SMSR
                 }
             }
         });
+
+        if (binding.ediTextOtp.getText().length()==6) {
+            ((AuthActivity)activity).showNextButton(true);
+        } else {
+            ((AuthActivity)activity).showNextButton(false);
+        }
+
         startSMSListener();
     }
 

@@ -5,6 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -72,5 +74,9 @@ public class RequestOtpViewModel extends AndroidViewModel {
         stringRequest.setTag(TAG);
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
+    }
+
+    public void getButtonStatus() {
+
     }
 }
