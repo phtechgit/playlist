@@ -25,8 +25,8 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 	@SerializedName("created_time")
 	private long createdDate;
 
-	@SerializedName("created_by")
-	private long createdBy;
+	@SerializedName("createdby")
+	private String createdBy;
 
 	@SerializedName("total_duration")
 	private long playDuration;
@@ -43,23 +43,17 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 	protected PlaylistEntity(Parcel in) {
 		playlistID = in.readLong();
 		createdDate = in.readLong();
-		createdBy = in.readLong();
+		createdBy = in.readString();
 		playDuration = in.readLong();
 		playlistName = in.readString();
 		songsCount = in.readLong();
-	}
-
-	@NonNull
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
 	}
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(playlistID);
 		dest.writeLong(createdDate);
-		dest.writeLong(createdBy);
+		dest.writeString(createdBy);
 		dest.writeLong(playDuration);
 		dest.writeString(playlistName);
 		dest.writeLong(songsCount);
@@ -81,6 +75,12 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 			return new PlaylistEntity[size];
 		}
 	};
+
+	@NonNull
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 
 	public long getPlaylistID() {
 		return playlistID;
@@ -132,18 +132,22 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 	}
 
 	public String getSongsCountWithFormattedTotalPlaybackTime(){
-		return songsCount + " song \u2022 " + CalenderUtils.getTimeDurationFormat2(playDuration);
+		if (songsCount>1) {
+			return songsCount + " songs \u2022 " + CalenderUtils.getTimeDurationFormat2(playDuration);
+		} else {
+			return songsCount + " song \u2022 " + CalenderUtils.getTimeDurationFormat2(playDuration);
+		}
 	}
 
 	public String getCreatedByFormatted(){
-		return "by " + ApiConstant.DUMMY_USER;
+		return "by " + createdBy;
 	}
 
-	public long getCreatedBy() {
+	public String getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(long createdBy) {
+	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
 }

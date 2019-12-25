@@ -15,12 +15,15 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AuthActivity;
 import com.pheuture.playlists.databinding.FragmentRequestOtpBinding;
 import com.pheuture.playlists.interfaces.ButtonClickInterface;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.Logger;
+import com.pheuture.playlists.utils.NetworkUtils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -68,24 +71,12 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
     }
 
     @Override
-    public void onAttach(@NotNull Context context) {
-        mContext = context;
-        Logger.e(TAG, "onAttach");
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        mContext = null;
-        Logger.e(TAG, "onDetach");
-        super.onDetach();
-    }
-
-    @Override
     public void onButtonClick() {
-        if (mContext==null){
+        if (!NetworkUtils.online(activity)){
+            Toast.makeText(activity, getString(R.string.no_internet_error), Toast.LENGTH_SHORT).show();
             return;
         }
+
         String phone = binding.ediTextPhone.getText().toString();
         viewModel.requestOTP(phone);
 

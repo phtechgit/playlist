@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -14,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +33,7 @@ import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.EditTextInputFilter;
 import com.pheuture.playlists.utils.KeyboardUtils;
+import com.pheuture.playlists.utils.StringUtils;
 
 import java.util.List;
 
@@ -43,6 +44,7 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
     private FragmentMyPlaylistsBinding binding;
     private PlaylistsRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
+    private String searchQuery;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,26 +75,10 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
                 new SimpleDividerItemDecoration(getResources().getDrawable(R.drawable.line_divider),
                         0, 0));*/
 
-        viewModel.getPlaylists().observe(this, new Observer<List<PlaylistEntity>>() {
-            @Override
-            public void onChanged(List<PlaylistEntity> playlistEntities) {
-                if (playlistEntities.size()>0){
-                    ((MainActivity) activity).updateActionBarStatus(true);
-                    binding.linearLayoutCreatePlaylist.setVisibility(View.GONE);
-                    binding.relativeLayoutPlaylists.setVisibility(View.VISIBLE);
-
-                } else {
-                    ((MainActivity) activity).updateActionBarStatus(false);
-                    binding.linearLayoutCreatePlaylist.setVisibility(View.VISIBLE);
-                    binding.relativeLayoutPlaylists.setVisibility(View.GONE);
-                }
-                recyclerAdapter.setData(playlistEntities);
-            }
-        });
-
         viewModel.getSearchQuery().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
+                searchQuery = s;
                 viewModel.getFreshData();
             }
         });
@@ -105,6 +91,23 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
                 } else {
                     hideProgress(binding.progressLayout.progressFullscreen);
                 }*/
+            }
+        });
+
+        viewModel.getPlaylists().observe(this, new Observer<List<PlaylistEntity>>() {
+            @Override
+            public void onChanged(List<PlaylistEntity> playlistEntities) {
+                if (StringUtils.isEmpty(searchQuery) && playlistEntities.size()==0){
+                    ((MainActivity) activity).updateActionBarStatus(false);
+                    binding.linearLayoutCreatePlaylist.setVisibility(View.VISIBLE);
+                    binding.relativeLayoutPlaylists.setVisibility(View.GONE);
+
+                } else {
+                    ((MainActivity) activity).updateActionBarStatus(true);
+                    binding.linearLayoutCreatePlaylist.setVisibility(View.GONE);
+                    binding.relativeLayoutPlaylists.setVisibility(View.VISIBLE);
+                }
+                recyclerAdapter.setData(playlistEntities);
             }
         });
     }
@@ -166,9 +169,12 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
                 editText.requestFocus();
 
             } else {
+                if (viewModel.isExistingPlaylist(editText.getText().toString())) {
+                    Toast.makeText(activity, "Playlist already present with same name!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 dialog.dismiss();
                 viewModel.createPlaylist(editText.getText().toString());
-
             }
         });
         /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/
@@ -208,12 +214,12 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
                         .navigate(R.id.action_navigation_playlist_to_navigation_playlist_detail, bundle);
             }
         } else {
-            showDeletePlaylistDialog(position, model);
+            showDeletePlaylistDialog(model);
         }
 
     }
 
-    private void showDeletePlaylistDialog(int position, PlaylistEntity model) {
+    private void showDeletePlaylistDialog(PlaylistEntity model) {
         Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;

@@ -8,6 +8,7 @@
         android:layout_height="match_parent">
 
         <androidx.appcompat.widget.Toolbar
+            android:visibility="gone"
             android:id="@+id/toolbar"
             style="@style/myToolbar"
             app:titleTextAppearance="@style/Toolbar.TitleText"

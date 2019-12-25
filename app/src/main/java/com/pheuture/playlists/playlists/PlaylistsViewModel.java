@@ -325,4 +325,9 @@ public class PlaylistsViewModel extends AndroidViewModel {
         stringRequest.setTag(TAG);
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }
+
+    public boolean isExistingPlaylist(String playlistName) {
+        List<PlaylistEntity> existingPlaylist = playlistDao.getPlaylist(playlistName);
+        return existingPlaylist != null && existingPlaylist.size() != 0;
+    }
 }

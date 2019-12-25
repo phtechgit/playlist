@@ -34,4 +34,7 @@ public interface PlaylistDao {
 
     @Query("delete from PlaylistEntity where playlistID=:playlistID")
     void deletePlaylist(long playlistID);
+
+    @Query("select * from PlaylistEntity where playlistName like:playlistName")
+    List<PlaylistEntity> getPlaylist(String playlistName);
 }

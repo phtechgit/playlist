@@ -31,6 +31,9 @@ public class MediaEntity implements Parcelable {
 	@SerializedName("videoName")
 	private String videoName;
 
+	@SerializedName("videoTitle")
+	private String videoTitle;
+
 	@SerializedName("video_duration")
 	private long playDuration;
 
@@ -49,6 +52,7 @@ public class MediaEntity implements Parcelable {
 		videoUrl = in.readString();
 		videoThumbnail = in.readString();
 		videoName = in.readString();
+		videoTitle = in.readString();
 		playDuration = in.readLong();
 		postDate = in.readString();
 		status = in.readString();
@@ -61,6 +65,7 @@ public class MediaEntity implements Parcelable {
 		dest.writeString(videoUrl);
 		dest.writeString(videoThumbnail);
 		dest.writeString(videoName);
+		dest.writeString(videoTitle);
 		dest.writeLong(playDuration);
 		dest.writeString(postDate);
 		dest.writeString(status);
@@ -160,4 +165,12 @@ public class MediaEntity implements Parcelable {
     public String getFormattedPlayDuration() {
 		return CalenderUtils.getTimeDurationInFormat1(playDuration);
     }
+
+	public String getVideoTitle() {
+		return videoTitle;
+	}
+
+	public void setVideoTitle(String videoTitle) {
+		this.videoTitle = videoTitle;
+	}
 }

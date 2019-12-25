@@ -32,25 +32,11 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     private Context mContext;
     private List<MediaEntity> oldList;
     private RecyclerViewInterface recyclerViewInterface;
-    private SimpleExoPlayer exoPlayer;
-    private DataSource.Factory dataSourceFactory;
-    private PlayerView playerView;
     private int playerPosition = RecyclerView.NO_POSITION;
 
     TrendingRecyclerAdapter(TrendingFragment context) {
         this.mContext = context.getContext();
-        this.recyclerViewInterface = (RecyclerViewInterface) context;
-
-        exoPlayer = ExoPlayerFactory.newSimpleInstance(mContext);
-        exoPlayer.setPlayWhenReady(true);
-
-        dataSourceFactory = new DefaultDataSourceFactory(mContext,
-                Util.getUserAgent(mContext, TAG));
-
-        playerView = new PlayerView(mContext);
-        playerView.setUseController(true);
-        playerView.setPlayer(exoPlayer);
-
+        this.recyclerViewInterface = context;
     }
 
     @NonNull
@@ -65,7 +51,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         MyViewHolder holder = (MyViewHolder) recyclerHOlder;
 
         MediaEntity model = oldList.get(position);
-        holder.binding.setMediaTitle(model.getVideoName());
+        holder.binding.setMediaTitle(model.getVideoTitle());
         holder.binding.setMediaDescription(model.getVideoDescription());
         holder.binding.setMediaThumbnail(model.getVideoThumbnail());
         holder.binding.setMediaDuration(model.getFormattedPlayDuration());

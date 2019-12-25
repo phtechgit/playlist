@@ -3,6 +3,7 @@ package com.pheuture.playlists.auth.verify_otp;
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.volley.Request;
@@ -24,6 +25,7 @@ import java.util.Map;
 public class VerifyOtpViewModel extends AndroidViewModel {
     private static final String TAG = VerifyOtpViewModel.class.getSimpleName();
     private String phone;
+    private MutableLiveData<Boolean> showProgress = new MutableLiveData<>();
     private MutableLiveData<UserModel> userModelMutableLiveData = new MutableLiveData<>();
 
     public VerifyOtpViewModel(@NonNull Application application, String phone) {
@@ -32,12 +34,15 @@ public class VerifyOtpViewModel extends AndroidViewModel {
     }
 
     public void verifyOtp(String otp) {
+        showProgress.postValue(true);
+
         final String url = Url.VERIFY_OTP;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
+                    showProgress.postValue(false);
                     Logger.e(url + ApiConstant.RESPONSE, response);
                     JSONObject responseJsonObject = new JSONObject(response);
                     if (!responseJsonObject.optBoolean(ApiConstant.MESSAGE, false)) {
@@ -50,7 +55,8 @@ public class VerifyOtpViewModel extends AndroidViewModel {
                     }
 
                     SharedPrefsUtils.setStringPreference(getApplication(), Constants.USER, responseJsonObject.optString(ApiConstant.DATA));
-                    userModelMutableLiveData.postValue(userModel);
+
+                    userModelMutableLiveData.setValue(userModel);
 
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
@@ -60,6 +66,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
             @Override
             public void onErrorResponse(VolleyError e) {
                 try {
+                    showProgress.postValue(false);
                     Logger.e(TAG, e.toString());
                 } catch (Exception ex) {
                     Logger.e(TAG, ex.toString());
@@ -86,5 +93,9 @@ public class VerifyOtpViewModel extends AndroidViewModel {
 
     public MutableLiveData<UserModel> getUserLive() {
         return userModelMutableLiveData;
+    }
+
+    public MutableLiveData<Boolean> getProgressStatus() {
+        return showProgress;
     }
 }

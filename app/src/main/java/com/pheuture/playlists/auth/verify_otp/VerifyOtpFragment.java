@@ -38,7 +38,7 @@ import com.pheuture.playlists.utils.StringUtils;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class VerifyOtpFragment extends BaseFragment implements TextWatcher, SMSReceiver.OTPReceiveListener{
+public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPReceiveListener{
     private static final String TAG = RequestOtpFragment.class.getSimpleName();
     private FragmentActivity activity;
     private FragmentVerifyOtpBinding binding;
@@ -69,6 +69,10 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher, SMSR
 
     @Override
     public void initializations() {
+        ((AuthActivity)activity).showNextButton(false);
+
+        binding.textViewMessage.setText("Waiting to automatically detect an SMS sent to " + phone);
+
         viewModel.getUserLive().observe(this, new Observer<UserModel>() {
             @Override
             public void onChanged(UserModel user) {
@@ -84,18 +88,23 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher, SMSR
             }
         });
 
-        if (binding.ediTextOtp.getText().length()==6) {
-            ((AuthActivity)activity).showNextButton(true);
-        } else {
-            ((AuthActivity)activity).showNextButton(false);
-        }
+        viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean show) {
+                if(show){
+                    showProgress(binding.progressLayout.relativeLayoutProgress, true);
+                } else {
+                    hideProgress(binding.progressLayout.relativeLayoutProgress);
+                }
+            }
+        });
 
         startSMSListener();
     }
 
     @Override
     public void setListeners() {
-        binding.ediTextOtp.addTextChangedListener(this);
+
     }
 
     @Override
@@ -149,8 +158,7 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher, SMSR
         String[] data = otp.split(" ");
         otp = data[data.length-2];
 
-        binding.ediTextOtp.setText(otp);
-        binding.ediTextOtp.setSelection(otp.length());
+        binding.textViewOtp.setText(otp);
 
         viewModel.verifyOtp(otp);
     }
@@ -177,24 +185,5 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher, SMSR
 
     private void showToast(String msg) {
         Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (binding.ediTextOtp.getText().length()==6) {
-            ((AuthActivity)activity).showNextButton(true);
-        } else {
-            ((AuthActivity)activity).showNextButton(false);
-        }
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
     }
 }
