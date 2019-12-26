@@ -1,4 +1,4 @@
-package com.pheuture.playlists.playlists.detail;
+package com.pheuture.playlists.playlist.detail;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -48,13 +48,9 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (getArguments() == null) {
-            return null;
-        }
-        playlist = getArguments().getParcelable(ARG_PARAM1);
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_playlist_detail, container, false);
         viewModel = ViewModelProviders.of(this, new PlaylistDetailViewModelFactory(
-                activity.getApplication(), playlist)).get(PlaylistDetailViewModel.class);
+                activity.getApplication(), getArguments().getLong(ARG_PARAM1))).get(PlaylistDetailViewModel.class);
         return binding.getRoot();
     }
 
@@ -168,7 +164,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
         textViewTitle.setText("Are you sure?");
-        textViewSubtitle.setText("Do you want to remove " + model.getVideoName() + " from the playlist?");
+        textViewSubtitle.setText("Do you want to remove " + model.getMediaName() + " from the playlist?");
         textViewSubtitle.setVisibility(View.VISIBLE);
         textViewRight.setText("Remove");
 

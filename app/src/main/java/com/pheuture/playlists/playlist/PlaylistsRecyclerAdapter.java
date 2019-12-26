@@ -1,4 +1,4 @@
-package com.pheuture.playlists.playlists;
+package com.pheuture.playlists.playlist;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -26,7 +26,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
     private List<PlaylistEntity> oldList;
     private RecyclerViewInterface recyclerViewInterface;
 
-    PlaylistsRecyclerAdapter(PlaylistsFragment context) {
+    PlaylistsRecyclerAdapter(PlaylistFragment context) {
         this.mContext = context.getContext();
         this.recyclerViewInterface = context;
     }
@@ -106,7 +106,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             if (contentsDifferent(String.valueOf(oldModel.getPlayDuration()), String.valueOf(newModel.getPlayDuration()))){
                 return false;
             }
-            if (contentsDifferent(String.valueOf(oldModel.getCreatedDate()), String.valueOf(newModel.getCreatedDate()))){
+            if (contentsDifferent(String.valueOf(oldModel.getCreatedOn()), String.valueOf(newModel.getCreatedOn()))){
                 return false;
             }
             return true;

@@ -10,31 +10,32 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
-import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.CalenderUtils;
 
 @Entity
 public class PlaylistEntity implements Parcelable, Cloneable {
 
-
 	@NonNull
 	@PrimaryKey
-	@SerializedName("id")
+	@SerializedName("playlistID")
 	private long playlistID;
 
-	@SerializedName("created_time")
-	private long createdDate;
+	@SerializedName("createdOn")
+	private long createdOn;
 
-	@SerializedName("createdby")
-	private String createdBy;
+	@SerializedName("createdByUserID")
+	private long createdByUserID;
 
-	@SerializedName("total_duration")
+	@SerializedName("createdByUserName")
+	private String createdByUserName;
+
+	@SerializedName("playDuration")
 	private long playDuration;
 
 	@SerializedName("playlistName")
 	private String playlistName;
 
-	@SerializedName("total_songs")
+	@SerializedName("songsCount")
 	private long songsCount;
 
 	public PlaylistEntity() {
@@ -42,8 +43,9 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 
 	protected PlaylistEntity(Parcel in) {
 		playlistID = in.readLong();
-		createdDate = in.readLong();
-		createdBy = in.readString();
+		createdOn = in.readLong();
+		createdByUserID = in.readLong();
+		createdByUserName = in.readString();
 		playDuration = in.readLong();
 		playlistName = in.readString();
 		songsCount = in.readLong();
@@ -52,8 +54,9 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(playlistID);
-		dest.writeLong(createdDate);
-		dest.writeString(createdBy);
+		dest.writeLong(createdOn);
+		dest.writeLong(createdByUserID);
+		dest.writeString(createdByUserName);
 		dest.writeLong(playDuration);
 		dest.writeString(playlistName);
 		dest.writeLong(songsCount);
@@ -90,12 +93,12 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 		this.playlistID = playlistID;
 	}
 
-	public long getCreatedDate() {
-		return createdDate;
+	public long getCreatedOn() {
+		return createdOn;
 	}
 
-	public void setCreatedDate(long createdDate) {
-		this.createdDate = createdDate;
+	public void setCreatedOn(long createdOn) {
+		this.createdOn = createdOn;
 	}
 
 	public long getPlayDuration() {
@@ -140,14 +143,22 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 	}
 
 	public String getCreatedByFormatted(){
-		return "by " + createdBy;
+		return "by " + createdByUserName;
 	}
 
-	public String getCreatedBy() {
-		return createdBy;
+	public String getCreatedByUserName() {
+		return createdByUserName;
 	}
 
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
+	public void setCreatedByUserName(String createdByUserName) {
+		this.createdByUserName = createdByUserName;
+	}
+
+	public long getCreatedByUserID() {
+		return createdByUserID;
+	}
+
+	public void setCreatedByUserID(long createdByUserID) {
+		this.createdByUserID = createdByUserID;
 	}
 }

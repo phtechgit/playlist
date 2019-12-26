@@ -188,7 +188,7 @@ public class MainActivity extends BaseActivity {
             Logger.e(TAG, "media loading Offline from: " + mediaUri);
 
         } else {
-            mediaUri = Uri.parse(media.getVideoUrl());
+            mediaUri = Uri.parse(media.getMediaUrl());
             Logger.e(TAG, "media loading Online from: " + mediaUri);
         }
 
@@ -197,8 +197,8 @@ public class MainActivity extends BaseActivity {
                 .createMediaSource(mediaUri);
         exoPlayer.prepare(mediaSource);
 
-        binding.layoutBottomSheet.textViewTitle.setText(media.getVideoName());
-        binding.layoutBottomSheet.textViewCreator.setText(media.getVideoDescription());
+        binding.layoutBottomSheet.textViewTitle.setText(media.getMediaName());
+        binding.layoutBottomSheet.textViewCreator.setText(media.getMediaDescription());
     }
 
     private Runnable runnable = new Runnable() {

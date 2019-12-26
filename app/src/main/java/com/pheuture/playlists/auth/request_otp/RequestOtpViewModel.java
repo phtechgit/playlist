@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.auth.AppSignatureHelper;
 import com.pheuture.playlists.utils.ApiConstant;
@@ -28,15 +29,27 @@ public class RequestOtpViewModel extends AndroidViewModel {
     }
 
     public void requestOTP(String phone) {
+        AppSignatureHelper appSignatureHashHelper = new AppSignatureHelper(getApplication());
+        String hashKey = appSignatureHashHelper.getAppSignatures().get(0);
+        Log.i(TAG, "HashKey: " + hashKey);
+
         final String url = Url.REQUEST_OTP;
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        JSONObject params = new JSONObject();
+        try {
+            params.put(ApiConstant.PHONE, phone);
+            params.put(ApiConstant.HASHTAG, hashKey);
+        } catch (Exception e) {
+            Logger.e(TAG, e.toString());
+        }
+        Logger.e(url + ApiConstant.PARAMS, params.toString());
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, params, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    Logger.e(url + ApiConstant.RESPONSE, response);
-                    JSONObject responseJsonObject = new JSONObject(response);
-                    if (!responseJsonObject.optBoolean(ApiConstant.MESSAGE, false)) {
+                    Logger.e(url + ApiConstant.RESPONSE, response.toString());
+                    if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         return;
                     }
 
@@ -48,35 +61,14 @@ public class RequestOtpViewModel extends AndroidViewModel {
             @Override
             public void onErrorResponse(VolleyError e) {
                 try {
-                    Logger.e(TAG, e.toString());
+                    Logger.e(url, e.toString());
                 } catch (Exception ex) {
                     Logger.e(TAG, ex.toString());
                 }
             }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                AppSignatureHelper appSignatureHashHelper = new AppSignatureHelper(getApplication());
-                String hashKey = appSignatureHashHelper.getAppSignatures().get(0);
-                Log.i(TAG, "HashKey: " + hashKey);
-
-                Map<String, String> params = new HashMap<>();
-                try {
-                    params.put(ApiConstant.PHONE, phone);
-                    params.put(ApiConstant.HASHTAG, hashKey);
-                } catch (Exception e) {
-                    Logger.e(TAG, e.toString());
-                }
-                Logger.e(url + ApiConstant.PARAMS, params.toString());
-                return params;
-            }
-        };
-        stringRequest.setTag(TAG);
+        });
+        jsonObjectRequest.setTag(TAG);
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
-        VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
-    }
-
-    public void getButtonStatus() {
-
+        VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
     }
 }

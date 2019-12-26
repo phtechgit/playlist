@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.auth.user_detail.UserModel;
 import com.pheuture.playlists.utils.ApiConstant;
@@ -38,23 +39,31 @@ public class VerifyOtpViewModel extends AndroidViewModel {
 
         final String url = Url.VERIFY_OTP;
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        JSONObject params = new JSONObject();
+        try {
+            params.put(ApiConstant.PHONE, phone);
+            params.put(ApiConstant.OTP, otp);
+        } catch (Exception e) {
+            Logger.e(TAG, e.toString());
+        }
+        Logger.e(url + ApiConstant.PARAMS, params.toString());
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, params, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(JSONObject response) {
                 try {
                     showProgress.postValue(false);
-                    Logger.e(url + ApiConstant.RESPONSE, response);
-                    JSONObject responseJsonObject = new JSONObject(response);
-                    if (!responseJsonObject.optBoolean(ApiConstant.MESSAGE, false)) {
+                    Logger.e(url + ApiConstant.RESPONSE, response.toString());
+                    if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         return;
                     }
 
-                    UserModel userModel = ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), UserModel.class);
+                    UserModel userModel = ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), UserModel.class);
                     if (userModel==null){
                         return;
                     }
 
-                    SharedPrefsUtils.setStringPreference(getApplication(), Constants.USER, responseJsonObject.optString(ApiConstant.DATA));
+                    SharedPrefsUtils.setStringPreference(getApplication(), Constants.USER, response.optString(ApiConstant.DATA));
 
                     userModelMutableLiveData.setValue(userModel);
 
@@ -67,28 +76,15 @@ public class VerifyOtpViewModel extends AndroidViewModel {
             public void onErrorResponse(VolleyError e) {
                 try {
                     showProgress.postValue(false);
-                    Logger.e(TAG, e.toString());
+                    Logger.e(url, e.toString());
                 } catch (Exception ex) {
                     Logger.e(TAG, ex.toString());
                 }
             }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                try {
-                    params.put(ApiConstant.PHONE, phone);
-                    params.put(ApiConstant.OTP, otp);
-                } catch (Exception e) {
-                    Logger.e(TAG, e.toString());
-                }
-                Logger.e(url + ApiConstant.PARAMS, params.toString());
-                return params;
-            }
-        };
-        stringRequest.setTag(TAG);
+        });
+        jsonObjectRequest.setTag(TAG);
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
-        VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
+        VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
     }
 
     public MutableLiveData<UserModel> getUserLive() {

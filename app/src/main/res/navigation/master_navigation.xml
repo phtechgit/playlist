@@ -8,9 +8,9 @@
 
     <fragment
         android:id="@+id/navigation_playlists"
-        android:name="com.pheuture.playlists.playlists.PlaylistsFragment"
+        android:name="com.pheuture.playlists.playlist.PlaylistFragment"
         android:label="@string/title_my_playlist"
-        tools:layout="@layout/fragment_my_playlists" >
+        tools:layout="@layout/fragment_playlist" >
         <action
             android:id="@+id/action_navigation_playlist_to_navigation_playlist_detail"
             app:destination="@id/navigation_playlist_detail" />
@@ -19,7 +19,7 @@
     <fragment
         android:id="@+id/navigation_playlist_detail"
         android:label=" "
-        android:name="com.pheuture.playlists.playlists.detail.PlaylistDetailFragment"
+        android:name="com.pheuture.playlists.playlist.detail.PlaylistDetailFragment"
         tools:layout="@layout/fragment_playlist_detail">
         <action
             android:id="@+id/action_navigation_playlist_detail_to_navigation_media"

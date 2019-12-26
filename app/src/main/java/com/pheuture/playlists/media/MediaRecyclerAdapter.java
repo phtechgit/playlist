@@ -48,9 +48,9 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         MyViewHolder holder = (MyViewHolder) recyclerHOlder;
 
         MediaEntity model = oldList.get(position);
-        holder.binding.setMediaTitle(model.getVideoTitle());
-        holder.binding.setMediaDescription(model.getVideoDescription());
-        holder.binding.setMediaThumbnail(model.getVideoThumbnail());
+        holder.binding.setMediaTitle(model.getMediaTitle());
+        holder.binding.setMediaDescription(model.getMediaDescription());
+        holder.binding.setMediaThumbnail(model.getMediaThumbnail());
         holder.binding.setMediaDuration(model.getFormattedPlayDuration());
     }
 
@@ -96,16 +96,16 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             MediaEntity oldModel = oldList.get(oldItemPosition);
             MediaEntity newModel = newList.get(newItemPosition);
 
-            if (contentsDifferent(oldModel.getVideoName(), newModel.getVideoName())){
+            if (contentsDifferent(oldModel.getMediaName(), newModel.getMediaName())){
                 return false;
             }
-            if (contentsDifferent(oldModel.getVideoDescription(), newModel.getVideoDescription())){
+            if (contentsDifferent(oldModel.getMediaDescription(), newModel.getMediaDescription())){
                 return false;
             }
-            if (contentsDifferent(oldModel.getVideoThumbnail(), newModel.getVideoThumbnail())){
+            if (contentsDifferent(oldModel.getMediaThumbnail(), newModel.getMediaThumbnail())){
                 return false;
             }
-            if (contentsDifferent(oldModel.getVideoUrl(), newModel.getVideoUrl())){
+            if (contentsDifferent(oldModel.getMediaUrl(), newModel.getMediaUrl())){
                 return false;
             }
             if (contentsDifferent(String.valueOf(oldModel.getPostDate()), String.valueOf(newModel.getPostDate()))){

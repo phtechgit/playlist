@@ -9,6 +9,7 @@ import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 
 @Entity
 public class OfflineMediaEntity extends MediaEntity implements Parcelable {
+    
     private long downloadID;
     private int downloadStatus;
     private String downloadedFilePath;

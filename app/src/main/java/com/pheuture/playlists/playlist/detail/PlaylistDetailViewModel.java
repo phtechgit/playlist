@@ -1,4 +1,4 @@
-package com.pheuture.playlists.playlists.detail;
+package com.pheuture.playlists.playlist.detail;
 
 import android.app.Application;
 import android.app.DownloadManager;
@@ -11,15 +11,18 @@ import androidx.lifecycle.MutableLiveData;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.pheuture.playlists.auth.user_detail.UserModel;
 import com.pheuture.playlists.datasource.local.LocalRepository;
+import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
+import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaDao;
 import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaEntity;
+import com.pheuture.playlists.service.PendingApiExecutorService;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
@@ -27,13 +30,13 @@ import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
 import com.pheuture.playlists.utils.VolleyClient;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 import static android.content.Context.DOWNLOAD_SERVICE;
 
 public class PlaylistDetailViewModel extends AndroidViewModel {
@@ -51,14 +54,17 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     private OfflineMediaDao offlineMediaDao;
     private DownloadManager downloadManager;
     private UserModel user;
+    private PendingUploadDao pendingUploadDao;
 
-    public PlaylistDetailViewModel(@NonNull Application application, PlaylistEntity model) {
+    public PlaylistDetailViewModel(@NonNull Application application, long playlistID) {
         super(application);
-        this.playlistID = model.getPlaylistID();
+        this.playlistID = playlistID;
+
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 getApplication(), Constants.USER, ""), UserModel.class);
 
         limit = 20;
+        pendingUploadDao = LocalRepository.getInstance(application).pendingUploadDao();
         playlistDao = LocalRepository.getInstance(application).playlistDao();
         playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
         offlineMediaDao = LocalRepository.getInstance(application).offlineVideoDao();
@@ -85,31 +91,29 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
 
         final String url = Url.PLAYLIST_VIDEOS;
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        JSONObject params = new JSONObject();
+        try {
+            params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
+            params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistID));
+            params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
+            params.put(ApiConstant.LIMIT, String.valueOf(limit));
+        } catch (JSONException e) {
+            Logger.e(TAG, e.toString());
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, params, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(JSONObject response) {
                 try {
                     showProgress.postValue(false);
-                    Logger.e(url + ApiConstant.RESPONSE, response);
+                    Logger.e(url + ApiConstant.RESPONSE, response.toString());
 
-                    JSONObject responseJsonObject = new JSONObject(response);
-
-                    if (!responseJsonObject.optBoolean(ApiConstant.MESSAGE, false)) {
+                    if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         return;
                     }
 
-                    /*long songsCount = responseJsonObject.optLong("total_songs", 0);
-                    long playbackDuration = responseJsonObject.optLong("total_duration", 0);
-
-                    //update playlist entity
-                    PlaylistEntity newPlaylistEntity = playlistEntity.getValue();
-                    assert newPlaylistEntity != null;
-                    newPlaylistEntity.setPlayDuration(playbackDuration);
-                    newPlaylistEntity.setSongsCount(songsCount);
-                    playlistDao.insert(newPlaylistEntity);*/
-
                     List<PlaylistMediaEntity> list = Arrays.asList(ParserUtil.getInstance()
-                            .fromJson(responseJsonObject.optString(ApiConstant.DATA),
+                            .fromJson(response.optString(ApiConstant.DATA),
                                     PlaylistMediaEntity[].class));
 
                     updateDbPlaylistMedia(list);
@@ -136,30 +140,15 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
             public void onErrorResponse(VolleyError e) {
                 try {
                     showProgress.postValue(false);
-                    Logger.e(TAG, e.toString());
+                    Logger.e(url, e.toString());
                 } catch (Exception ex) {
                     Logger.e(TAG, ex.toString());
                 }
             }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                try {
-                    params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
-                    params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistID));
-                    params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
-                    params.put(ApiConstant.LIMIT, String.valueOf(limit));
-                } catch (Exception e) {
-                    Logger.e(TAG, e.toString());
-                }
-                Logger.e(url + ApiConstant.PARAMS, params.toString());
-                return params;
-            }
-        };
-        stringRequest.setTag(TAG);
+        });
+        jsonObjectRequest.setTag(TAG);
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
-        VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
+        VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
     }
 
     private void updateDbPlaylistMedia(List<PlaylistMediaEntity> list) {
@@ -198,19 +187,19 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                     OfflineMediaEntity offlineVideoEntity = new OfflineMediaEntity();
 
                     offlineVideoEntity.setMediaID(mediaEntity.getMediaID());
-                    offlineVideoEntity.setVideoName(mediaEntity.getVideoName());
-                    offlineVideoEntity.setVideoDescription(mediaEntity.getVideoDescription());
-                    offlineVideoEntity.setVideoThumbnail(mediaEntity.getVideoThumbnail());
-                    offlineVideoEntity.setVideoUrl(mediaEntity.getVideoUrl());
+                    offlineVideoEntity.setMediaName(mediaEntity.getMediaName());
+                    offlineVideoEntity.setMediaDescription(mediaEntity.getMediaDescription());
+                    offlineVideoEntity.setMediaThumbnail(mediaEntity.getMediaThumbnail());
+                    offlineVideoEntity.setMediaUrl(mediaEntity.getMediaUrl());
                     offlineVideoEntity.setPostDate(mediaEntity.getPostDate());
                     offlineVideoEntity.setStatus(mediaEntity.getStatus());
                     offlineVideoEntity.setDownloadedFilePath(getFile(offlineVideoEntity).getPath());
                     offlineVideoEntity.setDownloadStatus(DownloadManager.STATUS_PENDING);
 
                     //add media to *download manager*
-                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(offlineVideoEntity.getVideoUrl()))
-                            .setTitle(offlineVideoEntity.getVideoName())// Title of the Download Notification
-                            .setDescription(offlineVideoEntity.getVideoDescription())// Description of the Download Notification
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(offlineVideoEntity.getMediaUrl()))
+                            .setTitle(offlineVideoEntity.getMediaName())// Title of the Download Notification
+                            .setDescription(offlineVideoEntity.getMediaDescription())// Description of the Download Notification
                             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)// Visibility of the download Notification
                             .setDestinationUri(Uri.fromFile(new File(offlineVideoEntity.getDownloadedFilePath())))// Uri of the destination file
                             .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
@@ -229,7 +218,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
 
     private File getFile(OfflineMediaEntity offlineVideoEntity) {
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                offlineVideoEntity.getVideoName());
+                offlineVideoEntity.getMediaName());
 
         if (!file.exists()){
             try {
@@ -256,60 +245,22 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     }
 
     public void removeMediaFromPlaylist(PlaylistMediaEntity model) {
-        //save changes in persistent storage finally after API response
+        //update playlist media
         playlistMediaDao.deleteMediaFromPlaylist(playlistID, model.getMediaID());
 
+        //update playlist
         PlaylistEntity newPlaylistEntity = playlistEntity.getValue();
         newPlaylistEntity.setSongsCount(newPlaylistEntity.getSongsCount() - 1);
         newPlaylistEntity.setPlayDuration(newPlaylistEntity.getPlayDuration() - model.getPlayDuration());
         playlistDao.insert(newPlaylistEntity);
 
-        final String url = Url.PLAYLIST_MEDIA_REMOVE;
+        //add to pending uploads
+        PendingUploadEntity pendingUploadEntity = new PendingUploadEntity();
+        pendingUploadEntity.setUrl(Url.PLAYLIST_MEDIA_REMOVE);
+        pendingUploadEntity.setParams(ParserUtil.getInstance().toJson(model, PlaylistMediaEntity.class));
+        pendingUploadDao.insert(pendingUploadEntity);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    showProgress.postValue(false);
-
-                    Logger.e(url + ApiConstant.RESPONSE, response);
-
-                    JSONObject responseJsonObject = new JSONObject(response);
-
-                    if (!responseJsonObject.optBoolean(ApiConstant.MESSAGE, false)) {
-                        return;
-                    }
-
-                } catch (Exception e) {
-                    Logger.e(TAG, e.toString());
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError e) {
-                try {
-                    showProgress.postValue(false);
-                    Logger.e(TAG, e.toString());
-                } catch (Exception ex) {
-                    Logger.e(TAG, ex.toString());
-                }
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                try {
-                    params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistID));
-                    params.put(ApiConstant.MEDIA_ID, String.valueOf(model.getMediaID()));
-                    params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
-                } catch (Exception e) {
-                    Logger.e(TAG, e.toString());
-                }
-                Logger.e(url + ApiConstant.PARAMS, params.toString());
-                return params;
-            }
-        };
-        stringRequest.setTag(TAG);
-        VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
+        //start ExecutorService
+        PendingApiExecutorService.startService(getApplication());
     }
 }

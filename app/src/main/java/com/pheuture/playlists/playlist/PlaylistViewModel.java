@@ -1,9 +1,9 @@
-package com.pheuture.playlists.media;
+package com.pheuture.playlists.playlist;
 
 import android.app.Application;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.volley.Request;
@@ -17,8 +17,6 @@ import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUpl
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
-import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.service.PendingApiExecutorService;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
@@ -31,58 +29,93 @@ import com.pheuture.playlists.utils.VolleyClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
-public class MediaViewModel extends AndroidViewModel {
-    private static final String TAG = MediaViewModel.class.getSimpleName();
-    private MutableLiveData<Boolean> showProgress;
-    private MutableLiveData<List<MediaEntity>> mediaEntitiesLive;
-    private PlaylistMediaDao playlistMediaDao;
-    private PlaylistDao playlistDao;
+public class PlaylistViewModel extends AndroidViewModel {
+    private static final String TAG = PlaylistViewModel.class.getSimpleName();
     private long lastID;
     private long limit;
+    private PlaylistDao playlistDao;
     private MutableLiveData<String> searchQuery;
     private MutableLiveData<Boolean> reachedLast;
-    private MutableLiveData<Boolean> updateParent;
-    private PlaylistEntity playlistEntity;
-    private UserModel user;
+    private MutableLiveData<Boolean> showProgress;
+    private LiveData<List<PlaylistEntity>> playlists;
+    private PlaylistMediaDao playlistMediaDao;
     private PendingUploadDao pendingUploadDao;
+    private UserModel user;
 
-    public MediaViewModel(@NonNull Application application, PlaylistEntity playlistEntity) {
+    public PlaylistViewModel(@NonNull Application application) {
         super(application);
-        this.playlistEntity = playlistEntity;
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 getApplication(), Constants.USER, ""), UserModel.class);
 
         limit = 20;
-        reachedLast = new MutableLiveData<>(false);
-        searchQuery = new MutableLiveData<>("");
 
-        showProgress = new MutableLiveData<>(false);
-        updateParent = new MutableLiveData<>(false);
+        reachedLast = new MutableLiveData<>();
+        searchQuery = new MutableLiveData<>();
+
+        showProgress = new MutableLiveData<>();
 
         pendingUploadDao = LocalRepository.getInstance(application).pendingUploadDao();
         playlistDao = LocalRepository.getInstance(application).playlistDao();
         playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
-        mediaEntitiesLive = new MutableLiveData<>();
+        playlists = playlistDao.getPlaylistsLive();
+
+        getFreshData();
+    }
+
+    public void createPlaylist(String playlistName) {
+        PlaylistEntity playlistEntity = new PlaylistEntity();
+        playlistEntity.setPlaylistID(generatePlaylistID());
+        playlistEntity.setPlaylistName(playlistName);
+        playlistEntity.setCreatedByUserID(user.getUserId());
+        playlistEntity.setCreatedByUserName(user.getUserName());
+        playlistEntity.setSongsCount(0);
+        playlistEntity.setPlayDuration(0);
+
+        //insert newly created playlist
+        playlistDao.insert(playlistEntity);
+
+        //add to pending uploads
+        PendingUploadEntity pendingUploadEntity = new PendingUploadEntity();
+        pendingUploadEntity.setUrl(Url.PLAYLIST_CREATE);
+        pendingUploadEntity.setParams(ParserUtil.getInstance().toJson(playlistEntity, PlaylistEntity.class));
+        pendingUploadDao.insert(pendingUploadEntity);
+
+        //start ExecutorService
+        PendingApiExecutorService.startService(getApplication());
+    }
+
+    private long generatePlaylistID() {
+        return user.getUserId() + Calendar.getInstance().getTimeInMillis();
+    }
+
+    public LiveData<List<PlaylistEntity>> getPlaylistEntities() {
+        return playlists;
+    }
+
+    public void setSearchQuery(String query) {
+        searchQuery.postValue(query);
+    }
+
+    public MutableLiveData<String> getSearchQuery() {
+        return searchQuery;
     }
 
     public void getFreshData() {
         //reset the last Id
         lastID = 0;
 
-        final String url = Url.MEDIA_TRENDING;
+        final String url = Url.PLAYLIST_LIST;
 
         JSONObject params = new JSONObject();
         try {
-            params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getPlaylistID()));
-            params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
+            params.put(ApiConstant.LAST_ID, lastID);
             params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
-            params.put(ApiConstant.LIMIT, String.valueOf(limit));
+            params.put(ApiConstant.LIMIT, limit);
+            params.put(ApiConstant.USER_ID, user.getUserId());
         } catch (JSONException e) {
             Logger.e(TAG, e.toString());
         }
@@ -99,12 +132,13 @@ public class MediaViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    List<MediaEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), MediaEntity[].class));
-                    mediaEntitiesLive.postValue(list);
+                    List<PlaylistEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), PlaylistEntity[].class));
+                    playlistDao.deleteAll();
+                    playlistDao.insertAll(list);
 
                     if (list.size()>0){
-                        MediaEntity mediaEntity = list.get(list.size() - 1);
-                        lastID = mediaEntity.getMediaID();
+                        PlaylistEntity videoEntity = list.get(list.size() - 1);
+                        lastID = videoEntity.getPlaylistID();
 
                         if (list.size()<limit) {
                             reachedLast.postValue(true);
@@ -118,8 +152,7 @@ public class MediaViewModel extends AndroidViewModel {
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }
-            }
-        }, new Response.ErrorListener() {
+            }}, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError e) {
                 try {
@@ -129,22 +162,10 @@ public class MediaViewModel extends AndroidViewModel {
                     Logger.e(TAG, ex.toString());
                 }
             }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-
-                Logger.e(url + ApiConstant.PARAMS, params.toString());
-                return params;
-            }
-        };
+        });
         jsonObjectRequest.setTag(TAG);
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
         VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
-    }
-
-    public MutableLiveData<List<MediaEntity>> getVideosLive() {
-        return mediaEntitiesLive;
     }
 
     public void getMoreData() {
@@ -152,18 +173,20 @@ public class MediaViewModel extends AndroidViewModel {
             return;
         }
 
-        final String url = Url.MEDIA_TRENDING;
+        final String url = Url.PLAYLIST_LIST;
 
         JSONObject params = new JSONObject();
         try {
-            params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
-            params.put(ApiConstant.LIMIT, String.valueOf(limit));
+            params.put(ApiConstant.LAST_ID, lastID);
+            params.put(ApiConstant.LIMIT, limit);
             params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
-        } catch (JSONException e) {
+            params.put(ApiConstant.USER_ID, user.getUserId());
+        } catch (Exception e) {
             Logger.e(TAG, e.toString());
         }
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, params, new Response.Listener<JSONObject>() {
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, params,new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -173,18 +196,15 @@ public class MediaViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    List<MediaEntity> newDataList = Arrays.asList(ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), MediaEntity[].class));
+                    List<PlaylistEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), PlaylistEntity[].class));
 
-                    List<MediaEntity> oldList = mediaEntitiesLive.getValue();
-                    oldList.addAll(newDataList);
+                    playlistDao.insertAll(list);
 
-                    mediaEntitiesLive.postValue(oldList);
+                    if (list.size()>0){
+                        PlaylistEntity videoEntity = list.get(list.size() - 1);
+                        lastID = videoEntity.getPlaylistID();
 
-                    if (newDataList.size()>0){
-                        MediaEntity mediaEntity = newDataList.get(newDataList.size() - 1);
-                        lastID = mediaEntity.getMediaID();
-
-                        if (newDataList.size()<limit) {
+                        if (list.size()<limit) {
                             reachedLast.postValue(true);
                         } else {
                             reachedLast.postValue(false);
@@ -208,43 +228,24 @@ public class MediaViewModel extends AndroidViewModel {
         VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
     }
 
-    public void setSearchQuery(String query) {
-        searchQuery.postValue(query);
+    public MutableLiveData<Boolean> getProgressStatus() {
+        return showProgress;
     }
 
-    public MutableLiveData<String> getSearchQuery() {
-        return searchQuery;
-    }
+    public void deletePlaylist(PlaylistEntity playlistModel) {
+        playlistMediaDao.deleteAllMediaFromPlaylist(playlistModel.getPlaylistID());
+        playlistDao.deletePlaylist(playlistModel.getPlaylistID());
 
-    public void addMediaToPlaylist(final int adapterPosition, final PlaylistMediaEntity playlistMediaEntity) {
-        //update playlist media
-        List<MediaEntity> mediaEntities = new ArrayList<>(mediaEntitiesLive.getValue());
-        mediaEntities.remove(adapterPosition);
-        mediaEntitiesLive.setValue(mediaEntities);
-
-        playlistMediaEntity.setPlaylistID(playlistEntity.getPlaylistID());
-        playlistMediaDao.insert(playlistMediaEntity);
-
-        //update playlist
-        playlistEntity.setSongsCount(playlistEntity.getSongsCount() + 1);
-        playlistEntity.setPlayDuration(playlistEntity.getPlayDuration() + playlistMediaEntity.getPlayDuration());
-        playlistDao.insert(playlistEntity);
-
-        //add to pending uploads
         PendingUploadEntity pendingUploadEntity = new PendingUploadEntity();
-        pendingUploadEntity.setUrl(Url.PLAYLIST_MEDIA_ADD);
-        pendingUploadEntity.setParams(ParserUtil.getInstance().toJson(playlistMediaEntity, PlaylistMediaEntity.class));
+        pendingUploadEntity.setUrl(Url.PLAYLIST_DELETE);
+        pendingUploadEntity.setParams(ParserUtil.getInstance().toJson(playlistModel, PlaylistEntity.class));
         pendingUploadDao.insert(pendingUploadEntity);
 
-        //start ExecutorService
         PendingApiExecutorService.startService(getApplication());
     }
 
-    public MutableLiveData<Boolean> getNeedToUpdateParent() {
-        return updateParent;
-    }
-
-    public MutableLiveData<Boolean> getProgressStatus() {
-        return showProgress;
+    public boolean isExistingPlaylist(String playlistName) {
+        List<PlaylistEntity> existingPlaylist = playlistDao.getPlaylist(playlistName);
+        return existingPlaylist != null && existingPlaylist.size() != 0;
     }
 }

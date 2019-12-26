@@ -3,10 +3,12 @@ package com.pheuture.playlists.datasource.local.video_handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.BindingAdapter;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
 import com.bumptech.glide.Glide;
 import com.google.gson.annotations.SerializedName;
 import com.pheuture.playlists.utils.CalenderUtils;
@@ -16,25 +18,25 @@ public class MediaEntity implements Parcelable {
 
 	@NonNull
 	@PrimaryKey
-	@SerializedName("id")
+	@SerializedName("mediaID")
 	private long mediaID;
 
-	@SerializedName("videoDescription")
-	private String videoDescription;
+	@SerializedName("mediaDescription")
+	private String mediaDescription;
 
-	@SerializedName("videoUrl")
-	private String videoUrl;
+	@SerializedName("mediaUrl")
+	private String mediaUrl;
 
-	@SerializedName("videoThumbail")
-	private String videoThumbnail;
+	@SerializedName("mediaThumbnail")
+	private String mediaThumbnail;
 
-	@SerializedName("videoName")
-	private String videoName;
+	@SerializedName("mediaName")
+	private String mediaName;
 
-	@SerializedName("videoTitle")
-	private String videoTitle;
+	@SerializedName("mediaTitle")
+	private String mediaTitle;
 
-	@SerializedName("video_duration")
+	@SerializedName("playDuration")
 	private long playDuration;
 
 	@SerializedName("postDate")
@@ -43,29 +45,29 @@ public class MediaEntity implements Parcelable {
 	@SerializedName("status")
 	private String status;
 
-	public MediaEntity() {
-	}
-
-	protected MediaEntity(Parcel in) {
+	private MediaEntity(Parcel in) {
 		mediaID = in.readLong();
-		videoDescription = in.readString();
-		videoUrl = in.readString();
-		videoThumbnail = in.readString();
-		videoName = in.readString();
-		videoTitle = in.readString();
+		mediaDescription = in.readString();
+		mediaUrl = in.readString();
+		mediaThumbnail = in.readString();
+		mediaName = in.readString();
+		mediaTitle = in.readString();
 		playDuration = in.readLong();
 		postDate = in.readString();
 		status = in.readString();
 	}
 
+	public MediaEntity() {
+	}
+
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(mediaID);
-		dest.writeString(videoDescription);
-		dest.writeString(videoUrl);
-		dest.writeString(videoThumbnail);
-		dest.writeString(videoName);
-		dest.writeString(videoTitle);
+		dest.writeString(mediaDescription);
+		dest.writeString(mediaUrl);
+		dest.writeString(mediaThumbnail);
+		dest.writeString(mediaName);
+		dest.writeString(mediaTitle);
 		dest.writeLong(playDuration);
 		dest.writeString(postDate);
 		dest.writeString(status);
@@ -88,16 +90,6 @@ public class MediaEntity implements Parcelable {
 		}
 	};
 
-	@BindingAdapter({"imageUrl"})
-	public static void loadImage(ImageView view, String imageUrl) {
-		if (imageUrl==null || imageUrl.length()==0){
-			return;
-		}
-		Glide.with(view.getContext())
-				.load(imageUrl)
-				.into(view);
-	}
-
 	public long getMediaID() {
 		return mediaID;
 	}
@@ -106,36 +98,52 @@ public class MediaEntity implements Parcelable {
 		this.mediaID = mediaID;
 	}
 
-	public String getVideoDescription() {
-		return videoDescription;
+	public String getMediaDescription() {
+		return mediaDescription;
 	}
 
-	public void setVideoDescription(String videoDescription) {
-		this.videoDescription = videoDescription;
+	public void setMediaDescription(String mediaDescription) {
+		this.mediaDescription = mediaDescription;
 	}
 
-	public String getVideoUrl() {
-		return videoUrl;
+	public String getMediaUrl() {
+		return mediaUrl;
 	}
 
-	public void setVideoUrl(String videoUrl) {
-		this.videoUrl = videoUrl;
+	public void setMediaUrl(String mediaUrl) {
+		this.mediaUrl = mediaUrl;
 	}
 
-	public String getVideoThumbnail() {
-		return videoThumbnail;
+	public String getMediaThumbnail() {
+		return mediaThumbnail;
 	}
 
-	public void setVideoThumbnail(String videoThumbnail) {
-		this.videoThumbnail = videoThumbnail;
+	public void setMediaThumbnail(String mediaThumbnail) {
+		this.mediaThumbnail = mediaThumbnail;
 	}
 
-	public String getVideoName() {
-		return videoName;
+	public String getMediaName() {
+		return mediaName;
 	}
 
-	public void setVideoName(String videoName) {
-		this.videoName = videoName;
+	public void setMediaName(String mediaName) {
+		this.mediaName = mediaName;
+	}
+
+	public String getMediaTitle() {
+		return mediaTitle;
+	}
+
+	public void setMediaTitle(String mediaTitle) {
+		this.mediaTitle = mediaTitle;
+	}
+
+	public long getPlayDuration() {
+		return playDuration;
+	}
+
+	public void setPlayDuration(long playDuration) {
+		this.playDuration = playDuration;
 	}
 
 	public String getPostDate() {
@@ -154,23 +162,18 @@ public class MediaEntity implements Parcelable {
 		this.status = status;
 	}
 
-	public long getPlayDuration() {
-		return playDuration;
+	@BindingAdapter({"imageUrl"})
+	public static void loadImage(ImageView view, String imageUrl) {
+		if (imageUrl==null || imageUrl.length()==0){
+			return;
+		}
+		Glide.with(view.getContext())
+				.load(imageUrl)
+				.into(view);
 	}
 
-	public void setPlayDuration(long playDuration) {
-		this.playDuration = playDuration;
-	}
-
-    public String getFormattedPlayDuration() {
+	public String getFormattedPlayDuration() {
 		return CalenderUtils.getTimeDurationInFormat1(playDuration);
-    }
-
-	public String getVideoTitle() {
-		return videoTitle;
 	}
 
-	public void setVideoTitle(String videoTitle) {
-		this.videoTitle = videoTitle;
-	}
 }

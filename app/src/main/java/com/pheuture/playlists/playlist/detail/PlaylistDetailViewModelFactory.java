@@ -1,26 +1,24 @@
-package com.pheuture.playlists.playlists.detail;
+package com.pheuture.playlists.playlist.detail;
 
 import android.app.Application;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-
 import org.jetbrains.annotations.NotNull;
 
 class PlaylistDetailViewModelFactory implements ViewModelProvider.Factory {
     private Application mApplication;
-    private PlaylistEntity model;
+    private long playlistID;
 
     @NotNull
     @Override
     public <T extends ViewModel> T create(@NotNull Class<T> modelClass) {
-        return (T) new PlaylistDetailViewModel(mApplication, model);
+        return (T) new PlaylistDetailViewModel(mApplication, playlistID);
     }
 
-    public PlaylistDetailViewModelFactory(Application application, PlaylistEntity model) {
+    public PlaylistDetailViewModelFactory(Application application, long playlistID) {
         this.mApplication = application;
-        this.model = model;
+        this.playlistID = playlistID;
     }
 }

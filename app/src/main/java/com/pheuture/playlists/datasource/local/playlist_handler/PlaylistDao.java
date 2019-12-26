@@ -23,7 +23,7 @@ public interface PlaylistDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<PlaylistEntity> playlistEntities);
 
-    @Query("select * from PlaylistEntity order by createdDate desc")
+    @Query("select * from PlaylistEntity order by createdOn desc")
     LiveData<List<PlaylistEntity>> getPlaylistsLive();
 
     @Query("select * from PlaylistEntity where playlistID=:playlistID")

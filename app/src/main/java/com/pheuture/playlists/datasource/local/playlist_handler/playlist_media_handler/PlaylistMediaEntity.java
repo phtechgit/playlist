@@ -2,30 +2,41 @@ package com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.widget.ImageView;
-
 import androidx.annotation.NonNull;
-import androidx.databinding.BindingAdapter;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
-import com.bumptech.glide.Glide;
+import androidx.room.Entity;
 import com.google.gson.annotations.SerializedName;
 import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 
 @Entity
 public class PlaylistMediaEntity extends MediaEntity implements Parcelable {
-	@NonNull
-	@PrimaryKey(autoGenerate = true)
-	@SerializedName("ignore")
-	private long id;
 
-	@SerializedName("playlistId")
+    @NonNull
+    @PrimaryKey
+	@SerializedName("playlistMediaID")
+    private long playlistMediaID;
+
+	@SerializedName("playlistID")
 	private long playlistID;
 
+	public PlaylistMediaEntity() {
+	}
+
 	protected PlaylistMediaEntity(Parcel in) {
-		id = in.readLong();
+		playlistMediaID = in.readLong();
 		playlistID = in.readLong();
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeLong(playlistMediaID);
+		dest.writeLong(playlistID);
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
 	}
 
 	public static final Creator<PlaylistMediaEntity> CREATOR = new Creator<PlaylistMediaEntity>() {
@@ -40,26 +51,12 @@ public class PlaylistMediaEntity extends MediaEntity implements Parcelable {
 		}
 	};
 
-	public PlaylistMediaEntity() {
+	public long getPlaylistMediaID() {
+		return playlistMediaID;
 	}
 
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeLong(id);
-		dest.writeLong(playlistID);
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
+	public void setPlaylistMediaID(long playlistMediaID) {
+		this.playlistMediaID = playlistMediaID;
 	}
 
 	public long getPlaylistID() {

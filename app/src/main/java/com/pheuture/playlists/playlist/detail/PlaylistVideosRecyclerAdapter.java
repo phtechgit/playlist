@@ -1,4 +1,4 @@
-package com.pheuture.playlists.playlists.detail;
+package com.pheuture.playlists.playlist.detail;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -44,9 +44,9 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
         MyViewHolder holder = (MyViewHolder) recyclerHOlder;
 
         PlaylistMediaEntity model = oldList.get(position);
-        holder.binding.setMediaTitle(model.getVideoTitle());
-        holder.binding.setMediaDescription(model.getVideoDescription());
-        holder.binding.setMediaThumbnail(model.getVideoThumbnail());
+        holder.binding.setMediaTitle(model.getMediaTitle());
+        holder.binding.setMediaDescription(model.getMediaDescription());
+        holder.binding.setMediaThumbnail(model.getMediaThumbnail());
         holder.binding.setMediaDuration(model.getFormattedPlayDuration());
     }
 
@@ -90,16 +90,16 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
             PlaylistMediaEntity oldModel = oldList.get(oldItemPosition);
             PlaylistMediaEntity newModel = newList.get(newItemPosition);
 
-            if (contentsDifferent(oldModel.getVideoUrl(), newModel.getVideoUrl())){
+            if (contentsDifferent(oldModel.getMediaUrl(), newModel.getMediaUrl())){
                 return false;
             }
-            if (contentsDifferent(oldModel.getVideoName(), newModel.getVideoName())){
+            if (contentsDifferent(oldModel.getMediaName(), newModel.getMediaName())){
                 return false;
             }
-            if (contentsDifferent(oldModel.getVideoDescription(), newModel.getVideoDescription())){
+            if (contentsDifferent(oldModel.getMediaDescription(), newModel.getMediaDescription())){
                 return false;
             }
-            if (contentsDifferent(oldModel.getVideoThumbnail(), newModel.getVideoThumbnail())){
+            if (contentsDifferent(oldModel.getMediaThumbnail(), newModel.getMediaThumbnail())){
                 return false;
             }
             return true;

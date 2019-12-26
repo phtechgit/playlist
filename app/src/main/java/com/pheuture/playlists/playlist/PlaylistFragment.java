@@ -1,4 +1,4 @@
-package com.pheuture.playlists.playlists;
+package com.pheuture.playlists.playlist;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -14,7 +14,6 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -24,24 +23,22 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
+import com.pheuture.playlists.databinding.FragmentPlaylistBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.databinding.FragmentMyPlaylistsBinding;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.EditTextInputFilter;
 import com.pheuture.playlists.utils.KeyboardUtils;
 import com.pheuture.playlists.utils.StringUtils;
-
 import java.util.List;
 
-public class PlaylistsFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
-    private static final String TAG = PlaylistsFragment.class.getSimpleName();
+public class PlaylistFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
+    private static final String TAG = PlaylistFragment.class.getSimpleName();
     private FragmentActivity activity;
-    private PlaylistsViewModel viewModel;
-    private FragmentMyPlaylistsBinding binding;
+    private PlaylistViewModel viewModel;
+    private FragmentPlaylistBinding binding;
     private PlaylistsRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
     private String searchQuery;
@@ -54,8 +51,8 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
 
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_playlists, container, false);
-        viewModel = ViewModelProviders.of(this).get(PlaylistsViewModel.class);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_playlist, container, false);
+        viewModel = ViewModelProviders.of(this).get(PlaylistViewModel.class);
         return binding.getRoot();
     }
 
@@ -94,7 +91,7 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
             }
         });
 
-        viewModel.getPlaylists().observe(this, new Observer<List<PlaylistEntity>>() {
+        viewModel.getPlaylistEntities().observe(this, new Observer<List<PlaylistEntity>>() {
             @Override
             public void onChanged(List<PlaylistEntity> playlistEntities) {
                 if (StringUtils.isEmpty(searchQuery) && playlistEntities.size()==0){
@@ -177,7 +174,6 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
                 viewModel.createPlaylist(editText.getText().toString());
             }
         });
-        /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/
     }
 
     @Override
@@ -192,30 +188,6 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
 
     @Override
     public void afterTextChanged(Editable s) {
-
-    }
-
-    @Override
-    public void onRecyclerViewItemClick(Bundle bundle) {
-        int position = bundle.getInt(ARG_PARAM1, -1);
-        int type = bundle.getInt(ARG_PARAM2, -1);
-        PlaylistEntity model = bundle.getParcelable(ARG_PARAM3);
-
-        assert model != null;
-        if (type == 1) {
-            if (position == 0){
-                showCreatePlaylistNameDialog();
-
-            } else {
-                bundle.clear();
-                bundle.putParcelable(ARG_PARAM1, model);
-
-                Navigation.findNavController(binding.getRoot())
-                        .navigate(R.id.action_navigation_playlist_to_navigation_playlist_detail, bundle);
-            }
-        } else {
-            showDeletePlaylistDialog(model);
-        }
 
     }
 
@@ -260,6 +232,30 @@ public class PlaylistsFragment extends BaseFragment implements TextWatcher, Recy
             viewModel.deletePlaylist(model);
         });
         /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/
+    }
+
+    @Override
+    public void onRecyclerViewItemClick(Bundle bundle) {
+        int position = bundle.getInt(ARG_PARAM1, -1);
+        int type = bundle.getInt(ARG_PARAM2, -1);
+        PlaylistEntity model = bundle.getParcelable(ARG_PARAM3);
+
+        assert model != null;
+        if (type == 1) {
+            if (position == 0){
+                showCreatePlaylistNameDialog();
+
+            } else {
+                bundle.clear();
+                bundle.putLong(ARG_PARAM1, model.getPlaylistID());
+
+                Navigation.findNavController(binding.getRoot())
+                        .navigate(R.id.action_navigation_playlist_to_navigation_playlist_detail, bundle);
+            }
+        } else {
+            showDeletePlaylistDialog(model);
+        }
+
     }
 
     @Override
