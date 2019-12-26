@@ -19,16 +19,6 @@
         android:id="@+id/navigation_verify_otp"
         android:label="OTP"
         android:name="com.pheuture.playlists.auth.verify_otp.VerifyOtpFragment"
-        tools:layout="@layout/fragment_verify_otp" >
-        <action
-            android:id="@+id/action_navigation_verify_otp_to_navigation_user_detail"
-            app:destination="@id/navigation_user_detail" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_user_detail"
-        android:label="User Detail"
-        android:name="com.pheuture.playlists.auth.user_detail.UserDetailFragment"
-        tools:layout="@layout/fragment_user_detail" />
+        tools:layout="@layout/fragment_verify_otp" />
 
 </navigation>

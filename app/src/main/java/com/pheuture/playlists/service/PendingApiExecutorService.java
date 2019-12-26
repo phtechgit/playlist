@@ -66,16 +66,16 @@ public class PendingApiExecutorService extends Service {
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override
             public void onResponse(String stringResponse) {
-                try {
-                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
+                        try {
+                            Logger.e(url + ApiConstant.RESPONSE, stringResponse);
 
-                    JSONObject response = new JSONObject(stringResponse);
-                            if (response.optBoolean(ApiConstant.MESSAGE, false) == Boolean.FALSE) {
-                                stopSelf();
-                                return;
-                            }
+                            JSONObject response = new JSONObject(stringResponse);
+                                    if (response.optBoolean(ApiConstant.MESSAGE, false) == Boolean.FALSE) {
+                                        stopSelf();
+                                        return;
+                                    }
 
-                            updateTaskStatus(pendingUploadEntity);
+                                    updateTaskStatus(pendingUploadEntity);
 
                         } catch (Exception e) {
                             Logger.e(TAG, e.toString());
@@ -107,6 +107,7 @@ public class PendingApiExecutorService extends Service {
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }
+                Logger.e(url + ApiConstant.PARAMS, params.toString());
                 return params;
             }
         };

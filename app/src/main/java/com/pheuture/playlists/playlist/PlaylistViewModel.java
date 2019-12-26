@@ -72,7 +72,7 @@ public class PlaylistViewModel extends AndroidViewModel {
         PlaylistEntity playlistEntity = new PlaylistEntity();
         playlistEntity.setPlaylistID(generatePlaylistID());
         playlistEntity.setPlaylistName(playlistName);
-        playlistEntity.setCreatedByUserID(user.getUserId());
+        playlistEntity.setCreatedByUserID(user.getUserID());
         playlistEntity.setCreatedByUserName(user.getUserName());
         playlistEntity.setSongsCount(0);
         playlistEntity.setPlayDuration(0);
@@ -91,7 +91,7 @@ public class PlaylistViewModel extends AndroidViewModel {
     }
 
     private long generatePlaylistID() {
-        return user.getUserId() + Calendar.getInstance().getTimeInMillis();
+        return user.getUserID() + Calendar.getInstance().getTimeInMillis();
     }
 
     public LiveData<List<PlaylistEntity>> getPlaylistEntities() {
@@ -163,7 +163,7 @@ public class PlaylistViewModel extends AndroidViewModel {
                 params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
                 params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
                 params.put(ApiConstant.LIMIT, String.valueOf(limit));
-                params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
+                params.put(ApiConstant.USER_ID, String.valueOf(user.getUserID()));
                 Logger.e(url + ApiConstant.PARAMS, params.toString());
                 return params;
             }
@@ -225,7 +225,7 @@ public class PlaylistViewModel extends AndroidViewModel {
                 params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
                 params.put(ApiConstant.LIMIT, String.valueOf(limit));
                 params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
-                params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
+                params.put(ApiConstant.USER_ID, String.valueOf(user.getUserID()));
                 Logger.e(url + ApiConstant.PARAMS, params.toString());
                 return params;
             }

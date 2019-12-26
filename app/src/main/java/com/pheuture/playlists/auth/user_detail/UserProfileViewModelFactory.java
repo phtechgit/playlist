@@ -9,7 +9,7 @@ import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 
 import org.jetbrains.annotations.NotNull;
 
-class UserDetailViewModelFactory implements ViewModelProvider.Factory {
+class UserProfileViewModelFactory implements ViewModelProvider.Factory {
     private Application mApplication;
     private UserModel userModel;
 
@@ -17,10 +17,10 @@ class UserDetailViewModelFactory implements ViewModelProvider.Factory {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NotNull Class<T> modelClass) {
-        return (T) new UserDetailViewModel(mApplication, userModel);
+        return (T) new UserProfileViewModel(mApplication, userModel);
     }
 
-    public UserDetailViewModelFactory(Application application, UserModel userModel) {
+    public UserProfileViewModelFactory(Application application, UserModel userModel) {
         this.mApplication = application;
         this.userModel = userModel;
     }

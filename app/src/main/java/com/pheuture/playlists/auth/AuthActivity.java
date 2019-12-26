@@ -15,6 +15,7 @@ import android.view.View;
 
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
+import com.pheuture.playlists.auth.user_detail.UserProfileActivity;
 import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 import com.pheuture.playlists.databinding.ActivityAuthBinding;
 import com.pheuture.playlists.interfaces.ButtonClickInterface;
@@ -57,7 +58,7 @@ public class AuthActivity extends BaseActivity {
         setSupportActionBar(binding.toolbar);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_request_otp, R.id.navigation_verify_otp, R.id.navigation_user_detail)
+                R.id.navigation_request_otp, R.id.navigation_verify_otp)
                 .build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_auth);
@@ -66,7 +67,12 @@ public class AuthActivity extends BaseActivity {
         UserModel user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 this, Constants.USER, ""), UserModel.class);
 
-        if (user != null && user.getUserId()!=0 && !StringUtils.isEmpty(user.getUserName())){
+        if (user != null && user.getUserID()!=0 && StringUtils.isEmpty(user.getUserName())){
+            Intent intent = new Intent(this, UserProfileActivity.class);
+            startActivity(intent);
+            finish();
+
+        } else if(user != null && user.getUserID()!=0 && !StringUtils.isEmpty(user.getUserName())){
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -101,10 +107,7 @@ public class AuthActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (navController.getCurrentDestination().getId() == R.id.navigation_user_detail) {
-            finish();
-
-        } else if (!navController.popBackStack()) {
+        if (!navController.popBackStack()) {
             super.onBackPressed();
         }
     }

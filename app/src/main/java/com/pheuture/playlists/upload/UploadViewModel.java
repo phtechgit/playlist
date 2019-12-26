@@ -84,7 +84,7 @@ public class UploadViewModel extends AndroidViewModel {
             params.put("movieName", "dummy");
             params.put("artists", "dummy");
             params.put("movieDirector", "dummy");
-            params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
+            params.put(ApiConstant.USER_ID, String.valueOf(user.getUserID()));
         } catch (Exception e) {
             Logger.e(TAG, e.toString());
         }

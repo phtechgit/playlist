@@ -143,7 +143,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put(ApiConstant.USER_ID, String.valueOf(user.getUserId()));
+                params.put(ApiConstant.USER_ID, String.valueOf(user.getUserID()));
                 params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistID));
                 params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
                 params.put(ApiConstant.LIMIT, String.valueOf(limit));

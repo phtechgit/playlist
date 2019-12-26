@@ -10,10 +10,11 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
+import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 import com.pheuture.playlists.utils.CalenderUtils;
 
 @Entity
-public class PlaylistEntity implements Parcelable, Cloneable {
+public class PlaylistEntity extends UserModel implements Parcelable, Cloneable {
 
 	@NonNull
 	@PrimaryKey
@@ -22,12 +23,6 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 
 	@SerializedName("createdOn")
 	private long createdOn;
-
-	@SerializedName("createdByUserID")
-	private long createdByUserID;
-
-	@SerializedName("createdByUserName")
-	private String createdByUserName;
 
 	@SerializedName("playDuration")
 	private long playDuration;
@@ -44,8 +39,6 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 	protected PlaylistEntity(Parcel in) {
 		playlistID = in.readLong();
 		createdOn = in.readLong();
-		createdByUserID = in.readLong();
-		createdByUserName = in.readString();
 		playDuration = in.readLong();
 		playlistName = in.readString();
 		songsCount = in.readLong();
@@ -55,8 +48,6 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(playlistID);
 		dest.writeLong(createdOn);
-		dest.writeLong(createdByUserID);
-		dest.writeString(createdByUserName);
 		dest.writeLong(playDuration);
 		dest.writeString(playlistName);
 		dest.writeLong(songsCount);
@@ -143,22 +134,6 @@ public class PlaylistEntity implements Parcelable, Cloneable {
 	}
 
 	public String getCreatedByFormatted(){
-		return "by " + createdByUserName;
-	}
-
-	public String getCreatedByUserName() {
-		return createdByUserName;
-	}
-
-	public void setCreatedByUserName(String createdByUserName) {
-		this.createdByUserName = createdByUserName;
-	}
-
-	public long getCreatedByUserID() {
-		return createdByUserID;
-	}
-
-	public void setCreatedByUserID(long createdByUserID) {
-		this.createdByUserID = createdByUserID;
+		return "by " + userName;
 	}
 }

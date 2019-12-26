@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,6 +66,8 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
                 playlist = playlistEntity;
                 binding.setModel(playlist);
             }
+
+            Telephony
         });
 
         layoutManager = new LinearLayoutManager(activity);

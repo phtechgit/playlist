@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.Task;
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AuthActivity;
+import com.pheuture.playlists.auth.user_detail.UserProfileActivity;
 import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 import com.pheuture.playlists.auth.request_otp.RequestOtpFragment;
 import com.pheuture.playlists.databinding.FragmentVerifyOtpBinding;
@@ -75,8 +76,9 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
             @Override
             public void onChanged(UserModel user) {
                 if (StringUtils.isEmpty(user.getUserName())){
-                    Navigation.findNavController(binding.getRoot())
-                            .navigate(R.id.action_navigation_verify_otp_to_navigation_user_detail);
+                    Intent intent = new Intent(activity, UserProfileActivity.class);
+                    startActivity(intent);
+                    activity.finish();
 
                 } else {
                     Intent intent = new Intent(activity, MainActivity.class);

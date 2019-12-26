@@ -16,12 +16,12 @@ import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
 
-public class UserDetailViewModel extends AndroidViewModel {
-    private static final String TAG = UserDetailViewModel.class.getSimpleName();
+public class UserProfileViewModel extends AndroidViewModel {
+    private static final String TAG = UserProfileViewModel.class.getSimpleName();
     private UserModel userModel;
     private PendingUploadDao pendingUploadDao;
 
-    public UserDetailViewModel(@NonNull Application application, UserModel user) {
+    public UserProfileViewModel(@NonNull Application application, UserModel user) {
         super(application);
         this.userModel = user;
         pendingUploadDao = LocalRepository.getInstance(application).pendingUploadDao();
