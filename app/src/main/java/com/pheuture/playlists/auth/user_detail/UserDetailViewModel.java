@@ -6,24 +6,15 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
+import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 import com.pheuture.playlists.service.PendingApiExecutorService;
-import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
-import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
-import com.pheuture.playlists.utils.VolleyClient;
-import org.json.JSONObject;
-import java.util.HashMap;
-import java.util.Map;
 
 public class UserDetailViewModel extends AndroidViewModel {
     private static final String TAG = UserDetailViewModel.class.getSimpleName();

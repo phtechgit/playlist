@@ -13,6 +13,8 @@ import com.bumptech.glide.Glide;
 import com.google.gson.annotations.SerializedName;
 import com.pheuture.playlists.utils.CalenderUtils;
 
+import org.json.JSONObject;
+
 @Entity
 public class MediaEntity implements Parcelable {
 
@@ -45,7 +47,7 @@ public class MediaEntity implements Parcelable {
 	@SerializedName("status")
 	private String status;
 
-	private MediaEntity(Parcel in) {
+	public MediaEntity(Parcel in) {
 		mediaID = in.readLong();
 		mediaDescription = in.readString();
 		mediaUrl = in.readString();
@@ -60,7 +62,7 @@ public class MediaEntity implements Parcelable {
 	public MediaEntity() {
 	}
 
-	@Override
+    @Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(mediaID);
 		dest.writeString(mediaDescription);

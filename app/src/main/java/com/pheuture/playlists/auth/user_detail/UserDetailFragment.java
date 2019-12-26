@@ -15,6 +15,7 @@ import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AuthActivity;
 import com.pheuture.playlists.databinding.FragmentUserDetailBinding;
+import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 import com.pheuture.playlists.interfaces.ButtonClickInterface;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.Constants;

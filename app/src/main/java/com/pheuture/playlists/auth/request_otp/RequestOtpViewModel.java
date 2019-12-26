@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -35,20 +36,14 @@ public class RequestOtpViewModel extends AndroidViewModel {
 
         final String url = Url.REQUEST_OTP;
 
-        JSONObject params = new JSONObject();
-        try {
-            params.put(ApiConstant.PHONE, phone);
-            params.put(ApiConstant.HASHTAG, hashKey);
-        } catch (Exception e) {
-            Logger.e(TAG, e.toString());
-        }
-        Logger.e(url + ApiConstant.PARAMS, params.toString());
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, params, new Response.Listener<JSONObject>() {
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onResponse(String stringResponse) {
                 try {
-                    Logger.e(url + ApiConstant.RESPONSE, response.toString());
+                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
+
+                    JSONObject response = new JSONObject(stringResponse);
+
                     if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         return;
                     }
@@ -66,7 +61,16 @@ public class RequestOtpViewModel extends AndroidViewModel {
                     Logger.e(TAG, ex.toString());
                 }
             }
-        });
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put(ApiConstant.PHONE, phone);
+                params.put(ApiConstant.HASHTAG, hashKey);
+                Logger.e(url + ApiConstant.PARAMS, params.toString());
+                return params;
+            }
+        };
         jsonObjectRequest.setTag(TAG);
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
         VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);

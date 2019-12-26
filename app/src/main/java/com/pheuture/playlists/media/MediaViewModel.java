@@ -6,11 +6,12 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.pheuture.playlists.auth.user_detail.UserModel;
+import com.android.volley.toolbox.StringRequest;
+import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
@@ -28,7 +29,6 @@ import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
 import com.pheuture.playlists.utils.VolleyClient;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -77,23 +77,15 @@ public class MediaViewModel extends AndroidViewModel {
 
         final String url = Url.MEDIA_TRENDING;
 
-        JSONObject params = new JSONObject();
-        try {
-            params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getPlaylistID()));
-            params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
-            params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
-            params.put(ApiConstant.LIMIT, String.valueOf(limit));
-        } catch (JSONException e) {
-            Logger.e(TAG, e.toString());
-        }
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, params, new Response.Listener<JSONObject>() {
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onResponse(String stringResponse) {
                 try {
                     showProgress.postValue(false);
 
-                    Logger.e(url + ApiConstant.RESPONSE, response.toString());
+                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
+
+                    JSONObject response = new JSONObject(stringResponse);
 
                     if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         return;
@@ -133,7 +125,10 @@ public class MediaViewModel extends AndroidViewModel {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-
+                params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getPlaylistID()));
+                params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
+                params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
+                params.put(ApiConstant.LIMIT, String.valueOf(limit));
                 Logger.e(url + ApiConstant.PARAMS, params.toString());
                 return params;
             }
@@ -154,20 +149,13 @@ public class MediaViewModel extends AndroidViewModel {
 
         final String url = Url.MEDIA_TRENDING;
 
-        JSONObject params = new JSONObject();
-        try {
-            params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
-            params.put(ApiConstant.LIMIT, String.valueOf(limit));
-            params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
-        } catch (JSONException e) {
-            Logger.e(TAG, e.toString());
-        }
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, params, new Response.Listener<JSONObject>() {
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onResponse(String stringResponse) {
                 try {
-                    Logger.e(url + ApiConstant.RESPONSE, response.toString());
+                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
+
+                    JSONObject response = new JSONObject(stringResponse);
 
                     if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         return;
@@ -202,7 +190,17 @@ public class MediaViewModel extends AndroidViewModel {
             public void onErrorResponse(VolleyError e) {
                 Logger.e(TAG, e.toString());
             }
-        });
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
+                params.put(ApiConstant.LIMIT, String.valueOf(limit));
+                params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
+                Logger.e(url + ApiConstant.PARAMS, params.toString());
+                return params;
+            }
+        };
         jsonObjectRequest.setTag(TAG);
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
         VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);

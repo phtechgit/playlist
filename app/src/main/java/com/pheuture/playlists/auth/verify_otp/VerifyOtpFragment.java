@@ -13,8 +13,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +26,7 @@ import com.google.android.gms.tasks.Task;
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AuthActivity;
-import com.pheuture.playlists.auth.user_detail.UserModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 import com.pheuture.playlists.auth.request_otp.RequestOtpFragment;
 import com.pheuture.playlists.databinding.FragmentVerifyOtpBinding;
 import com.pheuture.playlists.receiver.SMSReceiver;

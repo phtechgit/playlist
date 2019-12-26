@@ -11,7 +11,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.pheuture.playlists.auth.user_detail.UserModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.datasource.local.video_handler.MediaDao;
@@ -62,17 +62,19 @@ public class TrendingViewModel extends AndroidViewModel {
 
         final String url = Url.MEDIA_TRENDING;
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override
-            public void onResponse(String response) {
-                Logger.e(url + ApiConstant.RESPONSE, response);
+            public void onResponse(String stringResponse) {
                 try {
-                    JSONObject responseJsonObject = new JSONObject(response);
-                    if (!responseJsonObject.optBoolean(ApiConstant.MESSAGE, false)) {
+                    showProgress.postValue(false);
+                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
+                    JSONObject response = new JSONObject(stringResponse);
+
+                    if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         return;
                     }
 
-                    List<MediaEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(responseJsonObject.optString(ApiConstant.DATA), MediaEntity[].class));
+                    List<MediaEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), MediaEntity[].class));
                     mediaDao.deleteAll();
                     mediaDao.insertAll(list);
 
@@ -110,7 +112,6 @@ public class TrendingViewModel extends AndroidViewModel {
             }
         };
         stringRequest.setTag(TAG);
-
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }
@@ -168,19 +169,14 @@ public class TrendingViewModel extends AndroidViewModel {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                try {
-                    params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
-                    params.put(ApiConstant.LIMIT, String.valueOf(limit));
-                    params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
-                } catch (Exception e) {
-                    Logger.e(TAG, e.toString());
-                }
+                params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
+                params.put(ApiConstant.LIMIT, String.valueOf(limit));
+                params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
                 Logger.e(url + ApiConstant.PARAMS, params.toString());
                 return params;
             }
         };
         stringRequest.setTag(TAG);
-
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
         VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }

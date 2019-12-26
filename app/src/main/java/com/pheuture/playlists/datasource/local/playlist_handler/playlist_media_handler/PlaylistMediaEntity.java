@@ -2,6 +2,7 @@ package com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -13,7 +14,7 @@ import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 public class PlaylistMediaEntity extends MediaEntity implements Parcelable {
 
     @NonNull
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
 	@SerializedName("playlistMediaID")
     private long playlistMediaID;
 

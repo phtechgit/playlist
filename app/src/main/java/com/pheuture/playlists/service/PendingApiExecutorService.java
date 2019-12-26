@@ -7,10 +7,12 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
@@ -18,9 +20,13 @@ import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.VolleyClient;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class PendingApiExecutorService extends Service {
     private static final String TAG = PendingApiExecutorService.class.getSimpleName();
@@ -57,17 +63,13 @@ public class PendingApiExecutorService extends Service {
     private void startExecutor(PendingUploadEntity pendingUploadEntity) {
         String url = pendingUploadEntity.getUrl();
 
-        JSONObject jsonObjectParams = null;
-        try {
-            jsonObjectParams = new JSONObject(pendingUploadEntity.getParams());
-        } catch (Exception e) {
-            Logger.e(TAG, e.toString());
-        }
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
+            @Override
+            public void onResponse(String stringResponse) {
+                try {
+                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObjectParams, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
+                    JSONObject response = new JSONObject(stringResponse);
                             if (response.optBoolean(ApiConstant.MESSAGE, false) == Boolean.FALSE) {
                                 stopSelf();
                                 return;
@@ -91,7 +93,23 @@ public class PendingApiExecutorService extends Service {
                         }
                     }
                 }
-        );
+        ){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                try {
+                    JSONObject jsonObject = new JSONObject(pendingUploadEntity.getParams());
+                    Iterator<String> iterator = jsonObject.keys();
+                    while (iterator.hasNext()) {
+                        String key = iterator.next();
+                        params.put(key, jsonObject.optString(key));
+                    }
+                } catch (Exception e) {
+                    Logger.e(TAG, e.toString());
+                }
+                return params;
+            }
+        };
         jsonObjectRequest.setTag(TAG);
         VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
     }

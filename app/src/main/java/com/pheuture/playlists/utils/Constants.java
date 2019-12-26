@@ -11,7 +11,7 @@ public final class Constants {
     }
 
     public static final String USER = "user";
-    public static final String ARG_PARAM1 = "param1";
+    public static final String ARG_PARAM1 = "playlistId";
     public static final String ARG_PARAM2 = "param2";
     public static final String ARG_PARAM3 = "param3";
     public static final String ARG_PARAM4 = "param4";

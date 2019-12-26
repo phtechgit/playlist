@@ -5,7 +5,7 @@ import android.app.Application;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.pheuture.playlists.auth.verify_otp.VerifyOtpViewModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 
 import org.jetbrains.annotations.NotNull;
 

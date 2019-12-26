@@ -3,8 +3,7 @@ package com.pheuture.playlists.upload;
 import android.app.Application;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.widget.EditText;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
@@ -17,8 +16,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.pheuture.playlists.auth.user_detail.UserModel;
-import com.pheuture.playlists.utils.AlerterUtils;
+import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
@@ -29,7 +27,6 @@ import com.pheuture.playlists.utils.Url;
 
 import cz.msebera.android.httpclient.Header;
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import static android.provider.MediaStore.Video.Thumbnails.MINI_KIND;
 

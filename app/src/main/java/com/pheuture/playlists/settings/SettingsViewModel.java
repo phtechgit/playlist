@@ -6,9 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-import com.pheuture.playlists.auth.user_detail.UserModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserModel;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
