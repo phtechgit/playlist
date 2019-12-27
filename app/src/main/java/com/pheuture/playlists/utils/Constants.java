@@ -23,5 +23,7 @@ public final class Constants{
     public static final String OFFLINE_MEDIA_FOLDER = "offline_media";
     public static final String DOWNLOAD_PLAYLIST_MEDIA = "download_playlist_media";
     public static final String DOWNLOAD_USING_CELLULAR = "download_using_cellular";
+    public static final String DOWNLOAD_WHILE_ROAMING = "download_while_roaming";
+    public static final String CROSS_FADE_VALUE = "cross_fade_value";
 
 }

@@ -16,6 +16,7 @@
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
         <item name="editTextStyle">@style/EditTextStyle</item>
         <!--<item name="toolbarStyle">@style/ToolbarStyle</item>-->
+        <item name="seekBarStyle">@style/customSeekBarStyle</item>
     </style>
 
     <!--button style-->
@@ -61,6 +62,11 @@
 
     <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">30sp</item>
+    </style>
+
+    <style name="customSeekBarStyle" parent="Widget.AppCompat.SeekBar.Discrete">
+        <item name="android:progressBackgroundTint">@color/WhiteF</item>
+        <item name="android:progressTint">@color/red</item>
     </style>
 
 </resources>

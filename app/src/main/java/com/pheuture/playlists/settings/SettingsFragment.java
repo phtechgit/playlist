@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -30,7 +31,7 @@ import com.pheuture.playlists.utils.SharedPrefsUtils;
 
 import static com.pheuture.playlists.utils.RequestCodeConstant.REQUEST_CODE_FILE_SELECT;
 
-public class SettingsFragment extends BaseFragment implements CompoundButton.OnCheckedChangeListener {
+public class SettingsFragment extends BaseFragment implements CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
     private static final String TAG = SettingsFragment.class.getSimpleName();
     private SettingsViewModel viewModel;
     private FragmentSettingsBinding binding;
@@ -53,6 +54,21 @@ public class SettingsFragment extends BaseFragment implements CompoundButton.OnC
     public void initializations() {
         ((MainActivity) getActivity()).setupToolbar(false, "Settings");
 
+        boolean downloadPlaylistMediaStatus = SharedPrefsUtils.getBooleanPreference(activity,
+                Constants.DOWNLOAD_PLAYLIST_MEDIA, false);
+
+        boolean downloadOnCellularStatus = SharedPrefsUtils.getBooleanPreference(activity,
+                Constants.DOWNLOAD_USING_CELLULAR, false);
+        boolean downloadWhileRoamingStatus = SharedPrefsUtils.getBooleanPreference(activity,
+                Constants.DOWNLOAD_WHILE_ROAMING, false);
+
+        int crossFadeValue = SharedPrefsUtils.getIntegerPreference(activity,
+                Constants.CROSS_FADE_VALUE, 0);
+
+        binding.switchDownloadPlaylistVideosToOffline.setChecked(downloadPlaylistMediaStatus);
+        binding.switchDownloadUsingCellular.setChecked(downloadOnCellularStatus);
+        binding.switchDownloadWhileRoaming.setChecked(downloadWhileRoamingStatus);
+        binding.seekBarCrossFade.setProgress(crossFadeValue);
     }
 
     @Override
@@ -60,7 +76,9 @@ public class SettingsFragment extends BaseFragment implements CompoundButton.OnC
         binding.linearLayoutUpload.setOnClickListener(this);
         binding.switchDownloadPlaylistVideosToOffline.setOnCheckedChangeListener(this);
         binding.switchDownloadUsingCellular.setOnCheckedChangeListener(this);
+        binding.switchDownloadWhileRoaming.setOnCheckedChangeListener(this);
         binding.linearLayoutDeleteOfflineVideos.setOnClickListener(this);
+        binding.seekBarCrossFade.setOnSeekBarChangeListener(this);
     }
 
     @Override
@@ -143,6 +161,25 @@ public class SettingsFragment extends BaseFragment implements CompoundButton.OnC
 
         } else if (buttonView.equals(binding.switchDownloadUsingCellular)){
             SharedPrefsUtils.setBooleanPreference(activity, Constants.DOWNLOAD_USING_CELLULAR, isChecked);
+
+        } else if (buttonView.equals(binding.switchDownloadWhileRoaming)){
+            SharedPrefsUtils.setBooleanPreference(activity, Constants.DOWNLOAD_WHILE_ROAMING, isChecked);
         }
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        binding.textViewSeekProgress.setText(progress + " s");
+        SharedPrefsUtils.setIntegerPreference(activity, Constants.CROSS_FADE_VALUE, progress);
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 }

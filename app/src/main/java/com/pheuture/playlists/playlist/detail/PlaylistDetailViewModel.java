@@ -205,6 +205,8 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
 
                     boolean downloadOnCellularStatus = SharedPrefsUtils.getBooleanPreference(getApplication(),
                             Constants.DOWNLOAD_USING_CELLULAR, false);
+                    boolean downloadWhileRoamingStatus = SharedPrefsUtils.getBooleanPreference(getApplication(),
+                            Constants.DOWNLOAD_WHILE_ROAMING, false);
 
                     //add media to *download manager*
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(offlineVideoEntity.getMediaUrl()))
@@ -213,7 +215,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)// Visibility of the download Notification
                             .setDestinationUri(Uri.fromFile(new File(offlineVideoEntity.getDownloadedFilePath())))// Uri of the destination file
                             .setAllowedOverMetered(downloadOnCellularStatus)// Set if download is allowed on Mobile network
-                            .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
+                            .setAllowedOverRoaming(downloadWhileRoamingStatus);// Set if download is allowed on roaming network
 
                     long downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
 

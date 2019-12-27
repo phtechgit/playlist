@@ -58,7 +58,7 @@
                     android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Download playlist"
+                    android:text="Download Playlist"
                     android:textSize="@dimen/textSizeBody1"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toStartOf="@+id/switch_download_playlist_videos_to_offline"
@@ -100,7 +100,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Download using cellular"
+                    android:text="Download Using Cellular"
                     android:textSize="@dimen/textSizeBody1"
                     android:textStyle="bold" />
 
@@ -123,6 +123,43 @@
                 app:layout_constraintTop_toTopOf="@+id/linearLayout_download_using_cellular" />
 
             <LinearLayout
+                android:id="@+id/linearLayout_download_while_roaming"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toStartOf="@+id/switch_download_using_cellular"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout_download_using_cellular">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Download While Roaming"
+                    android:textSize="@dimen/textSizeBody1"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Recommended Setting: Off"
+                    android:textColor="@color/gray4"
+                    android:textSize="@dimen/textSizeBody2" />
+
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/switch_download_while_roaming"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:checked="false"
+                app:layout_constraintBottom_toBottomOf="@+id/linearLayout_download_while_roaming"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/linearLayout_download_while_roaming" />
+
+            <LinearLayout
                 android:id="@+id/linearLayout_delete_offline_videos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -134,7 +171,7 @@
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout_download_using_cellular">
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout_download_while_roaming">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -149,6 +186,86 @@
                     android:text="delete all offline videos"
                     android:textColor="@color/gray4"
                     android:textSize="@dimen/textSizeBody2" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout_cross_fade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout_delete_offline_videos">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Crossfade"
+                    android:textSize="@dimen/textSizeBody1"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="allow you to crossfade between songs"
+                    android:textColor="@color/gray4"
+                    android:textSize="@dimen/textSizeBody2" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/textView_seek_min"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:text="Off"
+                        android:gravity="center"
+                        android:textSize="@dimen/textSizeOverline"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@+id/seekBar_cross_fade"/>
+
+                    <SeekBar
+                        android:id="@+id/seekBar_cross_fade"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/gray2"
+                        android:max="12"
+                        android:min="0"
+                        android:progress="0"
+                        app:layout_constraintEnd_toStartOf="@+id/textView_seek_max"
+                        app:layout_constraintStart_toEndOf="@+id/textView_seek_min"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/textView_seek_max"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:text="12 s"
+                        android:gravity="center"
+                        android:textSize="@dimen/textSizeOverline"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@+id/seekBar_cross_fade"/>
+
+                    <TextView
+                        android:id="@+id/textView_seek_progress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 s"
+                        android:gravity="center"
+                        android:textSize="@dimen/textSizeOverline"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toBottomOf="@+id/seekBar_cross_fade"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 
