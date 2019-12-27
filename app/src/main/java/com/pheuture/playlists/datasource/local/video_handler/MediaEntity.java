@@ -13,11 +13,24 @@ import com.bumptech.glide.Glide;
 import com.google.gson.annotations.SerializedName;
 import com.pheuture.playlists.utils.CalenderUtils;
 import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.utils.StringUtils;
 
 import org.json.JSONObject;
 
 @Entity
 public class MediaEntity implements Parcelable {
+
+	public interface MediaColumns{
+		String MEDIA_DESCRIPTION = "mediaDescription";
+		String MEDIA_URL = "mediaUrl";
+		String MEDIA_THUMBNAIL = "mediaThumbnail";
+		String MEDIA_NAME = "mediaName";
+		String MEDIA_TITLE = "mediaTitle";
+		String PLAY_DURATION = "playDuration";
+		String POST_DATE = "postDate";
+		String CREATED_ON = "createdOn";
+		String STATUS = "status";
+	}
 
 	@NonNull
 	@PrimaryKey
@@ -45,10 +58,16 @@ public class MediaEntity implements Parcelable {
 	@SerializedName("postDate")
 	private String postDate;
 
+	@SerializedName("createdOn")
+	private long createdOn;
+
 	@SerializedName("status")
 	private String status;
 
-	public MediaEntity(Parcel in) {
+	public MediaEntity() {
+	}
+
+	protected MediaEntity(Parcel in) {
 		mediaID = in.readLong();
 		mediaDescription = in.readString();
 		mediaUrl = in.readString();
@@ -57,13 +76,11 @@ public class MediaEntity implements Parcelable {
 		mediaTitle = in.readString();
 		playDuration = in.readLong();
 		postDate = in.readString();
+		createdOn = in.readLong();
 		status = in.readString();
 	}
 
-	public MediaEntity() {
-	}
-
-    @Override
+	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(mediaID);
 		dest.writeString(mediaDescription);
@@ -73,6 +90,7 @@ public class MediaEntity implements Parcelable {
 		dest.writeString(mediaTitle);
 		dest.writeLong(playDuration);
 		dest.writeString(postDate);
+		dest.writeLong(createdOn);
 		dest.writeString(status);
 	}
 
@@ -165,18 +183,15 @@ public class MediaEntity implements Parcelable {
 		this.status = status;
 	}
 
-	@BindingAdapter({"imageUrl"})
-	public static void loadImage(ImageView view, String imageUrl) {
-		if (imageUrl==null || imageUrl.length()==0){
-			return;
-		}
-		Glide.with(view.getContext())
-				.load(imageUrl)
-				.into(view);
-	}
-
 	public String getFormattedPlayDuration() {
 		return CalenderUtils.getTimeDurationInFormat1(playDuration);
 	}
 
+	public long getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(long createdOn) {
+		this.createdOn = createdOn;
+	}
 }

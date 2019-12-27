@@ -1,6 +1,5 @@
 package com.pheuture.playlists.upload;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import  androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
@@ -9,13 +8,11 @@ import androidx.lifecycle.ViewModelProviders;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
-import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.navigation.Navigation;
 
-import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,12 +28,15 @@ import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentUploadBinding;
 import com.pheuture.playlists.utils.AlerterUtils;
 import com.pheuture.playlists.utils.BaseFragment;
-import com.pheuture.playlists.utils.ContentProvider;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.RealPathUtil;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
+import static android.provider.MediaStore.Video.Thumbnails.FULL_SCREEN_KIND;
+import static android.provider.MediaStore.Video.Thumbnails.MINI_KIND;
 import static com.pheuture.playlists.utils.RequestCodeConstant.REQUEST_CODE_FILE_SELECT;
 
 public class UploadFragment extends BaseFragment {
@@ -69,22 +69,6 @@ public class UploadFragment extends BaseFragment {
         assert getArguments() != null;
         mediaUri = getArguments().getParcelable(ARG_PARAM1);
 
-        /*String mimeType = ContentProvider.getContentResolver(activity).getType(returnUri);
-
-        Cursor returnCursor = ContentProvider.getContentResolver(activity)
-                .query(returnUri, null, null, null,
-                        null);
-
-        if (returnCursor!=null && returnCursor.getCount()>0) {
-            returnCursor.moveToFirst();
-
-            String fileName = returnCursor.getString(returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-            long fileSize = returnCursor.getLong(returnCursor.getColumnIndex(OpenableColumns.SIZE));
-
-            Logger.e(TAG, "fileName:" + fileName + ", fileType:" + mimeType + ", fileSize:" + fileSize);
-            returnCursor.close();
-        }*/
-
         playerView = binding.playerView;
         exoPlayer = viewModel.getExoPlayer();
         exoPlayer.setPlayWhenReady(false);
@@ -94,6 +78,8 @@ public class UploadFragment extends BaseFragment {
         mediaSource = new ProgressiveMediaSource.Factory(viewModel.getDataSourceFactory())
                 .createMediaSource(mediaUri);
         exoPlayer.prepare(mediaSource);
+
+        createAndSetThumbnail();
 
         viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
             @Override
@@ -122,6 +108,31 @@ public class UploadFragment extends BaseFragment {
                 }
             }
         });
+    }
+
+    private void createAndSetThumbnail() {
+         Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(
+                RealPathUtil.getRealPath(activity, mediaUri), FULL_SCREEN_KIND);
+
+        try {
+            File thumbnailFile = File.createTempFile("thumbnail", ".png", activity.getCacheDir());
+            if (!thumbnailFile.exists()){
+                if (!thumbnailFile.createNewFile()){
+                    return;
+                }
+            }
+            FileOutputStream fos = new FileOutputStream(thumbnailFile);
+            assert bitmap != null;
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
+            fos.close();
+
+            thumbnailUri = Uri.fromFile(thumbnailFile);
+
+            showThumbnail();
+
+        } catch (Exception e) {
+            Logger.e(TAG, e.toString());
+        }
     }
 
     @Override
@@ -168,13 +179,17 @@ public class UploadFragment extends BaseFragment {
         if (requestCode == REQUEST_CODE_FILE_SELECT && resultCode == Activity.RESULT_OK) {
             if (resultData != null) {
                 thumbnailUri = resultData.getData();
-                if (thumbnailUri != null) {
-                    binding.imageViewThumbnail.setPadding(0,0,0,0);
-                    Glide.with(activity)
-                            .load(thumbnailUri)
-                            .into(binding.imageViewThumbnail);
-                }
+                showThumbnail();
             }
+        }
+    }
+
+    private void showThumbnail() {
+        if (thumbnailUri != null) {
+            binding.imageViewThumbnail.setPadding(0,0,0,0);
+            Glide.with(activity)
+                    .load(thumbnailUri)
+                    .into(binding.imageViewThumbnail);
         }
     }
 

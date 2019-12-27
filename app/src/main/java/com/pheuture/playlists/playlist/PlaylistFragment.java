@@ -95,12 +95,12 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
             @Override
             public void onChanged(List<PlaylistEntity> playlistEntities) {
                 if (StringUtils.isEmpty(searchQuery) && playlistEntities.size()==0){
-                    ((MainActivity) activity).updateActionBarStatus(false);
+                    /*((MainActivity) activity).updateActionBarStatus(false);*/
                     binding.linearLayoutCreatePlaylist.setVisibility(View.VISIBLE);
                     binding.relativeLayoutPlaylists.setVisibility(View.GONE);
 
                 } else {
-                    ((MainActivity) activity).updateActionBarStatus(true);
+                    /*((MainActivity) activity).updateActionBarStatus(true);*/
                     binding.linearLayoutCreatePlaylist.setVisibility(View.GONE);
                     binding.relativeLayoutPlaylists.setVisibility(View.VISIBLE);
                 }

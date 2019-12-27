@@ -5,15 +5,14 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.auth.AppSignatureHelper;
-import com.pheuture.playlists.datasource.local.user_handler.UserColumns;
 import com.pheuture.playlists.utils.ApiConstant;
+import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.Url;
 import com.pheuture.playlists.utils.VolleyClient;
@@ -64,8 +63,8 @@ public class RequestOtpViewModel extends AndroidViewModel {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put(UserColumns.userMobile, userMobile);
-                params.put(ApiConstant.HASHTAG, hashKey);
+                params.put(ApiConstant.USER_MOBILE, userMobile);
+                params.put(ApiConstant.HASH_KEY, hashKey);
                 Logger.e(url + ApiConstant.PARAMS, params.toString());
                 return params;
             }

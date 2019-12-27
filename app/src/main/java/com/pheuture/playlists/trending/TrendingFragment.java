@@ -52,25 +52,6 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     private LinearLayoutManager layoutManager;
 
     @Override
-    public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.findItem(R.id.action_upload).setVisible(true);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NotNull MenuItem item) {
-        if (item.getItemId() == R.id.action_upload) {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.setType("video/*");
-            if (intent.resolveActivity(activity.getPackageManager()) != null) {
-                startActivityForResult(intent, REQUEST_CODE_FILE_SELECT);
-            }
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -187,21 +168,4 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     public void onRecyclerViewItemLongClick(Bundle bundle) {
 
     }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        if (requestCode == REQUEST_CODE_FILE_SELECT && resultCode == Activity.RESULT_OK) {
-            if (resultData != null) {
-                Uri mediaUri = resultData.getData();
-                if (mediaUri != null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable(ARG_PARAM1, mediaUri);
-
-                    Navigation.findNavController(binding.getRoot())
-                            .navigate(R.id.action_navigation_trending_to_navigation_uploads, bundle);
-                }
-            }
-        }
-    }
-
 }

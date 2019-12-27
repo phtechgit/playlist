@@ -44,16 +44,17 @@
         android:name="com.pheuture.playlists.trending.TrendingFragment"
         android:label="@string/title_trending"
         tools:layout="@layout/fragment_trendings" >
-        <action
-            android:id="@+id/action_navigation_trending_to_navigation_uploads"
-            app:destination="@id/navigation_uploads" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_settings"
         android:name="com.pheuture.playlists.settings.SettingsFragment"
         android:label="@string/title_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_navigation_settings_to_navigation_uploads"
+            app:destination="@id/navigation_uploads" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_uploads"

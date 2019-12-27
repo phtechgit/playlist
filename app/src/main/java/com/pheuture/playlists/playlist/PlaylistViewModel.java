@@ -11,7 +11,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.pheuture.playlists.datasource.local.user_handler.UserModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
@@ -46,12 +46,12 @@ public class PlaylistViewModel extends AndroidViewModel {
     private LiveData<List<PlaylistEntity>> playlists;
     private PlaylistMediaDao playlistMediaDao;
     private PendingUploadDao pendingUploadDao;
-    private UserModel user;
+    private UserEntity user;
 
     public PlaylistViewModel(@NonNull Application application) {
         super(application);
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
-                getApplication(), Constants.USER, ""), UserModel.class);
+                getApplication(), Constants.USER, ""), UserEntity.class);
 
         limit = 20;
 
@@ -72,8 +72,8 @@ public class PlaylistViewModel extends AndroidViewModel {
         PlaylistEntity playlistEntity = new PlaylistEntity();
         playlistEntity.setPlaylistID(generatePlaylistID());
         playlistEntity.setPlaylistName(playlistName);
-        playlistEntity.setCreatedByUserID(user.getUserID());
-        playlistEntity.setCreatedByUserName(user.getUserName());
+        playlistEntity.setUserID(user.getUserID());
+        playlistEntity.setUserFirstName(user.getUserFirstName());
         playlistEntity.setSongsCount(0);
         playlistEntity.setPlayDuration(0);
 
@@ -91,7 +91,7 @@ public class PlaylistViewModel extends AndroidViewModel {
     }
 
     private long generatePlaylistID() {
-        return user.getUserID() + Calendar.getInstance().getTimeInMillis();
+        return Long.valueOf(user.getUserID() + "" + Calendar.getInstance().getTimeInMillis());
     }
 
     public LiveData<List<PlaylistEntity>> getPlaylistEntities() {

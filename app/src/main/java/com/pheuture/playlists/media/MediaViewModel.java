@@ -11,7 +11,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.pheuture.playlists.datasource.local.user_handler.UserModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
@@ -29,6 +29,7 @@ import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
 import com.pheuture.playlists.utils.VolleyClient;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -49,14 +50,14 @@ public class MediaViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> reachedLast;
     private MutableLiveData<Boolean> updateParent;
     private PlaylistEntity playlistEntity;
-    private UserModel user;
+    private UserEntity user;
     private PendingUploadDao pendingUploadDao;
 
     public MediaViewModel(@NonNull Application application, PlaylistEntity playlistEntity) {
         super(application);
         this.playlistEntity = playlistEntity;
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
-                getApplication(), Constants.USER, ""), UserModel.class);
+                getApplication(), Constants.USER, ""), UserEntity.class);
 
         limit = 20;
         reachedLast = new MutableLiveData<>(false);
@@ -229,9 +230,17 @@ public class MediaViewModel extends AndroidViewModel {
         playlistDao.insert(playlistEntity);
 
         //add to pending uploads
+        JSONObject params = new JSONObject();
+        try {
+            params.put(ApiConstant.PLAYLIST_ID, playlistMediaEntity.getPlaylistID());
+            params.put(ApiConstant.MEDIA_ID, playlistMediaEntity.getMediaID());
+            params.put(ApiConstant.USER_ID, user.getUserID());
+        } catch (JSONException e) {
+            Logger.e(TAG, e.toString());
+        }
         PendingUploadEntity pendingUploadEntity = new PendingUploadEntity();
         pendingUploadEntity.setUrl(Url.PLAYLIST_MEDIA_ADD);
-        pendingUploadEntity.setParams(ParserUtil.getInstance().toJson(playlistMediaEntity, PlaylistMediaEntity.class));
+        pendingUploadEntity.setParams(params.toString());
         pendingUploadDao.insert(pendingUploadEntity);
 
         //start ExecutorService

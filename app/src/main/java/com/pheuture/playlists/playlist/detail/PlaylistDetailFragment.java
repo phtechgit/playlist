@@ -62,12 +62,9 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         viewModel.getPlaylistEntity().observe(this, new Observer<PlaylistEntity>() {
             @Override
             public void onChanged(PlaylistEntity playlistEntity) {
-                Logger.e(TAG, "playlist entity changed");
                 playlist = playlistEntity;
                 binding.setModel(playlist);
             }
-
-            Telephony
         });
 
         layoutManager = new LinearLayoutManager(activity);

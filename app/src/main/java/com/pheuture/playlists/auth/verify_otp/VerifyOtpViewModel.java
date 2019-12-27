@@ -10,7 +10,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.pheuture.playlists.datasource.local.user_handler.UserModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
@@ -24,13 +24,13 @@ import java.util.Map;
 
 public class VerifyOtpViewModel extends AndroidViewModel {
     private static final String TAG = VerifyOtpViewModel.class.getSimpleName();
-    private String phone;
+    private String userMobile;
     private MutableLiveData<Boolean> showProgress = new MutableLiveData<>();
-    private MutableLiveData<UserModel> userModelMutableLiveData = new MutableLiveData<>();
+    private MutableLiveData<UserEntity> userModelMutableLiveData = new MutableLiveData<>();
 
-    public VerifyOtpViewModel(@NonNull Application application, String phone) {
+    public VerifyOtpViewModel(@NonNull Application application, String userMobile) {
         super(application);
-        this.phone = phone;
+        this.userMobile = userMobile;
     }
 
     public void verifyOtp(String otp) {
@@ -52,14 +52,14 @@ public class VerifyOtpViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    UserModel userModel = ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), UserModel.class);
-                    if (userModel==null){
+                    UserEntity userEntity = ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), UserEntity.class);
+                    if (userEntity ==null){
                         return;
                     }
 
                     SharedPrefsUtils.setStringPreference(getApplication(), Constants.USER, response.optString(ApiConstant.DATA));
 
-                    userModelMutableLiveData.setValue(userModel);
+                    userModelMutableLiveData.setValue(userEntity);
 
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
@@ -79,7 +79,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put(ApiConstant.PHONE, phone);
+                params.put(ApiConstant.USER_MOBILE, userMobile);
                 params.put(ApiConstant.OTP, otp);
                 Logger.e(url + ApiConstant.PARAMS, params.toString());
                 return params;
@@ -90,7 +90,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
         VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
     }
 
-    public MutableLiveData<UserModel> getUserLive() {
+    public MutableLiveData<UserEntity> getUserLive() {
         return userModelMutableLiveData;
     }
 

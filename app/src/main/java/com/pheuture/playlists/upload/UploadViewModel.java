@@ -16,7 +16,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.pheuture.playlists.datasource.local.user_handler.UserModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
@@ -29,6 +29,9 @@ import cz.msebera.android.httpclient.Header;
 import java.io.File;
 
 import static android.provider.MediaStore.Video.Thumbnails.MINI_KIND;
+import static com.pheuture.playlists.datasource.local.video_handler.MediaEntity.MediaColumns.MEDIA_DESCRIPTION;
+import static com.pheuture.playlists.datasource.local.video_handler.MediaEntity.MediaColumns.MEDIA_TITLE;
+import static com.pheuture.playlists.datasource.local.video_handler.MediaEntity.MediaColumns.PLAY_DURATION;
 
 public class UploadViewModel extends AndroidViewModel {
     private static final String TAG = UploadViewModel.class.getSimpleName();
@@ -36,12 +39,12 @@ public class UploadViewModel extends AndroidViewModel {
     private SimpleExoPlayer exoPlayer;
     private MutableLiveData<Boolean> showProgress;
     private MutableLiveData<Integer> progressPercentage;
-    private UserModel user;
+    private UserEntity user;
 
     public UploadViewModel(@NonNull Application application) {
         super(application);
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
-                getApplication(), Constants.USER, ""), UserModel.class);
+                getApplication(), Constants.USER, ""), UserEntity.class);
 
         dataSourceFactory = new DefaultDataSourceFactory(application,
                 Util.getUserAgent(application, TAG));
@@ -76,15 +79,15 @@ public class UploadViewModel extends AndroidViewModel {
                 File thumbnail = new File(RealPathUtil.getRealPath(getApplication(), thumbnailUri));
                 params.put("videoThumbnail", thumbnail);
             }
-            params.put("videoTitle", title);
-            params.put("videoDescription", description);
-            params.put("videoDuration", getExoPlayer().getDuration());
+            params.put(MEDIA_TITLE, title);
+            params.put(MEDIA_DESCRIPTION, description);
+            params.put(PLAY_DURATION, getExoPlayer().getDuration());
             params.put("videoSingers", "dummy");
             params.put("musicDirector", "dummy");
             params.put("movieName", "dummy");
             params.put("artists", "dummy");
             params.put("movieDirector", "dummy");
-            params.put(ApiConstant.USER_ID, String.valueOf(user.getUserID()));
+            params.put(ApiConstant.USER_ID, user.getUserID());
         } catch (Exception e) {
             Logger.e(TAG, e.toString());
         }

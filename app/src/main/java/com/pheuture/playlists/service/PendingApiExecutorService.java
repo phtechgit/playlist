@@ -18,6 +18,7 @@ import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUpl
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Logger;
+import com.pheuture.playlists.utils.NetworkUtils;
 import com.pheuture.playlists.utils.VolleyClient;
 
 import org.json.JSONException;
@@ -37,13 +38,16 @@ public class PendingApiExecutorService extends Service {
     }
 
     public synchronized static void startService(Application application) {
-        Intent intent = new Intent(application, PendingApiExecutorService.class);
-        application.startService(intent);
+        if (NetworkUtils.online(application)) {
+            Intent intent = new Intent(application, PendingApiExecutorService.class);
+            application.startService(intent);
+        }
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Logger.e(TAG, "started");
         pendingUploadDao = LocalRepository.getInstance(this).pendingUploadDao();
 
         pendingUploadEntities = pendingUploadDao.getAllPendingUploadEntities();
@@ -128,10 +132,11 @@ public class PendingApiExecutorService extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         if (pendingUploadEntities.size()>0){
             scheduleRestart();
         }
+        super.onDestroy();
+        Logger.e(TAG, "stopped");
     }
 
     @Nullable
@@ -142,5 +147,6 @@ public class PendingApiExecutorService extends Service {
 
     private void scheduleRestart() {
         //implement workManager
+
     }
 }

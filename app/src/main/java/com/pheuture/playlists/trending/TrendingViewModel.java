@@ -11,7 +11,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.pheuture.playlists.datasource.local.user_handler.UserModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.datasource.local.video_handler.MediaDao;
@@ -39,12 +39,12 @@ public class TrendingViewModel extends AndroidViewModel {
     private long limit;
     private MutableLiveData<String> searchQuery;
     private MutableLiveData<Boolean> reachedLast;
-    private UserModel user;
+    private UserEntity user;
 
     public TrendingViewModel(@NonNull Application application) {
         super(application);
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
-                getApplication(), Constants.USER, ""), UserModel.class);
+                getApplication(), Constants.USER, ""), UserEntity.class);
 
         limit = 10;
         reachedLast = new MutableLiveData<>(false);

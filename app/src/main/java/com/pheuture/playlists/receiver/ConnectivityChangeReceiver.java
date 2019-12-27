@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.NetworkUtils;
 
 public class ConnectivityChangeReceiver extends BroadcastReceiver {

@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +26,7 @@ import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AuthActivity;
 import com.pheuture.playlists.auth.user_detail.UserProfileActivity;
-import com.pheuture.playlists.datasource.local.user_handler.UserModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.auth.request_otp.RequestOtpFragment;
 import com.pheuture.playlists.databinding.FragmentVerifyOtpBinding;
 import com.pheuture.playlists.receiver.SMSReceiver;
@@ -72,10 +71,10 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
 
         binding.textViewMessage.setText("Waiting to automatically detect an SMS sent to " + phone);
 
-        viewModel.getUserLive().observe(this, new Observer<UserModel>() {
+        viewModel.getUserLive().observe(this, new Observer<UserEntity>() {
             @Override
-            public void onChanged(UserModel user) {
-                if (StringUtils.isEmpty(user.getUserName())){
+            public void onChanged(UserEntity user) {
+                if (StringUtils.isEmpty(user.getUserFirstName())){
                     Intent intent = new Intent(activity, UserProfileActivity.class);
                     startActivity(intent);
                     activity.finish();

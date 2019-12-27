@@ -14,7 +14,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.pheuture.playlists.datasource.local.user_handler.UserModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
@@ -33,6 +33,7 @@ import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
 import com.pheuture.playlists.utils.VolleyClient;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.File;
 import java.util.Arrays;
@@ -56,7 +57,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     private PlaylistMediaDao playlistMediaDao;
     private OfflineMediaDao offlineMediaDao;
     private DownloadManager downloadManager;
-    private UserModel user;
+    private UserEntity user;
     private PendingUploadDao pendingUploadDao;
 
     public PlaylistDetailViewModel(@NonNull Application application, long playlistID) {
@@ -64,7 +65,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         this.playlistID = playlistID;
 
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
-                getApplication(), Constants.USER, ""), UserModel.class);
+                getApplication(), Constants.USER, ""), UserEntity.class);
 
         limit = 20;
         pendingUploadDao = LocalRepository.getInstance(application).pendingUploadDao();
@@ -249,20 +250,30 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         return offlineVideoEntity == null;
     }
 
-    public void removeMediaFromPlaylist(PlaylistMediaEntity model) {
+    public void removeMediaFromPlaylist(PlaylistMediaEntity playlistMediaEntity) {
         //update playlist media
-        playlistMediaDao.deleteMediaFromPlaylist(playlistID, model.getMediaID());
+        playlistMediaDao.deleteMediaFromPlaylist(playlistID, playlistMediaEntity.getMediaID());
 
         //update playlist
         PlaylistEntity newPlaylistEntity = playlistEntity.getValue();
         newPlaylistEntity.setSongsCount(newPlaylistEntity.getSongsCount() - 1);
-        newPlaylistEntity.setPlayDuration(newPlaylistEntity.getPlayDuration() - model.getPlayDuration());
+        newPlaylistEntity.setPlayDuration(newPlaylistEntity.getPlayDuration() - playlistMediaEntity.getPlayDuration());
         playlistDao.insert(newPlaylistEntity);
 
         //add to pending uploads
+        //add to pending uploads
+        JSONObject params = new JSONObject();
+        try {
+            params.put(ApiConstant.PLAYLIST_ID, playlistMediaEntity.getPlaylistID());
+            params.put(ApiConstant.MEDIA_ID, playlistMediaEntity.getMediaID());
+            params.put(ApiConstant.USER_ID, user.getUserID());
+        } catch (JSONException e) {
+            Logger.e(TAG, e.toString());
+        }
+
         PendingUploadEntity pendingUploadEntity = new PendingUploadEntity();
         pendingUploadEntity.setUrl(Url.PLAYLIST_MEDIA_REMOVE);
-        pendingUploadEntity.setParams(ParserUtil.getInstance().toJson(model, PlaylistMediaEntity.class));
+        pendingUploadEntity.setParams(params.toString());
         pendingUploadDao.insert(pendingUploadEntity);
 
         //start ExecutorService

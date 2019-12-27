@@ -3,23 +3,21 @@ package com.pheuture.playlists.datasource.local.playlist_handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.databinding.BindingAdapter;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
 import com.google.gson.annotations.SerializedName;
-import com.pheuture.playlists.datasource.local.user_handler.UserModel;
+import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.utils.CalenderUtils;
 
 @Entity
-public class PlaylistEntity extends UserModel implements Parcelable, Cloneable {
+public class PlaylistEntity extends UserEntity implements Parcelable, Cloneable {
 
 	@NonNull
 	@PrimaryKey
 	@SerializedName("playlistID")
-	private long playlistID;
+	public long playlistID;
 
 	@SerializedName("createdOn")
 	private long createdOn;
@@ -134,6 +132,6 @@ public class PlaylistEntity extends UserModel implements Parcelable, Cloneable {
 	}
 
 	public String getCreatedByFormatted(){
-		return "by " + userName;
+		return "by " + getUserFullName();
 	}
 }
