@@ -1,12 +1,18 @@
 package com.pheuture.playlists.settings;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -18,10 +24,14 @@ import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentSettingsBinding;
 import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.utils.KeyboardUtils;
+import com.pheuture.playlists.utils.SharedPrefsUtils;
 
 import static com.pheuture.playlists.utils.RequestCodeConstant.REQUEST_CODE_FILE_SELECT;
 
-public class SettingsFragment extends BaseFragment {
+public class SettingsFragment extends BaseFragment implements CompoundButton.OnCheckedChangeListener {
+    private static final String TAG = SettingsFragment.class.getSimpleName();
     private SettingsViewModel viewModel;
     private FragmentSettingsBinding binding;
     private FragmentActivity activity;
@@ -48,6 +58,9 @@ public class SettingsFragment extends BaseFragment {
     @Override
     public void setListeners() {
         binding.linearLayoutUpload.setOnClickListener(this);
+        binding.switchDownloadPlaylistVideosToOffline.setOnCheckedChangeListener(this);
+        binding.switchDownloadUsingCellular.setOnCheckedChangeListener(this);
+        binding.linearLayoutDeleteOfflineVideos.setOnClickListener(this);
     }
 
     @Override
@@ -58,7 +71,53 @@ public class SettingsFragment extends BaseFragment {
             if (intent.resolveActivity(activity.getPackageManager()) != null) {
                 startActivityForResult(intent, REQUEST_CODE_FILE_SELECT);
             }
+        } else if (v.equals(binding.linearLayoutDeleteOfflineVideos)){
+            showDeleteConfirmationDialog();
         }
+    }
+
+    private void showDeleteConfirmationDialog() {
+        Dialog dialog = new Dialog(activity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.setContentView(R.layout.layout_create_playlist);
+        dialog.show();
+
+        TextView textViewTitle = dialog.findViewById(R.id.textView_title);
+        TextView textViewSubtitle = dialog.findViewById(R.id.textView_subtitle);
+        EditText editText = dialog.findViewById(R.id.ediText);
+        TextView textViewLeft = dialog.findViewById(R.id.textView_left);
+        TextView textViewRight = dialog.findViewById(R.id.textView_right);
+
+        textViewTitle.setText("Are you sure?");
+        textViewSubtitle.setText("Do you want to remove all the offline songs?");
+        textViewSubtitle.setVisibility(View.VISIBLE);
+        textViewRight.setText("Remove");
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                KeyboardUtils.hideKeyboard(activity, editText);
+            }
+        });
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                KeyboardUtils.hideKeyboard(activity, editText);
+            }
+        });
+
+        textViewLeft.setOnClickListener(view -> {
+            dialog.cancel();
+        });
+
+        textViewRight.setOnClickListener(view -> {
+            dialog.dismiss();
+            viewModel.deleteOfflineMedia();
+            ((MainActivity) activity).showSnack("Offline songs removed.");
+        });
+        /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/
     }
 
     @Override
@@ -74,6 +133,16 @@ public class SettingsFragment extends BaseFragment {
                             .navigate(R.id.action_navigation_settings_to_navigation_uploads, bundle);
                 }
             }
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (buttonView.equals(binding.switchDownloadPlaylistVideosToOffline)){
+            SharedPrefsUtils.setBooleanPreference(activity, Constants.DOWNLOAD_PLAYLIST_MEDIA, isChecked);
+
+        } else if (buttonView.equals(binding.switchDownloadUsingCellular)){
+            SharedPrefsUtils.setBooleanPreference(activity, Constants.DOWNLOAD_USING_CELLULAR, isChecked);
         }
     }
 }

@@ -10,7 +10,6 @@ public final class Constants{
         throw new IllegalStateException("utility class should not be instantiated ");
     }
 
-    public static final String USER = "user";
     public static final String ARG_PARAM1 = "param1";
     public static final String ARG_PARAM2 = "param2";
     public static final String ARG_PARAM3 = "param3";
@@ -19,5 +18,10 @@ public final class Constants{
 
     public static final String DECORATOR_STARTING_VIEW = "decorator_starting_view";
     public static final String DECORATOR_ENDING_VIEW = "decorator_ending_view";
+
+    public static final String USER = "user";
+    public static final String OFFLINE_MEDIA_FOLDER = "offline_media";
+    public static final String DOWNLOAD_PLAYLIST_MEDIA = "download_playlist_media";
+    public static final String DOWNLOAD_USING_CELLULAR = "download_using_cellular";
 
 }

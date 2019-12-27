@@ -25,6 +25,8 @@ import com.pheuture.playlists.utils.RealPathUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
 
+import org.json.JSONObject;
+
 import cz.msebera.android.httpclient.Header;
 import java.io.File;
 
@@ -37,8 +39,9 @@ public class UploadViewModel extends AndroidViewModel {
     private static final String TAG = UploadViewModel.class.getSimpleName();
     private DataSource.Factory dataSourceFactory;
     private SimpleExoPlayer exoPlayer;
-    private MutableLiveData<Boolean> showProgress;
-    private MutableLiveData<Integer> progressPercentage;
+    private MutableLiveData<Boolean> showProgress = new MutableLiveData<>();
+    private MutableLiveData<Boolean> uploaded = new MutableLiveData<>();
+    private MutableLiveData<Integer>  progressPercentage = new MutableLiveData<>();
     private UserEntity user;
 
     public UploadViewModel(@NonNull Application application) {
@@ -49,8 +52,6 @@ public class UploadViewModel extends AndroidViewModel {
         dataSourceFactory = new DefaultDataSourceFactory(application,
                 Util.getUserAgent(application, TAG));
         exoPlayer = ExoPlayerFactory.newSimpleInstance(application);
-        showProgress = new MutableLiveData<>();
-        progressPercentage = new MutableLiveData<>();
     }
 
     public SimpleExoPlayer getExoPlayer() {
@@ -62,6 +63,8 @@ public class UploadViewModel extends AndroidViewModel {
     }
 
     public void submitMedia(Uri mediaUri, Uri thumbnailUri, String title, String description) {
+        uploaded.setValue(null);
+
         File media = new File(RealPathUtil.getRealPath(getApplication(), mediaUri));
 
         showProgress.setValue(true);
@@ -98,8 +101,16 @@ public class UploadViewModel extends AndroidViewModel {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
                     showProgress.setValue(false);
-                    String response = new String(responseBody, "UTF-8");
-                    Logger.e(url + ApiConstant.RESPONSE, response);
+                    String stringResponse = new String(responseBody, "UTF-8");
+                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
+
+                    JSONObject response = new JSONObject(stringResponse);
+
+                    if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
+                        return;
+                    }
+
+                    uploaded.setValue(true);
 
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
@@ -110,8 +121,11 @@ public class UploadViewModel extends AndroidViewModel {
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 try {
                     showProgress.setValue(false);
-                    String response = new String(responseBody, "UTF-8");
-                    Logger.e(url, statusCode + ": " + response);
+                    String stringResponse = new String(responseBody, "UTF-8");
+                    Logger.e(url, statusCode + ": " + stringResponse);
+
+                    uploaded.setValue(false);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -134,4 +148,7 @@ public class UploadViewModel extends AndroidViewModel {
         return progressPercentage;
     }
 
+    public MutableLiveData<Boolean> getUploadedStatus() {
+        return uploaded;
+    }
 }

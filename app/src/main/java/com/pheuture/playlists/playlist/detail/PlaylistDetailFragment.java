@@ -26,8 +26,11 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.KeyboardUtils;
 import com.pheuture.playlists.utils.Logger;
+import com.pheuture.playlists.utils.NetworkUtils;
+import com.pheuture.playlists.utils.SharedPrefsUtils;
 
 import java.util.List;
 
@@ -92,7 +95,12 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
                     binding.imageButtonShuffle.setImageResource(R.drawable.ic_shuffle_grey);
                 }
 
-                viewModel.addToOfflineMedia(playlistMediaEntities);
+                boolean downloadPlaylistMediaStatus = SharedPrefsUtils.getBooleanPreference(activity,
+                        Constants.DOWNLOAD_PLAYLIST_MEDIA, false);
+
+                if (downloadPlaylistMediaStatus) {
+                    viewModel.addToOfflineMedia(playlistMediaEntities);
+                }
             }
         });
 

@@ -24,6 +24,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentUploadBinding;
 import com.pheuture.playlists.utils.AlerterUtils;
@@ -88,7 +89,21 @@ public class UploadFragment extends BaseFragment {
                     alertDialog = AlerterUtils.progressDeterminateShow(activity, "Uploading Video");
                 } else {
                     AlerterUtils.progressDeterminateDismiss(alertDialog);
+                }
+            }
+        });
+
+        viewModel.getUploadedStatus().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean uploaded) {
+                if (uploaded == null){
+                    return;
+                }
+                if (uploaded) {
+                    ((MainActivity) activity).showSnack("uploaded successfully");
                     activity.onBackPressed();
+                } else {
+                    ((MainActivity) activity).showSnack("uploading failed");
                 }
             }
         });

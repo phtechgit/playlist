@@ -43,7 +43,50 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/linearLayout2"
+                android:id="@+id/linearLayout_download_playlist_videos_to_offline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toStartOf="@+id/switch_download_playlist_videos_to_offline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout_upload">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Download playlist"
+                    android:textSize="@dimen/textSizeBody1"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/switch_download_playlist_videos_to_offline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="listen to your playlist while offline"
+                    android:textColor="@color/gray4"
+                    android:textSize="@dimen/textSizeBody2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/switch_download_playlist_videos_to_offline"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:checked="false"
+                app:layout_constraintBottom_toBottomOf="@+id/linearLayout_download_playlist_videos_to_offline"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/linearLayout_download_playlist_videos_to_offline" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout_download_using_cellular"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -52,7 +95,7 @@
                 android:orientation="vertical"
                 app:layout_constraintEnd_toStartOf="@+id/switch_download_using_cellular"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout_upload">
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout_download_playlist_videos_to_offline">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -74,9 +117,40 @@
                 android:id="@+id/switch_download_using_cellular"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="@+id/linearLayout2"
+                android:checked="false"
+                app:layout_constraintBottom_toBottomOf="@+id/linearLayout_download_using_cellular"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/linearLayout2" />
+                app:layout_constraintTop_toTopOf="@+id/linearLayout_download_using_cellular" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout_delete_offline_videos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout_download_using_cellular">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delete"
+                    android:textSize="@dimen/textSizeBody1"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="delete all offline videos"
+                    android:textColor="@color/gray4"
+                    android:textSize="@dimen/textSizeBody2" />
+
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

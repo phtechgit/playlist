@@ -194,6 +194,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
 
                     offlineVideoEntity.setMediaID(mediaEntity.getMediaID());
                     offlineVideoEntity.setMediaName(mediaEntity.getMediaName());
+                    offlineVideoEntity.setMediaTitle(mediaEntity.getMediaTitle());
                     offlineVideoEntity.setMediaDescription(mediaEntity.getMediaDescription());
                     offlineVideoEntity.setMediaThumbnail(mediaEntity.getMediaThumbnail());
                     offlineVideoEntity.setMediaUrl(mediaEntity.getMediaUrl());
@@ -202,13 +203,16 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                     offlineVideoEntity.setDownloadedFilePath(getFile(offlineVideoEntity).getPath());
                     offlineVideoEntity.setDownloadStatus(DownloadManager.STATUS_PENDING);
 
+                    boolean downloadOnCellularStatus = SharedPrefsUtils.getBooleanPreference(getApplication(),
+                            Constants.DOWNLOAD_USING_CELLULAR, false);
+
                     //add media to *download manager*
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(offlineVideoEntity.getMediaUrl()))
                             .setTitle(offlineVideoEntity.getMediaName())// Title of the Download Notification
                             .setDescription(offlineVideoEntity.getMediaDescription())// Description of the Download Notification
                             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)// Visibility of the download Notification
                             .setDestinationUri(Uri.fromFile(new File(offlineVideoEntity.getDownloadedFilePath())))// Uri of the destination file
-                            .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
+                            .setAllowedOverMetered(downloadOnCellularStatus)// Set if download is allowed on Mobile network
                             .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
                     long downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.

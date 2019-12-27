@@ -36,4 +36,7 @@ public interface OfflineMediaDao {
 
     @Query("update OfflineMediaEntity set downloadedFilePath=:downloadedFilePath, downloadStatus=:downloadStatus where downloadID =:downloadId")
     void updateOfflineVideoStatus(long downloadId, String downloadedFilePath, int downloadStatus);
+
+    @Query("delete from OfflineMediaEntity where mediaName=:fileName")
+    void delete(String fileName);
 }

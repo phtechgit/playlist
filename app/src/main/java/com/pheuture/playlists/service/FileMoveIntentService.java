@@ -12,6 +12,7 @@ import com.pheuture.playlists.utils.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -67,18 +68,28 @@ public class FileMoveIntentService extends IntentService {
 
     private void handleActionMove(long downloadId, String source) {
         try {
-            Calendar calendar = Calendar.getInstance();
-            File destinationFile = new File(getFilesDir(), String.valueOf(calendar.getTimeInMillis()) + source.substring(source.lastIndexOf(".")));
-            if (!destinationFile.exists()){
-                if (!destinationFile.createNewFile()) {
-                    Logger.e(TAG, "failed to create destination file");
+            File destinationDirectory = new File(getFilesDir(), Constants.OFFLINE_MEDIA_FOLDER);
+            if (!destinationDirectory.exists()){
+                if (!destinationDirectory.mkdirs()) {
+                    Logger.e(TAG, "failed to create offline media directory");
                     return;
                 }
-                Logger.e(TAG, "destination file created successfully");
+                Logger.e(TAG, "offline media directory created");
+            }
+
+            Calendar calendar = Calendar.getInstance();
+            File destinationFile = new File(getFilesDir() + "/" + Constants.OFFLINE_MEDIA_FOLDER, calendar.getTimeInMillis() + source.substring(source.lastIndexOf(".")));
+            if (!destinationFile.exists()){
+                if (!destinationFile.createNewFile()) {
+                    Logger.e(TAG, "failed to create offline media file");
+                    return;
+                }
+                Logger.e(TAG, "offline media  file created");
             }
 
             InputStream in = new FileInputStream(source);
-            OutputStream out = openFileOutput(destinationFile.getName(), MODE_PRIVATE);
+            FileOutputStream out = new FileOutputStream(destinationFile);
+            /*OutputStream out = openFileOutput(fOut., MODE_PRIVATE);*/
 
             byte[] buf = new byte[512];
             int len;
