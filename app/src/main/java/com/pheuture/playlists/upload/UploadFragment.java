@@ -1,15 +1,14 @@
 package com.pheuture.playlists.upload;
 
+import androidx.core.content.FileProvider;
 import  androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.app.Activity;
-import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -27,20 +26,18 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentUploadBinding;
-import com.pheuture.playlists.utils.AlerterUtils;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.RealPathUtil;
+import com.pheuture.playlists.utils.progress_dialog.ProgressDialog;
+import com.pheuture.playlists.utils.progress_dialog.ProgressDialogActionInterface;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import org.jetbrains.annotations.NotNull;
 
-import static android.provider.MediaStore.Video.Thumbnails.FULL_SCREEN_KIND;
-import static android.provider.MediaStore.Video.Thumbnails.MINI_KIND;
+import java.nio.file.spi.FileSystemProvider;
+
 import static com.pheuture.playlists.utils.RequestCodeConstant.REQUEST_CODE_FILE_SELECT;
 
-public class UploadFragment extends BaseFragment {
+public class UploadFragment extends BaseFragment implements ProgressDialogActionInterface.ClickListener{
     private static final String TAG = UploadFragment.class.getSimpleName();
     private FragmentActivity activity;
     private UploadViewModel viewModel;
@@ -49,14 +46,14 @@ public class UploadFragment extends BaseFragment {
     private PlayerView playerView;
     private Uri mediaUri;
     private Uri thumbnailUri;
-    private long lastProgress = 0;
-    private Dialog alertDialog;
+    private int lastProgress = 0;
+    private ProgressDialogActionInterface progressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = ViewModelProviders.of(this).get(UploadViewModel.class);
         activity = getActivity();
+        progressDialog = new ProgressDialog(activity, this);
     }
 
     @Override
@@ -70,25 +67,42 @@ public class UploadFragment extends BaseFragment {
         assert getArguments() != null;
         mediaUri = getArguments().getParcelable(ARG_PARAM1);
 
+        if (mediaUri == null){
+            Toast.makeText(activity, "Invalid media file", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        viewModel = ViewModelProviders.of(this, new UploadViewModelFactory(
+                activity.getApplication(), mediaUri)).get(UploadViewModel.class);
+
         playerView = binding.playerView;
         exoPlayer = viewModel.getExoPlayer();
         exoPlayer.setPlayWhenReady(false);
         playerView.setPlayer(exoPlayer);
 
-        MediaSource mediaSource;
-        mediaSource = new ProgressiveMediaSource.Factory(viewModel.getDataSourceFactory())
-                .createMediaSource(mediaUri);
-        exoPlayer.prepare(mediaSource);
-
-        createAndSetThumbnail();
-
         viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean show) {
                 if(show){
-                    alertDialog = AlerterUtils.progressDeterminateShow(activity, "Uploading Video");
+                    progressDialog.show("Uploading Video");
                 } else {
-                    AlerterUtils.progressDeterminateDismiss(alertDialog);
+                    progressDialog.dismiss();
+                }
+            }
+        });
+
+        viewModel.getProgressPercentage().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer percentage) {
+                if (percentage<lastProgress){
+                    return;
+                }
+                lastProgress = percentage;
+
+                if (percentage>100) {
+                   progressDialog.setProgress(100);
+                } else {
+                    progressDialog.setProgress(lastProgress);
                 }
             }
         });
@@ -103,51 +117,35 @@ public class UploadFragment extends BaseFragment {
                     ((MainActivity) activity).showSnack("uploaded successfully");
                     activity.onBackPressed();
                 } else {
+                    progressDialog.dismiss();
                     ((MainActivity) activity).showSnack("uploading failed");
                 }
             }
         });
 
-        viewModel.getProgressPercentage().observe(this, new Observer<Integer>() {
+        viewModel.getThumbnailLive().observe(this, new Observer<Uri>() {
             @Override
-            public void onChanged(Integer percentage) {
-                if (percentage<lastProgress){
-                    return;
-                }
-                lastProgress = percentage;
-
-                if (percentage>100) {
-                    AlerterUtils.progressDeterminateUpdateProgress(100);
-                } else {
-                    AlerterUtils.progressDeterminateUpdateProgress(lastProgress);
-                }
+            public void onChanged(Uri uri) {
+                thumbnailUri = uri;
+                showThumbnail();
             }
         });
+
+        viewModel.getMediaUri().observe(this, new Observer<Uri>() {
+            @Override
+            public void onChanged(Uri uri) {
+                mediaUri = uri;
+                setMediaInPlayer();
+            }
+        });
+
     }
 
-    private void createAndSetThumbnail() {
-         Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(
-                RealPathUtil.getRealPath(activity, mediaUri), FULL_SCREEN_KIND);
-
-        try {
-            File thumbnailFile = File.createTempFile("thumbnail", ".png", activity.getCacheDir());
-            if (!thumbnailFile.exists()){
-                if (!thumbnailFile.createNewFile()){
-                    return;
-                }
-            }
-            FileOutputStream fos = new FileOutputStream(thumbnailFile);
-            assert bitmap != null;
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
-            fos.close();
-
-            thumbnailUri = Uri.fromFile(thumbnailFile);
-
-            showThumbnail();
-
-        } catch (Exception e) {
-            Logger.e(TAG, e.toString());
-        }
+    private void setMediaInPlayer() {
+        MediaSource mediaSource;
+        mediaSource = new ProgressiveMediaSource.Factory(viewModel.getDataSourceFactory())
+                .createMediaSource(mediaUri);
+        exoPlayer.prepare(mediaSource);
     }
 
     @Override
@@ -182,7 +180,7 @@ public class UploadFragment extends BaseFragment {
 
             Runnable runnable = new Runnable() {
                 public void run() {
-                    viewModel.submitMedia(mediaUri, thumbnailUri, binding.ediTextTitle.getText().toString(), binding.ediTextDescription.getText().toString());
+                    viewModel.uploadMedia(binding.ediTextTitle.getText().toString(), binding.ediTextDescription.getText().toString());
                 }
             };
             proceedWithPermissions(activity, runnable, false);
@@ -193,8 +191,7 @@ public class UploadFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         if (requestCode == REQUEST_CODE_FILE_SELECT && resultCode == Activity.RESULT_OK) {
             if (resultData != null) {
-                thumbnailUri = resultData.getData();
-                showThumbnail();
+                viewModel.setThumbnailUri(resultData.getData());
             }
         }
     }
@@ -214,5 +211,11 @@ public class UploadFragment extends BaseFragment {
         if (exoPlayer!=null){
             exoPlayer.release();
         }
+    }
+
+    @Override
+    public void onCancelled() {
+        Logger.e(TAG, "onCancelled");
+        viewModel.cancelUpload();
     }
 }

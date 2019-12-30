@@ -5,6 +5,7 @@ public final class Url {
         throw new IllegalStateException("utility class should not be instantiated ");
     }
 
+    public static final String BASE_URL = "http://111.118.180.237/testing_d/praveen/playlist/";
     public static final String REQUEST_OTP = "http://111.118.180.237/testing_d/praveen/playlist/sendOtp.php";
     public static final String VERIFY_OTP = "http://111.118.180.237/testing_d/praveen/playlist/varify_Otp.php";
     public static final String UPDATE_USER_DETAIL = "http://111.118.180.237/testing_d/praveen/playlist/create_user.php";

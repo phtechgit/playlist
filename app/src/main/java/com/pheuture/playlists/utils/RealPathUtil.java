@@ -1,6 +1,8 @@
 package com.pheuture.playlists.utils;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -123,6 +125,10 @@ public class RealPathUtil {
 
                 return getDataColumn(context, contentUri, selection, selectionArgs);
             }
+
+            else if (isGoogleDriveDocument(uri)) {
+                return uri.getEncodedPath();
+            }
         }
         // MediaStore (and general)
         else if ("content".equalsIgnoreCase(uri.getScheme())) {
@@ -139,6 +145,10 @@ public class RealPathUtil {
         }
 
         return null;
+    }
+
+    private static boolean isGoogleDriveDocument(Uri uri) {
+        return "com.google.android.apps.docs.storage".equals(uri.getAuthority());
     }
 
     /**

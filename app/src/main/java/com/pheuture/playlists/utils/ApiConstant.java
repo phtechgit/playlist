@@ -6,24 +6,24 @@ public final class ApiConstant {
         throw new IllegalStateException("utility class should not be instantiated ");
     }
 
-    public static String LAST_ID = "last";
-    public static String LIMIT = "limit";
-    public static String SEARCH_QUERY = "skey";
-    public static String USER_ID = "userID";
-    public static String USER_MOBILE = "userMobile";
-    public static String PLAYLIST_ID = "playlistID";
-    public static String MEDIA_ID = "mediaID";
+    public static final String LAST_ID = "last";
+    public static final String LIMIT = "limit";
+    public static final String SEARCH_QUERY = "skey";
+    public static final String USER_ID = "userID";
+    public static final String USER_MOBILE = "userMobile";
+    public static final String PLAYLIST_ID = "playlistID";
+    public static final String MEDIA_ID = "mediaID";
     /*public static String USER_FIRST_NAME = "userFirstName";
     public static String USER_LAST_NAME = "userLastName";*/
-    public static String HASH_KEY = "hashtag";
-    public static String OTP = "otp";
+    public static final String HASH_KEY = "hashtag";
+    public static final String OTP = "otp";
 
-    public static String PARAMS = "_params";
-    public static String PARAM = "_param";
-    public static String RESPONSE = "_response";
-    public static String STATUS = "Status";
-    public static String MESSAGE = "message";
-    public static String DATA = "data";
+    public static final String PARAMS = "_params";
+    public static final String PARAM = "_param";
+    public static final String RESPONSE = "_response";
+    public static final String STATUS = "Status";
+    public static final String MESSAGE = "message";
+    public static final String DATA = "data";
 
 
 }

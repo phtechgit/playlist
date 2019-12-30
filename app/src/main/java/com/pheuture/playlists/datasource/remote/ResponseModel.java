@@ -4,16 +4,20 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class ResponseModel implements Parcelable {
-    private String message;
-    private String url;
-
-    public ResponseModel(String url){
-        this.url = url;
-
-    }
+    private boolean message;
 
     protected ResponseModel(Parcel in) {
-        url = in.readString();
+        message = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (message ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<ResponseModel> CREATOR = new Creator<ResponseModel>() {
@@ -28,29 +32,12 @@ public class ResponseModel implements Parcelable {
         }
     };
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(url);
-    }
-
-    public String getMessage() {
+    public boolean getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(boolean message) {
         this.message = message;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
 }

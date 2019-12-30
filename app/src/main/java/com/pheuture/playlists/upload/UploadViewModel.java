@@ -1,6 +1,7 @@
 package com.pheuture.playlists.upload;
 
 import android.app.Application;
+import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 
@@ -13,24 +14,45 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.common.api.Api;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
+import com.pheuture.playlists.datasource.remote.FileUploadDao;
+import com.pheuture.playlists.datasource.remote.ProgressRequestBody;
+import com.pheuture.playlists.datasource.remote.RemoteRepository;
+import com.pheuture.playlists.datasource.remote.ResponseModel;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.RealPathUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
+import com.pheuture.playlists.utils.StringUtils;
 import com.pheuture.playlists.utils.Url;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
-import java.io.File;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-import static android.provider.MediaStore.Video.Thumbnails.MINI_KIND;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
+
+import static android.provider.MediaStore.Video.Thumbnails.FULL_SCREEN_KIND;
 import static com.pheuture.playlists.datasource.local.video_handler.MediaEntity.MediaColumns.MEDIA_DESCRIPTION;
 import static com.pheuture.playlists.datasource.local.video_handler.MediaEntity.MediaColumns.MEDIA_TITLE;
 import static com.pheuture.playlists.datasource.local.video_handler.MediaEntity.MediaColumns.PLAY_DURATION;
@@ -43,9 +65,18 @@ public class UploadViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> uploaded = new MutableLiveData<>();
     private MutableLiveData<Integer>  progressPercentage = new MutableLiveData<>();
     private UserEntity user;
+    private MutableLiveData<Uri> mediaUri;
+    private MutableLiveData<Uri> thumbnailUri = new MutableLiveData<>();
+    private AsyncHttpClient fileUploadClient;
+    private Retrofit remoteRepository;
 
-    public UploadViewModel(@NonNull Application application) {
+    public UploadViewModel(@NonNull Application application, Uri newMediaUri) {
         super(application);
+        remoteRepository = RemoteRepository.getInstance(getApplication());
+        mediaUri = new MutableLiveData<>(newMediaUri);
+
+        createAndSetThumbnail();
+
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 getApplication(), Constants.USER, ""), UserEntity.class);
 
@@ -62,51 +93,68 @@ public class UploadViewModel extends AndroidViewModel {
         return dataSourceFactory;
     }
 
-    public void submitMedia(Uri mediaUri, Uri thumbnailUri, String title, String description) {
+    protected void uploadMedia(String title, String description) {
         uploaded.setValue(null);
 
-        File media = new File(RealPathUtil.getRealPath(getApplication(), mediaUri));
+        String mediaFilePath = RealPathUtil.getRealPath(getApplication(), mediaUri.getValue());
+        String thumbnailFilePath = RealPathUtil.getRealPath(getApplication(), thumbnailUri.getValue());
+
+        if (StringUtils.isEmpty(mediaFilePath)){
+            Logger.e(TAG, "mediaFilePath si empty");
+            uploaded.setValue(false);
+        }
+
+        if (StringUtils.isEmpty(thumbnailFilePath)){
+            Logger.e(TAG, "thumbnailFilePath si empty");
+            uploaded.setValue(false);
+        }
+
+        File mediaFile = new File(mediaFilePath);
+        File thumbnailFile = new File(thumbnailFilePath);
 
         showProgress.setValue(true);
 
         final String url = Url.MEDIA_UPLOAD;
 
-        RequestParams params = new RequestParams();
-        try {
-            params.put("videofile", media);
-            if (thumbnailUri == null){
-                params.put("videoThumbnail", ThumbnailUtils.createVideoThumbnail(
-                        RealPathUtil.getRealPath(getApplication(), mediaUri), MINI_KIND));
+        FileUploadDao fileUploadDao = remoteRepository.create(FileUploadDao.class);
+        Call<ResponseModel> fileUploadClient = fileUploadDao.uploadMediaFile(
+                RequestBody.create(title, MultipartBody.FORM),
+                RequestBody.create(description, MultipartBody.FORM),
+                RequestBody.create(String.valueOf(exoPlayer.getDuration()), MultipartBody.FORM),
+                RequestBody.create("", MultipartBody.FORM),
+                RequestBody.create("", MultipartBody.FORM),
+                RequestBody.create("", MultipartBody.FORM),
+                RequestBody.create("", MultipartBody.FORM),
+                RequestBody.create("", MultipartBody.FORM),
+                RequestBody.create(String.valueOf(user.getUserID()), MultipartBody.FORM),
+                MultipartBody.Part.createFormData("videofile", title,
+                        ProgressRequestBody.Companion.create(mediaFile, MultipartBody.FORM)),
+                MultipartBody.Part.createFormData("videoThumbnail", title,
+                        new ProgressRequestBody(thumbnailFile, MediaType.parse("video/*"), new ProgressRequestBody.UploadCallbacks() {
+                            @Override
+                            public void onProgressUpdate(int percentage) {
 
-            } else {
-                File thumbnail = new File(RealPathUtil.getRealPath(getApplication(), thumbnailUri));
-                params.put("videoThumbnail", thumbnail);
-            }
-            params.put(MEDIA_TITLE, title);
-            params.put(MEDIA_DESCRIPTION, description);
-            params.put(PLAY_DURATION, getExoPlayer().getDuration());
-            params.put("videoSingers", "dummy");
-            params.put("musicDirector", "dummy");
-            params.put("movieName", "dummy");
-            params.put("artists", "dummy");
-            params.put("movieDirector", "dummy");
-            params.put(ApiConstant.USER_ID, user.getUserID());
-        } catch (Exception e) {
-            Logger.e(TAG, e.toString());
-        }
+                            }
 
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.post(url, params, new AsyncHttpResponseHandler() {
+                            @Override
+                            public void onError() {
+
+                            }
+
+                            @Override
+                            public void onFinish() {
+
+                            }
+                        })));
+
+        fileUploadClient.enqueue(new Callback<ResponseModel>() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+            public void onResponse(@NotNull Call<ResponseModel> fileUploadClient, @NotNull retrofit2.Response<ResponseModel> response) {
                 try {
                     showProgress.setValue(false);
-                    String stringResponse = new String(responseBody, "UTF-8");
-                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
+                    Logger.e(url + ApiConstant.RESPONSE, response.body().toString());
 
-                    JSONObject response = new JSONObject(stringResponse);
-
-                    if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
+                    if (response.body().getMessage() == Boolean.FALSE) {
                         return;
                     }
 
@@ -118,24 +166,17 @@ public class UploadViewModel extends AndroidViewModel {
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+            public void onFailure(@NotNull Call<ResponseModel> call, @NotNull Throwable t) {
                 try {
                     showProgress.setValue(false);
-                    String stringResponse = new String(responseBody, "UTF-8");
-                    Logger.e(url, statusCode + ": " + stringResponse);
+                    String stringResponse = t.getMessage();
+                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
 
                     uploaded.setValue(false);
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
-
-            @Override
-            public void onProgress(long bytesWritten, long totalSize) {
-                super.onProgress(bytesWritten, totalSize);
-                int progress = (int) (100*bytesWritten/totalSize);
-                progressPercentage.setValue(progress);
             }
         });
     }
@@ -150,5 +191,50 @@ public class UploadViewModel extends AndroidViewModel {
 
     public MutableLiveData<Boolean> getUploadedStatus() {
         return uploaded;
+    }
+
+    public MutableLiveData<Uri> getMediaUri() {
+        return mediaUri;
+    }
+
+    public void createAndSetThumbnail() {
+        Runnable runnable = () -> {
+            Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(
+                    RealPathUtil.getRealPath(getApplication(), mediaUri.getValue()), FULL_SCREEN_KIND);
+
+            try {
+                File thumbnailFile = File.createTempFile("thumbnail", ".png", getApplication().getCacheDir());
+                if (!thumbnailFile.exists()){
+                    if (!thumbnailFile.createNewFile()){
+                        return;
+                    }
+                }
+                FileOutputStream fos = new FileOutputStream(thumbnailFile);
+                assert bitmap != null;
+                bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                fos.close();
+
+                thumbnailUri.postValue(Uri.fromFile(thumbnailFile));
+
+            } catch (Exception e) {
+                Logger.e(TAG, e.toString());
+            }
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
+    public MutableLiveData<Uri> getThumbnailLive() {
+        return thumbnailUri;
+    }
+
+    public void setThumbnailUri(Uri data) {
+        thumbnailUri.postValue(data);
+    }
+
+    public void cancelUpload() {
+        if (fileUploadClient!=null){
+            fileUploadClient.cancelRequestsByTAG(TAG, true);
+        }
     }
 }
