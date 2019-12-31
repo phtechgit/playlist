@@ -98,7 +98,17 @@ public class PendingApiExecutorService extends Service implements PendingUploadE
     }
 
     private void startSimpleApiCall(PendingUploadEntity pendingUploadEntity) {
-        PendingUploadParamEntity params = ParserUtil.getInstance().fromJson(pendingUploadEntity.getParams());
+        Map<String, String> params = new HashMap<>();
+        try {
+            JSONObject jsonObject = new JSONObject(pendingUploadEntity.getParams());
+            Iterator<String> iterator = jsonObject.keys();
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                params.put(key, jsonObject.optString(key));
+            }
+        } catch (Exception e) {
+            Logger.e(TAG, e.toString());
+        }
 
         final String url = pendingUploadEntity.getUrl();
 
