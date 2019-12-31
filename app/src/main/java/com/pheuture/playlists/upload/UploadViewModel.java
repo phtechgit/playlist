@@ -4,23 +4,33 @@ import android.app.Application;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
+import androidx.room.util.FileUtil;
+
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.loopj.android.http.AsyncHttpClient;
+import com.pheuture.playlists.datasource.local.LocalRepository;
+import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
+import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
+import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadParamEntity;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.datasource.remote.FileUploadDao;
 import com.pheuture.playlists.datasource.remote.ProgressRequestBody;
 import com.pheuture.playlists.datasource.remote.RemoteRepository;
 import com.pheuture.playlists.datasource.remote.ResponseModel;
+import com.pheuture.playlists.service.PendingApiExecutorService;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.utils.FileUtils;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.RealPathUtil;
@@ -45,7 +55,9 @@ import java.util.List;
 import java.util.Map;
 import static android.provider.MediaStore.Video.Thumbnails.FULL_SCREEN_KIND;
 
-public class UploadViewModel extends AndroidViewModel implements MediaEntity.MediaColumns {
+public class UploadViewModel extends AndroidViewModel implements MediaEntity.MediaColumns,
+        PendingUploadEntity.UploadType, PendingUploadParamEntity.MediaType {
+
     private static final String TAG = UploadViewModel.class.getSimpleName();
     private DataSource.Factory dataSourceFactory;
     private SimpleExoPlayer exoPlayer;
@@ -55,12 +67,12 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
     private UserEntity user;
     private MutableLiveData<Uri> mediaUri;
     private MutableLiveData<Uri> thumbnailUri = new MutableLiveData<>();
-    private Retrofit remoteRepository;
-    private Call<ResponseModel> fileUploadClient;
+    private PendingUploadDao pendingUploadDao;
 
     public UploadViewModel(@NonNull Application application, Uri newMediaUri) {
         super(application);
-        remoteRepository = RemoteRepository.getInstance(getApplication());
+        pendingUploadDao = LocalRepository.getInstance(application).pendingUploadDao();
+
         mediaUri = new MutableLiveData<>(newMediaUri);
 
         createAndSetThumbnail();
@@ -82,9 +94,30 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
     }
 
     protected void uploadMedia(String title, String description) {
-        uploaded.setValue(null);
+        PendingUploadEntity pendingUploadEntity = new PendingUploadEntity();
+        pendingUploadEntity.setUrl(Url.MEDIA_UPLOAD);
+        pendingUploadEntity.setType(MULTI_PART);
 
+        List<PendingUploadParamEntity> paramEntities = new ArrayList<>();
+        paramEntities.add(new PendingUploadParamEntity(FILE, "videofile",
+                RealPathUtil.getRealPath(getApplication(), mediaUri.getValue()), "video/*"));
+        paramEntities.add(new PendingUploadParamEntity(FILE, "videoThumbnail",
+                RealPathUtil.getRealPath(getApplication(), thumbnailUri.getValue()), "image/*"));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, MEDIA_TITLE, title, null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, MEDIA_DESCRIPTION, description, null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, PLAY_DURATION, String.valueOf(getExoPlayer().getDuration()), null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, "videoSingers", "", null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, "musicDirector", "", null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, "movieName", "", null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, "artists", "", null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, "movieDirector", "", null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, ApiConstant.USER_ID, String.valueOf(user.getUserID()), null));
 
+        pendingUploadEntity.setParams(ParserUtil.getInstance().toJson(paramEntities));
+
+        pendingUploadDao.insert(pendingUploadEntity);
+
+        PendingApiExecutorService.startService(getApplication());
     }
 
     public MutableLiveData<Boolean> getProgressStatus() {
@@ -136,11 +169,5 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
 
     public void setThumbnailUri(Uri data) {
         thumbnailUri.postValue(data);
-    }
-
-    public void cancelUpload() {
-        if (fileUploadClient!=null){
-            fileUploadClient.cancel();
-        }
     }
 }

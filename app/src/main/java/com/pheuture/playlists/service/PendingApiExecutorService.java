@@ -13,6 +13,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.google.gson.JsonObject;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
@@ -42,22 +43,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class PendingApiExecutorService extends Service implements PendingUploadParamEntity.MediaType{
+public class PendingApiExecutorService extends Service implements PendingUploadEntity.UploadType,
+        PendingUploadParamEntity.MediaType{
     private static final String TAG = PendingApiExecutorService.class.getSimpleName();
     private PendingUploadDao pendingUploadDao;
     private List<PendingUploadEntity> pendingUploadEntities;
     private Retrofit remoteRepository;
     private Call<ResponseModel> fileUploadClient;
-
-    public PendingApiExecutorService() {
-        remoteRepository = RemoteRepository.getInstance(PendingApiExecutorService.this);
-    }
+    private FileUploadDao fileUploadDao;
 
     public synchronized static void startService(Application application) {
         if (NetworkUtils.online(application)) {
@@ -70,6 +70,8 @@ public class PendingApiExecutorService extends Service implements PendingUploadP
     public void onCreate() {
         super.onCreate();
         Logger.e(TAG, "started");
+        remoteRepository = RemoteRepository.getInstance(PendingApiExecutorService.this);
+        fileUploadDao = remoteRepository.create(FileUploadDao.class);
         pendingUploadDao = LocalRepository.getInstance(this).pendingUploadDao();
 
         pendingUploadEntities = pendingUploadDao.getAllPendingUploadEntities();
@@ -87,35 +89,37 @@ public class PendingApiExecutorService extends Service implements PendingUploadP
     }
 
     private void startExecutor(PendingUploadEntity pendingUploadEntity) {
-        if (pendingUploadEntity.getType() == 1){
+        if (pendingUploadEntity.getType() == SIMPLE || pendingUploadEntity.getType() == NOT_DEFINED){
             startSimpleApiCall(pendingUploadEntity);
-        } else {
+
+        } else if (pendingUploadEntity.getType() == MULTI_PART){
             startMultipartApiCall(pendingUploadEntity);
         }
     }
 
     private void startSimpleApiCall(PendingUploadEntity pendingUploadEntity) {
-        JSONObject jsonParams = null;
-        try {
-            jsonParams = new JSONObject(pendingUploadEntity.getParams());
-        } catch (JSONException e) {
-            Logger.e(TAG, e.toString());
-        }
+        PendingUploadParamEntity params = ParserUtil.getInstance().fromJson(pendingUploadEntity.getParams());
 
         final String url = pendingUploadEntity.getUrl();
 
         FileUploadDao fileUploadDao = remoteRepository.create(FileUploadDao.class);
-        fileUploadClient = fileUploadDao.simpleApiCall(url, jsonParams);
+        fileUploadClient = fileUploadDao.simpleApiCall(url, params);
         fileUploadClient.enqueue(new Callback<ResponseModel>() {
             @Override
             public void onResponse(@NotNull Call<ResponseModel> fileUploadClient, @NotNull retrofit2.Response<ResponseModel> response) {
                 try {
-                    Logger.e(url + ApiConstant.RESPONSE, response.body().toString());
-
-                    if (response.body().getMessage() == Boolean.FALSE) {
+                    if (response.body()==null){
+                        stopSelf();
                         return;
                     }
 
+                    Logger.e(url + ApiConstant.RESPONSE, response.body().toString());
+                    if (response.body().getMessage() == Boolean.FALSE) {
+                        stopSelf();
+                        return;
+                    }
+
+                    updateTaskStatus(pendingUploadEntity);
 
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
@@ -127,10 +131,10 @@ public class PendingApiExecutorService extends Service implements PendingUploadP
                 try {
                     String stringResponse = t.getMessage();
                     Logger.e(url + ApiConstant.RESPONSE, stringResponse);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                stopSelf();
             }
         });
     }
@@ -145,26 +149,33 @@ public class PendingApiExecutorService extends Service implements PendingUploadP
         for (int i=0; i<params.size(); i++) {
             PendingUploadParamEntity paramEntity = params.get(i);
 
-            if (paramEntity.getMediaType() == FILE) {
-                File mediaFile = new File(paramEntity.getValue());
-                partFiles.add(MultipartBody.Part.createFormData(paramEntity.getKey(), paramEntity.getExtra(),
-                        ProgressRequestBody.Companion.create(mediaFile, MultipartBody.FORM)));
-            } else {
+            if (paramEntity.getMediaType() == OTHER) {
                 partMap.put(paramEntity.getKey(), RequestBody.create(paramEntity.getValue(), MultipartBody.FORM));
+
+            } else if (paramEntity.getMediaType() == FILE) {
+                File mediaFile = new File(paramEntity.getValue());
+                partFiles.add(MultipartBody.Part.createFormData(paramEntity.getKey(), paramEntity.getValue().substring(paramEntity.getValue().lastIndexOf("/")),
+                        RequestBody.Companion.create(mediaFile, MediaType.parse(paramEntity.getExtra()))));
             }
         }
 
-        FileUploadDao fileUploadDao = remoteRepository.create(FileUploadDao.class);
         fileUploadClient = fileUploadDao.multipartApiCall(url, partMap, partFiles);
         fileUploadClient.enqueue(new Callback<ResponseModel>() {
             @Override
             public void onResponse(@NotNull Call<ResponseModel> fileUploadClient, @NotNull retrofit2.Response<ResponseModel> response) {
                 try {
-                    Logger.e(url + ApiConstant.RESPONSE, response.body().toString());
-
-                    if (response.body().getMessage() == Boolean.FALSE) {
+                    if (response.body()==null){
+                        stopSelf();
                         return;
                     }
+
+                    Logger.e(url + ApiConstant.RESPONSE, response.body().toString());
+                    if (response.body().getMessage() == Boolean.FALSE) {
+                        stopSelf();
+                        return;
+                    }
+
+                    updateTaskStatus(pendingUploadEntity);
 
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
@@ -176,10 +187,10 @@ public class PendingApiExecutorService extends Service implements PendingUploadP
                 try {
                     String stringResponse = t.getMessage();
                     Logger.e(url + ApiConstant.RESPONSE, stringResponse);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                stopSelf();
             }
         });
 
@@ -201,8 +212,8 @@ public class PendingApiExecutorService extends Service implements PendingUploadP
         if (pendingUploadEntities.size()>0){
             scheduleRestart();
         }
-        super.onDestroy();
         Logger.e(TAG, "stopped");
+        super.onDestroy();
     }
 
     @Nullable

@@ -216,6 +216,6 @@ public class UploadFragment extends BaseFragment implements ProgressDialogAction
     @Override
     public void onCancelled() {
         Logger.e(TAG, "onCancelled");
-        viewModel.cancelUpload();
+        /*viewModel.cancelUpload();*/
     }
 }

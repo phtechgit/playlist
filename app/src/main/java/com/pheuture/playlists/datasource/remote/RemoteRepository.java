@@ -36,6 +36,7 @@ public abstract class RemoteRepository  {
 
             httpClient.addInterceptor(logging)
                     .readTimeout(1200, TimeUnit.SECONDS)
+                    .retryOnConnectionFailure(false)
                     .connectTimeout(1200, TimeUnit.SECONDS);
 
             mLocalRepository = new Retrofit.Builder()

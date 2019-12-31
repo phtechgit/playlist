@@ -15,7 +15,7 @@ import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
 
-public class UserProfileViewModel extends AndroidViewModel {
+public class UserProfileViewModel extends AndroidViewModel implements PendingUploadEntity.UploadType {
     private static final String TAG = UserProfileViewModel.class.getSimpleName();
     private UserEntity userEntity;
     private PendingUploadDao pendingUploadDao;
@@ -34,6 +34,7 @@ public class UserProfileViewModel extends AndroidViewModel {
                 ParserUtil.getInstance().toJson(userEntity, UserEntity.class));
 
         PendingUploadEntity pendingUploadEntity = new PendingUploadEntity();
+        pendingUploadEntity.setType(SIMPLE);
         pendingUploadEntity.setUrl(Url.UPDATE_USER_DETAIL);
         pendingUploadEntity.setParams(ParserUtil.getInstance().toJson(userEntity, UserEntity.class));
         pendingUploadDao.insert(pendingUploadEntity);

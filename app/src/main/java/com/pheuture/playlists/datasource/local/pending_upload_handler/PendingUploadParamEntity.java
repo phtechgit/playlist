@@ -13,8 +13,8 @@ public class PendingUploadParamEntity implements Parcelable {
     }
 
     public interface MediaType{
-        int FILE = 1;
-        int OTHER = 2;
+        int OTHER = 1;
+        int FILE = 2;
     }
 
     private int mediaType;
@@ -22,8 +22,6 @@ public class PendingUploadParamEntity implements Parcelable {
     private String value;
     private String extra;
 
-    public PendingUploadParamEntity() {
-    }
 
     protected PendingUploadParamEntity(Parcel in) {
         mediaType = in.readInt();
