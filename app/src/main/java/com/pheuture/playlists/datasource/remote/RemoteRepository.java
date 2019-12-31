@@ -26,7 +26,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public abstract class RemoteRepository  {
     private static Retrofit mLocalRepository;
-    FileUploadDao fileUploadDao;
 
     public static Retrofit getInstance(Context context) {
         if (mLocalRepository == null) {
