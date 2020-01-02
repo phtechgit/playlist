@@ -1,4 +1,4 @@
-package com.pheuture.playlists.utils.progress_dialog;
+package com.pheuture.playlists.datasource.remote.progress_dialog;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -9,7 +9,6 @@ import android.view.Window;
 import androidx.databinding.DataBindingUtil;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.LayoutAlertIndeterminateBinding;
-import com.pheuture.playlists.upload.UploadFragment;
 
 import java.util.Objects;
 

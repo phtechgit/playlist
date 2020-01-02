@@ -1,13 +1,11 @@
 package com.pheuture.playlists.upload;
 
-import androidx.core.content.FileProvider;
 import  androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,12 +26,8 @@ import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentUploadBinding;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.progress_dialog.ProgressDialog;
-import com.pheuture.playlists.utils.progress_dialog.ProgressDialogActionInterface;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.spi.FileSystemProvider;
+import com.pheuture.playlists.datasource.remote.progress_dialog.ProgressDialog;
+import com.pheuture.playlists.datasource.remote.progress_dialog.ProgressDialogActionInterface;
 
 import static com.pheuture.playlists.utils.RequestCodeConstant.REQUEST_CODE_FILE_SELECT;
 
@@ -180,6 +174,7 @@ public class UploadFragment extends BaseFragment implements ProgressDialogAction
 
             Runnable runnable = new Runnable() {
                 public void run() {
+                    ((MainActivity) activity).showSnack("file added to upload queue");
                     viewModel.uploadMedia(binding.ediTextTitle.getText().toString(), binding.ediTextDescription.getText().toString());
                 }
             };

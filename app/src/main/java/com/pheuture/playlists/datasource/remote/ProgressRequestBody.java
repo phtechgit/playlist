@@ -60,27 +60,25 @@ public class ProgressRequestBody extends RequestBody {
     }
 
     private class ProgressUpdater implements Runnable {
-        private long mUploaded;
-        private long mTotal;
+        private long mUploadedInBytes;
+        private long mTotalInBytes;
 
         ProgressUpdater(long uploaded, long total) {
-            mUploaded = uploaded;
-            mTotal = total;
+            mUploadedInBytes = uploaded;
+            mTotalInBytes = total;
         }
 
         @Override
         public void run() {
-            Logger.e(TAG, "uploaded:" + mUploaded + "total:" + mTotal);
+            Logger.e(TAG, "uploaded:" + mUploadedInBytes + "total:" + mTotalInBytes);
             if (mListener!=null) {
-                mListener.onProgressUpdate((int) (100 * mUploaded / mTotal));
+                mListener.onProgressUpdate(mUploadedInBytes, mTotalInBytes);
             }
         }
     }
 
     public interface UploadCallbacks {
-        void onProgressUpdate(int percentage);
-        void onError();
-        void onFinish();
+        void onProgressUpdate(long uploadedInBytes, long totalInBytes);
     }
 
 }

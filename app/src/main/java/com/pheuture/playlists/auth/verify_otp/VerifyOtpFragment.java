@@ -131,7 +131,7 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
             task.addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    showToast("SMS sent on " + phone);
+                    showToast("SMS sent to " + phone);
                 }
             });
 

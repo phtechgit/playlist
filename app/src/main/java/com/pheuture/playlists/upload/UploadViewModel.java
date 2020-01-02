@@ -106,11 +106,11 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
         paramEntities.add(new PendingUploadParamEntity(OTHER, MEDIA_TITLE, title, null));
         paramEntities.add(new PendingUploadParamEntity(OTHER, MEDIA_DESCRIPTION, description, null));
         paramEntities.add(new PendingUploadParamEntity(OTHER, PLAY_DURATION, String.valueOf(getExoPlayer().getDuration()), null));
-        paramEntities.add(new PendingUploadParamEntity(OTHER, "videoSingers", "", null));
-        paramEntities.add(new PendingUploadParamEntity(OTHER, "musicDirector", "", null));
-        paramEntities.add(new PendingUploadParamEntity(OTHER, "movieName", "", null));
-        paramEntities.add(new PendingUploadParamEntity(OTHER, "artists", "", null));
-        paramEntities.add(new PendingUploadParamEntity(OTHER, "movieDirector", "", null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, "videoSingers", "dummy", null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, "musicDirector", "dummy", null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, "movieName", "dummy", null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, "artists", "dummy", null));
+        paramEntities.add(new PendingUploadParamEntity(OTHER, "movieDirector", "dummy", null));
         paramEntities.add(new PendingUploadParamEntity(OTHER, ApiConstant.USER_ID, String.valueOf(user.getUserID()), null));
 
         pendingUploadEntity.setParams(ParserUtil.getInstance().toJson(paramEntities));

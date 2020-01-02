@@ -51,7 +51,7 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 
 public class PendingApiExecutorService extends Service implements PendingUploadEntity.UploadType,
-        PendingUploadParamEntity.MediaType{
+        PendingUploadParamEntity.MediaType, ProgressRequestBody.UploadCallbacks{
     private static final String TAG = PendingApiExecutorService.class.getSimpleName();
     private PendingUploadDao pendingUploadDao;
     private List<PendingUploadEntity> pendingUploadEntities;
@@ -153,7 +153,7 @@ public class PendingApiExecutorService extends Service implements PendingUploadE
         List<PendingUploadParamEntity> params = Arrays.asList(ParserUtil.getInstance().fromJson(pendingUploadEntity.getParams(), PendingUploadParamEntity[].class));
 
         final String url = pendingUploadEntity.getUrl();
-        Map<String, RequestBody> partMap = new HashMap<>();
+        HashMap<String, RequestBody> partMap = new HashMap<>();
         List<MultipartBody.Part> partFiles = new ArrayList<>();
 
         for (int i=0; i<params.size(); i++) {
@@ -165,7 +165,7 @@ public class PendingApiExecutorService extends Service implements PendingUploadE
             } else if (paramEntity.getMediaType() == FILE) {
                 File mediaFile = new File(paramEntity.getValue());
                 partFiles.add(MultipartBody.Part.createFormData(paramEntity.getKey(), paramEntity.getValue().substring(paramEntity.getValue().lastIndexOf("/")),
-                        RequestBody.Companion.create(mediaFile, MediaType.parse(paramEntity.getExtra()))));
+                        new ProgressRequestBody(mediaFile, MediaType.parse(paramEntity.getExtra()), this)));
             }
         }
 
@@ -234,6 +234,10 @@ public class PendingApiExecutorService extends Service implements PendingUploadE
 
     private void scheduleRestart() {
         //implement workManager
+    }
+
+    @Override
+    public void onProgressUpdate(long uploadedInBytes, long totalInBytes) {
 
     }
 }

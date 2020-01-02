@@ -1,4 +1,4 @@
-package com.pheuture.playlists.utils.progress_dialog;
+package com.pheuture.playlists.datasource.remote.progress_dialog;
 
 import android.content.Context;
 
