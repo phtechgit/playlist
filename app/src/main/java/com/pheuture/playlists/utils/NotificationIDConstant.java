@@ -6,5 +6,5 @@ public final class NotificationIDConstant {
         throw new IllegalStateException("utility class should not be instantiated ");
     }
 
-    public static final int NOTIFICATION1 = 101;
+    public static final int FILE_UPLOAD_SERVICE_NOTIFICATION = 101;
 }

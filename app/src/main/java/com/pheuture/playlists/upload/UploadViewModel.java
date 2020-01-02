@@ -62,7 +62,6 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
     private DataSource.Factory dataSourceFactory;
     private SimpleExoPlayer exoPlayer;
     private MutableLiveData<Boolean> showProgress = new MutableLiveData<>();
-    private MutableLiveData<Boolean> uploaded = new MutableLiveData<>();
     private MutableLiveData<Integer>  progressPercentage = new MutableLiveData<>();
     private UserEntity user;
     private MutableLiveData<Uri> mediaUri;
@@ -95,6 +94,7 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
 
     protected void uploadMedia(String title, String description) {
         PendingUploadEntity pendingUploadEntity = new PendingUploadEntity();
+        pendingUploadEntity.setTitle(title);
         pendingUploadEntity.setUrl(Url.MEDIA_UPLOAD);
         pendingUploadEntity.setType(MULTI_PART);
 
@@ -126,10 +126,6 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
 
     public MutableLiveData<Integer> getProgressPercentage() {
         return progressPercentage;
-    }
-
-    public MutableLiveData<Boolean> getUploadedStatus() {
-        return uploaded;
     }
 
     public MutableLiveData<Uri> getMediaUri() {

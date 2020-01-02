@@ -43,42 +43,46 @@ public class ProgressRequestBody extends RequestBody {
     public void writeTo(@NotNull BufferedSink sink) throws IOException {
         long fileLength = mFile.length();
         byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+        int lastProgress = 0;
 
         try (FileInputStream in = new FileInputStream(mFile)) {
             long uploaded = 0;
             int read;
             Handler handler = new Handler(Looper.getMainLooper());
+
             while ((read = in.read(buffer)) != -1) {
-
-                // update progress on UI thread
-                handler.post(new ProgressUpdater(uploaded, fileLength));
-
                 uploaded += read;
                 sink.write(buffer, 0, read);
+
+                int progress = (int) ((uploaded*100)/fileLength);
+                if (progress!=lastProgress){
+                    lastProgress = progress;
+                    // update progress on UI thread
+                    handler.post(new ProgressUpdater(uploaded));
+                }
             }
         }
     }
 
     private class ProgressUpdater implements Runnable {
+        private int percentageCompleted;
         private long mUploadedInBytes;
         private long mTotalInBytes;
 
-        ProgressUpdater(long uploaded, long total) {
+        ProgressUpdater(long uploaded) {
             mUploadedInBytes = uploaded;
-            mTotalInBytes = total;
         }
 
         @Override
         public void run() {
-            Logger.e(TAG, "uploaded:" + mUploadedInBytes + "total:" + mTotalInBytes);
             if (mListener!=null) {
-                mListener.onProgressUpdate(mUploadedInBytes, mTotalInBytes);
+                mListener.onProgressUpdate(mUploadedInBytes);
             }
         }
     }
 
     public interface UploadCallbacks {
-        void onProgressUpdate(long uploadedInBytes, long totalInBytes);
+        void onProgressUpdate(long uploadedInBytes);
     }
 
 }

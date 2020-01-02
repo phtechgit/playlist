@@ -35,9 +35,9 @@ public abstract class RemoteRepository  {
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
             httpClient.addInterceptor(logging)
-                    .readTimeout(1200, TimeUnit.SECONDS)
+                    .readTimeout(120, TimeUnit.SECONDS)
                     .retryOnConnectionFailure(false)
-                    .connectTimeout(1200, TimeUnit.SECONDS);
+                    .connectTimeout(120, TimeUnit.SECONDS);
 
             mLocalRepository = new Retrofit.Builder()
                     .baseUrl(Url.BASE_URL)

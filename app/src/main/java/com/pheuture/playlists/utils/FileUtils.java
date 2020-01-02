@@ -162,7 +162,7 @@ public class FileUtils {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
-    public static String fileSizeValueFormat(double bytes) {
+    public static String getFileSize(double bytes) {
         DecimalFormat mFormat = new DecimalFormat("########0.00");
         if (bytes>=1073741824){
             return mFormat.format(bytes/1073741824) + " GB";

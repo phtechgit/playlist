@@ -1,19 +1,21 @@
 package com.pheuture.playlists.service;
 
-import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.IBinder;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.google.gson.JsonObject;
+import com.pheuture.playlists.R;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
 import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
@@ -22,17 +24,17 @@ import com.pheuture.playlists.datasource.remote.FileUploadDao;
 import com.pheuture.playlists.datasource.remote.ProgressRequestBody;
 import com.pheuture.playlists.datasource.remote.RemoteRepository;
 import com.pheuture.playlists.datasource.remote.ResponseModel;
+import com.pheuture.playlists.receiver.NotificationActionReceiver;
 import com.pheuture.playlists.utils.ApiConstant;
+import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.utils.FileUtils;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.NetworkUtils;
+import com.pheuture.playlists.utils.NotificationChannelIDConstant;
+import com.pheuture.playlists.utils.NotificationIDConstant;
 import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.RealPathUtil;
-import com.pheuture.playlists.utils.StringUtils;
-import com.pheuture.playlists.utils.Url;
-import com.pheuture.playlists.utils.VolleyClient;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -51,18 +53,32 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 
 public class PendingApiExecutorService extends Service implements PendingUploadEntity.UploadType,
-        PendingUploadParamEntity.MediaType, ProgressRequestBody.UploadCallbacks{
+        PendingUploadParamEntity.MediaType, ProgressRequestBody.UploadCallbacks,
+        NotificationActionReceiver.NotificationActions,
+        NotificationActionReceiver.NotificationActionInterface {
+
     private static final String TAG = PendingApiExecutorService.class.getSimpleName();
     private PendingUploadDao pendingUploadDao;
     private List<PendingUploadEntity> pendingUploadEntities;
+    private PendingUploadEntity pendingUploadEntity;
     private Retrofit remoteRepository;
     private Call<ResponseModel> fileUploadClient;
     private FileUploadDao fileUploadDao;
+    private NotificationManager notificationManager;
+    private Notification progressNotification;
+    private boolean serviceInForeground = false;
+    private PendingIntent btPendingIntent;
+    private NotificationActionReceiver notificationActionReceiver;
+    private long mUploadedInBytes = 0;
 
-    public synchronized static void startService(Application application) {
-        if (NetworkUtils.online(application)) {
-            Intent intent = new Intent(application, PendingApiExecutorService.class);
-            application.startService(intent);
+    public synchronized static void startService(Context context) {
+        try {
+            if (NetworkUtils.online(context)) {
+                Intent intent = new Intent(context, PendingApiExecutorService.class);
+                context.startService(intent);
+            }
+        } catch (Exception e) {
+            Logger.e(TAG, e.toString());
         }
     }
 
@@ -70,17 +86,49 @@ public class PendingApiExecutorService extends Service implements PendingUploadE
     public void onCreate() {
         super.onCreate();
         Logger.e(TAG, "started");
+
         remoteRepository = RemoteRepository.getInstance(PendingApiExecutorService.this);
         fileUploadDao = remoteRepository.create(FileUploadDao.class);
         pendingUploadDao = LocalRepository.getInstance(this).pendingUploadDao();
 
         pendingUploadEntities = pendingUploadDao.getAllPendingUploadEntities();
-        assert pendingUploadEntities != null;
-        if (pendingUploadEntities.size()>0){
-            startExecutor(pendingUploadEntities.get(0));
-        } else {
+        if (pendingUploadEntities.size()==0){
             stopSelf();
+        } else {
+            pendingUploadEntity = pendingUploadEntities.get(0);
+            setupNotificationComponents();
+            startExecutor();
         }
+    }
+
+    private void setupNotificationComponents() {
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        //create channel for notification
+        if (Build.VERSION.SDK_INT >=  Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel  =  new NotificationChannel(
+                    NotificationChannelIDConstant.NOTIFICATION_CHANNEL_01,
+                    NotificationChannelIDConstant.NOTIFICATION_CHANNEL_01,
+                    NotificationManager.IMPORTANCE_HIGH);
+
+            notificationManager.createNotificationChannel(serviceChannel);
+        }
+
+        //Create an Intent for the BroadcastReceiver
+        Intent buttonIntent = new Intent(this, NotificationActionReceiver.class);
+        buttonIntent.putExtra(Constants.ARG_PARAM1, pendingUploadEntity.getId());
+        buttonIntent.setAction(CANCEL);
+
+        //Create the PendingIntent
+        btPendingIntent = PendingIntent.getBroadcast(this, 0,
+                buttonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        setUpBroadcastReceiver();
+    }
+
+    private void setUpBroadcastReceiver() {
+        notificationActionReceiver = new NotificationActionReceiver(this);
+        registerReceiver(notificationActionReceiver, new IntentFilter(CANCEL));
     }
 
     @Override
@@ -88,16 +136,16 @@ public class PendingApiExecutorService extends Service implements PendingUploadE
         return START_STICKY;
     }
 
-    private void startExecutor(PendingUploadEntity pendingUploadEntity) {
+    private void startExecutor() {
         if (pendingUploadEntity.getType() == SIMPLE || pendingUploadEntity.getType() == NOT_DEFINED){
-            startSimpleApiCall(pendingUploadEntity);
+            startSimpleApiCall();
 
         } else if (pendingUploadEntity.getType() == MULTI_PART){
-            startMultipartApiCall(pendingUploadEntity);
+            startMultipartApiCall();
         }
     }
 
-    private void startSimpleApiCall(PendingUploadEntity pendingUploadEntity) {
+    private void startSimpleApiCall() {
         Map<String, String> params = new HashMap<>();
         try {
             JSONObject jsonObject = new JSONObject(pendingUploadEntity.getParams());
@@ -129,7 +177,7 @@ public class PendingApiExecutorService extends Service implements PendingUploadE
                         return;
                     }
 
-                    updateTaskStatus(pendingUploadEntity);
+                    updateTaskStatus();
 
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
@@ -149,7 +197,7 @@ public class PendingApiExecutorService extends Service implements PendingUploadE
         });
     }
 
-    private void startMultipartApiCall(PendingUploadEntity pendingUploadEntity) {
+    private void startMultipartApiCall() {
         List<PendingUploadParamEntity> params = Arrays.asList(ParserUtil.getInstance().fromJson(pendingUploadEntity.getParams(), PendingUploadParamEntity[].class));
 
         final String url = pendingUploadEntity.getUrl();
@@ -185,7 +233,7 @@ public class PendingApiExecutorService extends Service implements PendingUploadE
                         return;
                     }
 
-                    updateTaskStatus(pendingUploadEntity);
+                    updateTaskStatus();
 
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
@@ -206,24 +254,29 @@ public class PendingApiExecutorService extends Service implements PendingUploadE
 
     }
 
-    private void updateTaskStatus(PendingUploadEntity pendingUploadEntity) {
-        pendingUploadDao.delete(pendingUploadEntity);
+    private void updateTaskStatus() {
         pendingUploadEntities.remove(0);
+        pendingUploadDao.delete(pendingUploadEntity);
 
-        if (pendingUploadEntities.size()>0){
-            startExecutor(pendingUploadEntities.get(0));
-        } else {
-            stopSelf();
+        stopForeground(false);
+        stopSelf();
+        updateProgressStatus();
+
+        if (pendingUploadEntities.size()>0) {
+            PendingApiExecutorService.startService(this);
         }
     }
 
-    @Override
-    public void onDestroy() {
-        if (pendingUploadEntities.size()>0){
-            scheduleRestart();
-        }
-        Logger.e(TAG, "stopped");
-        super.onDestroy();
+    private void updateProgressStatus() {
+        progressNotification = new NotificationCompat.Builder(this,
+                NotificationChannelIDConstant.NOTIFICATION_CHANNEL_01)
+                .setContentTitle(pendingUploadEntity.getTitle())
+                .setSubText("uploaded successfully")
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .build();
+
+        notificationManager.notify(pendingUploadEntity.getId(), progressNotification);
     }
 
     @Nullable
@@ -232,12 +285,54 @@ public class PendingApiExecutorService extends Service implements PendingUploadE
         return null;
     }
 
+    @Override
+    public void onProgressUpdate(long uploadedInBytes) {
+        mUploadedInBytes = uploadedInBytes;
+        int percentageCompleted = (int) (mUploadedInBytes*100/pendingUploadEntity.getSize());
+        String subTitle =  "uploaded " + FileUtils.getFileSize(mUploadedInBytes) + " of " + FileUtils.getFileSize(pendingUploadEntity.getSize());
+
+        progressNotification = new NotificationCompat.Builder(this,
+                NotificationChannelIDConstant.NOTIFICATION_CHANNEL_01)
+                .setContentTitle(pendingUploadEntity.getTitle())
+                .setSubText(subTitle)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setOnlyAlertOnce(true)
+                .addAction(R.drawable.ic_close_black, CANCEL, btPendingIntent)
+                .setProgress(100, percentageCompleted, false)
+                .build();
+
+        notificationManager.notify(pendingUploadEntity.getId(), progressNotification);
+        if (!serviceInForeground){
+            startForeground(pendingUploadEntity.getId(), progressNotification);
+            serviceInForeground = true;
+        }
+    }
+
+    @Override
+    public void onNotificationCancelled() {
+        if (!fileUploadClient.isCanceled()) {
+            fileUploadClient.cancel();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        try {
+            if (notificationActionReceiver != null) {
+                unregisterReceiver(notificationActionReceiver);
+            }
+        } catch (Exception ignored) {
+        }
+
+        if (pendingUploadEntities.size()>0){
+            scheduleRestart();
+        }
+        Logger.e(TAG, "stopped");
+        super.onDestroy();
+    }
+
     private void scheduleRestart() {
         //implement workManager
     }
 
-    @Override
-    public void onProgressUpdate(long uploadedInBytes, long totalInBytes) {
-
-    }
 }

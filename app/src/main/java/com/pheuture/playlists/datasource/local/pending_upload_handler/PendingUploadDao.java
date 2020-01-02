@@ -33,6 +33,9 @@ public interface PendingUploadDao {
     @Query("select * from PendingUploadEntity")
     List<PendingUploadEntity> getAllPendingUploadEntities();
 
+    @Query("select * from PendingUploadEntity limit 1")
+    PendingUploadEntity getSinglePendingUploadEntities();
+
     @Query("delete from PendingUploadEntity")
     void deleteAll();
 

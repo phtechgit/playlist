@@ -101,22 +101,6 @@ public class UploadFragment extends BaseFragment implements ProgressDialogAction
             }
         });
 
-        viewModel.getUploadedStatus().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean uploaded) {
-                if (uploaded == null){
-                    return;
-                }
-                if (uploaded) {
-                    ((MainActivity) activity).showSnack("uploaded successfully");
-                    activity.onBackPressed();
-                } else {
-                    progressDialog.dismiss();
-                    ((MainActivity) activity).showSnack("uploading failed");
-                }
-            }
-        });
-
         viewModel.getThumbnailLive().observe(this, new Observer<Uri>() {
             @Override
             public void onChanged(Uri uri) {
@@ -174,8 +158,9 @@ public class UploadFragment extends BaseFragment implements ProgressDialogAction
 
             Runnable runnable = new Runnable() {
                 public void run() {
-                    ((MainActivity) activity).showSnack("file added to upload queue");
                     viewModel.uploadMedia(binding.ediTextTitle.getText().toString(), binding.ediTextDescription.getText().toString());
+                    ((MainActivity) activity).showSnack("file added to upload queue");
+                    activity.onBackPressed();
                 }
             };
             proceedWithPermissions(activity, runnable, false);

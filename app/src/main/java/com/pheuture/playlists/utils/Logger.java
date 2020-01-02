@@ -21,8 +21,8 @@ public class Logger {
     public static void e(String tag, String message) {
         if (message!=null) {
             Log.e(tag, message);
-            /*Calendar calendar = Calendar.getInstance();
-            appendLog(CalenderUtils.getFullTimeWithSecAndMillis(calendar) + " " + CalenderUtils.getFullDate(calendar)+ " " + ": " + tag + ": " + message + "\n");*/
+            Calendar calendar = Calendar.getInstance();
+            appendLog(CalenderUtils.getFullTimeWithSecAndMillis(calendar) + " " + CalenderUtils.getFullDate(calendar)+ " " + ": " + tag + ": " + message + "\n");
         }
     }
     public static void d(String tag, String message) {
@@ -43,28 +43,22 @@ public class Logger {
 
     private static void appendLog(String text) {
         Calendar calendar = Calendar.getInstance();
-        File logFile = new File(Environment.getExternalStorageDirectory(), "WhyFi" + "_log_"  + CalenderUtils.getFullDate(calendar).replaceAll("/","") + ".file");
-        if (!logFile.exists())
-        {
-            try
-            {
+        File logFile = new File(Environment.getExternalStorageDirectory(), "Playlist" + "_log_"  + CalenderUtils.getFullDate(calendar).replaceAll("/","") + ".file");
+        if (!logFile.exists()) {
+            try {
                 logFile.createNewFile();
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        try
-        {
+
+        try {
             //BufferedWriter for performance, true to set append to file flag
             BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
             buf.append(text);
             buf.newLine();
             buf.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
