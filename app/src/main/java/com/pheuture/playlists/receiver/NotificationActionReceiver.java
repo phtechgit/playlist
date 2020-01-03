@@ -24,7 +24,9 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         }
 
         if (intent.getAction().equals(NotificationActions.CANCEL)){
-            notificationActionInterface.onNotificationCancelled();
+            if (notificationActionInterface!=null) {
+                notificationActionInterface.onNotificationCancelled();
+            }
         }
     }
 

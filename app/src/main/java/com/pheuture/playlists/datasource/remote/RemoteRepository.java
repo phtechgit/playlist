@@ -34,8 +34,7 @@ public abstract class RemoteRepository  {
 
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
-            httpClient.addInterceptor(logging)
-                    .readTimeout(120, TimeUnit.SECONDS)
+            httpClient.readTimeout(120, TimeUnit.SECONDS)
                     .retryOnConnectionFailure(false)
                     .connectTimeout(120, TimeUnit.SECONDS);
 

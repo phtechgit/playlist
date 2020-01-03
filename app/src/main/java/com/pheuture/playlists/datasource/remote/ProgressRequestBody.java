@@ -4,6 +4,7 @@ package com.pheuture.playlists.datasource.remote;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.pheuture.playlists.utils.FileUtils;
 import com.pheuture.playlists.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,7 @@ public class ProgressRequestBody extends RequestBody {
     private File mFile;
     private UploadCallbacks mListener;
     private MediaType mContentType;
-    private static final int DEFAULT_BUFFER_SIZE = 1024;
+    private final int DEFAULT_BUFFER_SIZE = 1024;
 
     public ProgressRequestBody(final File file, MediaType contentType, final UploadCallbacks listener) {
         mContentType = contentType;
@@ -45,6 +46,8 @@ public class ProgressRequestBody extends RequestBody {
         byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
         int lastProgress = 0;
 
+        Logger.e(TAG, mFile.getName() + ", fileSize:" + FileUtils.getReadableFileSize(mFile.length()));
+
         try (FileInputStream in = new FileInputStream(mFile)) {
             long uploaded = 0;
             int read;
@@ -53,36 +56,41 @@ public class ProgressRequestBody extends RequestBody {
             while ((read = in.read(buffer)) != -1) {
                 uploaded += read;
                 sink.write(buffer, 0, read);
+                // update progress on UI thread
+                handler.post(new ProgressUpdater(fileLength, uploaded, read));
 
-                int progress = (int) ((uploaded*100)/fileLength);
+                /*int progress = (int) ((uploaded*100)/fileLength);
                 if (progress!=lastProgress){
                     lastProgress = progress;
                     // update progress on UI thread
-                    handler.post(new ProgressUpdater(uploaded));
-                }
+                    handler.post(new ProgressUpdater(DEFAULT_BUFFER_SIZE, uploaded));
+                }*/
             }
         }
     }
 
     private class ProgressUpdater implements Runnable {
         private int percentageCompleted;
-        private long mUploadedInBytes;
-        private long mTotalInBytes;
+        private long mUploaded;
+        private long mfileLength;
+        private int mCurrentBufferSize;
 
-        ProgressUpdater(long uploaded) {
-            mUploadedInBytes = uploaded;
+        ProgressUpdater(long fileLength, long uploaded, int currentBufferSize) {
+            mfileLength = fileLength;
+            mUploaded = uploaded;
+            mCurrentBufferSize = currentBufferSize;
         }
 
         @Override
         public void run() {
             if (mListener!=null) {
-                mListener.onProgressUpdate(mUploadedInBytes);
+                mListener.onProgressUpdate(mfileLength, mUploaded, mCurrentBufferSize);
             }
         }
     }
 
     public interface UploadCallbacks {
-        void onProgressUpdate(long uploadedInBytes);
+        void onProgressUpdate(long mfileLength, long mUploaded, int defaultBufferSize);
     }
 
 }

@@ -1,11 +1,11 @@
-package com.pheuture.playlists.datasource.local.pending_upload_handler;
+package com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class PendingUploadParamEntity implements Parcelable {
+public class PendingFileUploadParamEntity implements Parcelable {
 
-    public PendingUploadParamEntity(int mediaType, String key, String value, String extra) {
+    public PendingFileUploadParamEntity(int mediaType, String key, String value, String extra) {
         this.mediaType = mediaType;
         this.key = key;
         this.value = value;
@@ -23,7 +23,7 @@ public class PendingUploadParamEntity implements Parcelable {
     private String extra;
 
 
-    protected PendingUploadParamEntity(Parcel in) {
+    protected PendingFileUploadParamEntity(Parcel in) {
         mediaType = in.readInt();
         key = in.readString();
         value = in.readString();
@@ -43,15 +43,15 @@ public class PendingUploadParamEntity implements Parcelable {
         return 0;
     }
 
-    public static final Creator<PendingUploadParamEntity> CREATOR = new Creator<PendingUploadParamEntity>() {
+    public static final Creator<PendingFileUploadParamEntity> CREATOR = new Creator<PendingFileUploadParamEntity>() {
         @Override
-        public PendingUploadParamEntity createFromParcel(Parcel in) {
-            return new PendingUploadParamEntity(in);
+        public PendingFileUploadParamEntity createFromParcel(Parcel in) {
+            return new PendingFileUploadParamEntity(in);
         }
 
         @Override
-        public PendingUploadParamEntity[] newArray(int size) {
-            return new PendingUploadParamEntity[size];
+        public PendingFileUploadParamEntity[] newArray(int size) {
+            return new PendingFileUploadParamEntity[size];
         }
     };
 

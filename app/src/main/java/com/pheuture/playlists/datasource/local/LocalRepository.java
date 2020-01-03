@@ -5,9 +5,10 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
-
-import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
-import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
+import com.pheuture.playlists.datasource.local.pending_api.PendingApiDao;
+import com.pheuture.playlists.datasource.local.pending_api.PendingApiEntity;
+import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler.PendingFileUploadDao;
+import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler.PendingFileUploadEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
@@ -23,9 +24,8 @@ import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
  * date: 07-Jan-19.
  */
 
-@Database(version = 1,
-        entities = {
-                PendingUploadEntity.class,
+@Database(version = 1, entities = {PendingApiEntity.class,
+                PendingFileUploadEntity.class,
                 PlaylistEntity.class,
                 PlaylistMediaEntity.class,
                 MediaEntity.class,
@@ -36,7 +36,8 @@ import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 public abstract class LocalRepository extends RoomDatabase {
     private static LocalRepository mLocalRepository;
 
-    public abstract PendingUploadDao pendingUploadDao();
+    public abstract PendingApiDao pendingApiDao();
+    public abstract PendingFileUploadDao pendingUploadDao();
     public abstract PlaylistDao playlistDao();
     public abstract PlaylistMediaDao playlistMediaDao();
     public abstract OfflineMediaDao offlineVideoDao();

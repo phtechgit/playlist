@@ -93,8 +93,8 @@ public class FileUtils {
         return fileName;
     }
 
-    public static String getSize(Context context, Uri uri) {
-        String fileSize = null;
+    public static long getSize(Context context, Uri uri) {
+        long fileSize = 0;
         try (Cursor cursor = context.getContentResolver()
                 .query(uri, null, null, null, null, null)) {
             if (cursor != null && cursor.moveToFirst()) {
@@ -102,7 +102,7 @@ public class FileUtils {
                 // get file size
                 int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
                 if (!cursor.isNull(sizeIndex)) {
-                    fileSize = cursor.getString(sizeIndex);
+                    fileSize = cursor.getLong(sizeIndex);
                 }
                 cursor.close();
             }
@@ -162,20 +162,35 @@ public class FileUtils {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
-    public static String getFileSize(double bytes) {
-        DecimalFormat mFormat = new DecimalFormat("########0.00");
-        if (bytes>=1073741824){
-            return mFormat.format(bytes/1073741824) + " GB";
+    /**
+     * Get the file size in a human-readable string.
+     *
+     * @param size
+     * @return
+     * @author paulburke
+     */
+    public static String getReadableFileSize(long size) {
+        final double BYTES_IN_KILOBYTES = 1024;
+        final DecimalFormat dec = new DecimalFormat("###.##");
+        final String KILOBYTES = " KB";
+        final String MEGABYTES = " MB";
+        final String GIGABYTES = " GB";
+        double fileSize = 0;
+        String suffix = KILOBYTES;
 
-        }else if (bytes>=1048576){
-            return mFormat.format(bytes/1048576) + " MB";
-
-        }else if (bytes>=1024){
-            return mFormat.format(bytes/1024) + " KB";
-
-        }else {
-            return bytes + " Bytes";
+        if (size > BYTES_IN_KILOBYTES) {
+            fileSize = size / BYTES_IN_KILOBYTES;
+            if (fileSize > BYTES_IN_KILOBYTES) {
+                fileSize = fileSize / BYTES_IN_KILOBYTES;
+                if (fileSize > BYTES_IN_KILOBYTES) {
+                    fileSize = fileSize / BYTES_IN_KILOBYTES;
+                    suffix = GIGABYTES;
+                } else {
+                    suffix = MEGABYTES;
+                }
+            }
         }
+        return dec.format(fileSize) + suffix;
     }
 }
 

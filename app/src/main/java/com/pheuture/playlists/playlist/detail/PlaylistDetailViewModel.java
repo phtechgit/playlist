@@ -14,10 +14,11 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.pheuture.playlists.datasource.local.pending_api.PendingApiDao;
+import com.pheuture.playlists.datasource.local.pending_api.PendingApiEntity;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadDao;
-import com.pheuture.playlists.datasource.local.pending_upload_handler.PendingUploadEntity;
+import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler.PendingFileUploadEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
@@ -58,7 +59,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     private OfflineMediaDao offlineMediaDao;
     private DownloadManager downloadManager;
     private UserEntity user;
-    private PendingUploadDao pendingUploadDao;
+    private PendingApiDao pendingApiDao;
 
     public PlaylistDetailViewModel(@NonNull Application application, long playlistID) {
         super(application);
@@ -68,7 +69,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
                 getApplication(), Constants.USER, ""), UserEntity.class);
 
         limit = 20;
-        pendingUploadDao = LocalRepository.getInstance(application).pendingUploadDao();
+        pendingApiDao = LocalRepository.getInstance(application).pendingApiDao();
         playlistDao = LocalRepository.getInstance(application).playlistDao();
         playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
         offlineMediaDao = LocalRepository.getInstance(application).offlineVideoDao();
@@ -277,10 +278,10 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
             Logger.e(TAG, e.toString());
         }
 
-        PendingUploadEntity pendingUploadEntity = new PendingUploadEntity();
-        pendingUploadEntity.setUrl(Url.PLAYLIST_MEDIA_REMOVE);
-        pendingUploadEntity.setParams(params.toString());
-        pendingUploadDao.insert(pendingUploadEntity);
+        PendingApiEntity pendingFileUploadEntity = new PendingApiEntity();
+        pendingFileUploadEntity.setUrl(Url.PLAYLIST_MEDIA_REMOVE);
+        pendingFileUploadEntity.setParams(params.toString());
+        pendingApiDao.insert(pendingFileUploadEntity);
 
         //start ExecutorService
         PendingApiExecutorService.startService(getApplication());

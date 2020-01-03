@@ -55,7 +55,6 @@ public class MainActivity extends BaseActivity {
     private SimpleExoPlayer exoPlayer1;
     private SimpleExoPlayer exoPlayer2;
     private PlayerView playerView;
-    private PlaylistEntity playlistToPlay;
     private List<PlaylistMediaEntity> mediaToPlay;
     private ConstraintLayout constraintLayoutBottomSheet;
     private BottomSheetBehavior bottomSheetBehavior;
@@ -138,7 +137,6 @@ public class MainActivity extends BaseActivity {
         viewModel.getPlaylist().observe(this, new Observer<PlaylistEntity>() {
             @Override
             public void onChanged(PlaylistEntity playlistEntity) {
-                playlistToPlay = playlistEntity;
             }
         });
 
