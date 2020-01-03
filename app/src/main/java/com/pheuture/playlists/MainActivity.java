@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -31,7 +30,6 @@ import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMedi
 import com.pheuture.playlists.utils.AlerterUtils;
 import com.pheuture.playlists.utils.BaseActivity;
 import com.pheuture.playlists.utils.Logger;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -43,7 +41,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.io.File;
 import java.util.List;
 
