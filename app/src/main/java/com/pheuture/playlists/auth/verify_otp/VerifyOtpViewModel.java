@@ -42,8 +42,6 @@ public class VerifyOtpViewModel extends AndroidViewModel {
             @Override
             public void onResponse(String stringResponse) {
                 try {
-                    showProgress.postValue(false);
-
                     Logger.e(url + ApiConstant.RESPONSE, stringResponse);
 
                     JSONObject response = new JSONObject(stringResponse);
@@ -69,7 +67,6 @@ public class VerifyOtpViewModel extends AndroidViewModel {
             @Override
             public void onErrorResponse(VolleyError e) {
                 try {
-                    showProgress.postValue(false);
                     Logger.e(url, e.toString());
                 } catch (Exception ex) {
                     Logger.e(TAG, ex.toString());

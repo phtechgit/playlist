@@ -40,7 +40,7 @@
             android:layout_marginStart="8dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="@+id/playerView"
-            app:layout_constraintEnd_toStartOf="@+id/imageView_togglePlay"
+            app:layout_constraintEnd_toStartOf="@+id/relativeLayout_play"
             app:layout_constraintStart_toEndOf="@+id/playerView"
             app:layout_constraintTop_toTopOf="@+id/playerView">
 
@@ -75,17 +75,31 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/imageView_togglePlay"
-            android:layout_width="?actionBarSize"
-            android:layout_height="?actionBarSize"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="16dp"
-            android:src="@android:drawable/ic_media_pause"
+        <RelativeLayout
+            android:id="@+id/relativeLayout_play"
             app:layout_constraintEnd_toStartOf="@+id/imageView_next"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="?actionBarSize"
+            android:layout_height="?actionBarSize">
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/imageView_togglePlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="16dp"
+                android:src="@android:drawable/ic_media_pause" />
+
+            <ProgressBar
+                android:id="@+id/progress_buffering"
+                android:layout_width="?actionBarSize"
+                android:layout_height="?actionBarSize"
+                android:padding="16dp" />
+
+        </RelativeLayout>
 
         <ImageView
             android:id="@+id/imageView_next"

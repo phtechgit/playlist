@@ -28,7 +28,9 @@ public class SMSReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (SmsRetriever.SMS_RETRIEVED_ACTION.equals(intent.getAction())) {
             Bundle extras = intent.getExtras();
+            assert extras != null;
             Status status = (Status) extras.get(SmsRetriever.EXTRA_STATUS);
+            assert status != null;
             switch (status.getStatusCode()) {
                 case CommonStatusCodes.SUCCESS:
 
@@ -83,11 +85,8 @@ public class SMSReceiver extends BroadcastReceiver {
      *
      */
     public interface OTPReceiveListener {
-
         void onOTPReceived(String otp);
-
         void onOTPTimeOut();
-
         void onOTPReceivedError(String error);
     }
 }

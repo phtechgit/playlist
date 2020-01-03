@@ -4,18 +4,21 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.lifecycle.MutableLiveData;
+
+import com.pheuture.playlists.utils.Logger;
+
 public class NotificationActionReceiver extends BroadcastReceiver {
+    private static final String TAG = NotificationActionReceiver.class.getSimpleName();
     private NotificationActionInterface notificationActionInterface;
 
-    public NotificationActionReceiver(NotificationActionInterface notificationActionInterface) {
+    public void setNotificationActionInterface(NotificationActionInterface notificationActionInterface) {
         this.notificationActionInterface = notificationActionInterface;
-    }
-
-    public NotificationActionReceiver() {
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Logger.e(TAG, "onReceive");
         if (intent == null){
          return;
         }
@@ -25,7 +28,10 @@ public class NotificationActionReceiver extends BroadcastReceiver {
 
         if (intent.getAction().equals(NotificationActions.CANCEL)){
             if (notificationActionInterface!=null) {
+                Logger.e(TAG, "onNotificationCancelled called");
                 notificationActionInterface.onNotificationCancelled();
+            } else {
+                Logger.e(TAG, "notificationActionInterface is null");
             }
         }
     }

@@ -31,12 +31,9 @@ public class MainViewModel extends AndroidViewModel {
     private MutableLiveData<PlaylistEntity> playlist;
     private MutableLiveData<List<PlaylistMediaEntity>> playlistMediaEntites;
     private OfflineMediaDao offlineMediaDao;
-    private UserEntity user;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
-        user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
-                getApplication(), Constants.USER, ""), UserEntity.class);
 
         dataSourceFactory = new DefaultDataSourceFactory(application,
                 Util.getUserAgent(application, TAG));

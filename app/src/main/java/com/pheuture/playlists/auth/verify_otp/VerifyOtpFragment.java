@@ -80,9 +80,9 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
                     activity.finish();
 
                 } else {
+                    activity.finish();
                     Intent intent = new Intent(activity, MainActivity.class);
                     startActivity(intent);
-                    activity.finish();
                 }
             }
         });

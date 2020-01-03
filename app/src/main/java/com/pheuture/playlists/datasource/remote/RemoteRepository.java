@@ -7,6 +7,8 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.pheuture.playlists.datasource.local.video_handler.MediaDao;
 import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
 import com.pheuture.playlists.utils.Converters;
@@ -38,10 +40,14 @@ public abstract class RemoteRepository  {
                     .retryOnConnectionFailure(false)
                     .connectTimeout(120, TimeUnit.SECONDS);
 
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .create();
+
             mLocalRepository = new Retrofit.Builder()
                     .baseUrl(Url.BASE_URL)
                     .client(httpClient.build())
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
         }
         return mLocalRepository;

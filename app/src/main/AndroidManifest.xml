@@ -49,13 +49,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receiver.NotificationActionReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="cancel" />
-            </intent-filter>
-        </receiver>
-
         <service
             android:name=".service.FileMoveIntentService"
             android:enabled="true"

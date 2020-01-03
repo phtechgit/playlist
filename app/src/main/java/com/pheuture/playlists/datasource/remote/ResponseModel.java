@@ -1,36 +1,11 @@
 package com.pheuture.playlists.datasource.remote;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.json.JSONArray;
 
-public class ResponseModel implements Parcelable {
+public class ResponseModel {
     private boolean message;
-
-    protected ResponseModel(Parcel in) {
-        message = in.readByte() != 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte((byte) (message ? 1 : 0));
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<ResponseModel> CREATOR = new Creator<ResponseModel>() {
-        @Override
-        public ResponseModel createFromParcel(Parcel in) {
-            return new ResponseModel(in);
-        }
-
-        @Override
-        public ResponseModel[] newArray(int size) {
-            return new ResponseModel[size];
-        }
-    };
+    private String status;
+    private JSONArray data;
 
     public boolean getMessage() {
         return message;
@@ -40,4 +15,28 @@ public class ResponseModel implements Parcelable {
         this.message = message;
     }
 
+    public JSONArray getData() {
+        return data;
+    }
+
+    public void setData(JSONArray data) {
+        this.data = data;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseModel{" +
+                "message=" + message +
+                ", status='" + status + '\'' +
+                ", data=" + data +
+                '}';
+    }
 }

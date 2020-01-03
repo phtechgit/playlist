@@ -131,11 +131,11 @@ public class MainActivity extends BaseActivity {
         exoPlayer1 = viewModel.getExoPlayer1();
         exoPlayer2 = viewModel.getExoPlayer2();
 
-        viewModel.getPlaylist().observe(this, new Observer<PlaylistEntity>() {
+       /*viewModel.getPlaylist().observe(this, new Observer<PlaylistEntity>() {
             @Override
             public void onChanged(PlaylistEntity playlistEntity) {
             }
-        });
+        });*/
 
         viewModel.getPlaylistMediaEntities().observe(this, new Observer<List<PlaylistMediaEntity>>() {
             @Override
@@ -338,33 +338,32 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            /*Logger.e(TAG, "onPlayerStateChanged: " + playWhenReady + ", " + playbackState);*/
+            Logger.e(TAG, playbackState + "");
             if (currentPlayer == 1) {
-                if (playWhenReady) {
-                    // media actually playing
-                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
-                } else {
-                    // player paused in any state
-                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
-                }
-
                 switch (playbackState) {
                     case Player.STATE_BUFFERING:
-                        /*Logger.e(TAG, "onPlayerStateChanged: buffering");
-                        int percentageBuffered = exoPlayer1.getBufferedPercentage();
-                        Logger.e(TAG, percentageBuffered + "");*/
+                        binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.GONE);
+                        binding.layoutBottomSheet.progressBuffering.setVisibility(View.VISIBLE);
                         break;
                     case Player.STATE_ENDED:
-                        /*Logger.e(TAG, "onPlayerStateChanged: ended");*/
-                        /*if (isPlaying){
-                            viewModel.setIsPlaying(false);
-                        }*/
-                        break;
-                    case Player.STATE_IDLE:
-                        /*Logger.e(TAG, "onPlayerStateChanged: idle");*/
+                        binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
+                        binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
+                        binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
                         break;
                     case Player.STATE_READY:
-                        /*Logger.e(TAG, "onPlayerStateChanged: ready");*/
+                        if (playWhenReady) {
+                            // media actually playing
+                            binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
+                            binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
+                            binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
+                        } else {
+                            // player paused in any state
+                            binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
+                            binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
+                            binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+                        }
+                        break;
+                    case Player.STATE_IDLE:
                         break;
                     default:
                         break;
@@ -423,39 +422,35 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            Logger.e(TAG, "ExoPlayer2: duration: " + exoPlayer2.getDuration() + "currentPosition: " + exoPlayer2.getCurrentPosition());
-            /*Logger.e(TAG, "onPlayerStateChanged: " + playWhenReady + ", " + playbackState);*/
-
             if (currentPlayer == 2) {
-                if (playWhenReady) {
-                    // media actually playing
-                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
-                } else {
-                    // player paused in any state
-                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+                switch (playbackState) {
+                    case Player.STATE_BUFFERING:
+                        binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.GONE);
+                        binding.layoutBottomSheet.progressBuffering.setVisibility(View.VISIBLE);
+                        break;
+                    case Player.STATE_ENDED:
+                        binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
+                        binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
+                        binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+                        break;
+                    case Player.STATE_READY:
+                        if (playWhenReady) {
+                            // media actually playing
+                            binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
+                            binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
+                            binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
+                        } else {
+                            // player paused in any state
+                            binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
+                            binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
+                            binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+                        }
+                        break;
+                    case Player.STATE_IDLE:
+                        break;
+                    default:
+                        break;
                 }
-            }
-
-            switch (playbackState) {
-                case Player.STATE_BUFFERING:
-                    /*Logger.e(TAG, "onPlayerStateChanged: buffering");
-                    int percentageBuffered = exoPlayer1.getBufferedPercentage();
-                    Logger.e(TAG, percentageBuffered + "");*/
-                    break;
-                case Player.STATE_ENDED:
-                    /*Logger.e(TAG, "onPlayerStateChanged: ended");*/
-                    /*if (isPlaying){
-                        viewModel.setIsPlaying(false);
-                    }*/
-                    break;
-                case Player.STATE_IDLE:
-                    /*Logger.e(TAG, "onPlayerStateChanged: idle");*/
-                    break;
-                case Player.STATE_READY:
-                    /*Logger.e(TAG, "onPlayerStateChanged: ready");*/
-                    break;
-                default:
-                    break;
             }
         }
 

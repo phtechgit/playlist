@@ -50,7 +50,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class PendingFileUploadService extends Service implements PendingFileUploadParamEntity.MediaType, ProgressRequestBody.UploadCallbacks,
+public class PendingFileUploadService extends Service implements PendingFileUploadParamEntity.MediaType,
+        ProgressRequestBody.UploadCallbacks,
         NotificationActionReceiver.NotificationActions,
         NotificationActionReceiver.NotificationActionInterface {
 
@@ -126,19 +127,25 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
 
         //Create an Intent for the BroadcastReceiver
         Intent buttonIntent = new Intent(this, NotificationActionReceiver.class);
-        buttonIntent.putExtra(Constants.ARG_PARAM1, NotificationIDConstant.FILE_UPLOAD_SERVICE_NOTIFICATION);
         buttonIntent.setAction(CANCEL);
 
         //Create the PendingIntent
-        btPendingIntent = PendingIntent.getBroadcast(this, 0,
+        btPendingIntent = PendingIntent.getBroadcast(this,
+                NotificationIDConstant.FILE_UPLOAD_SERVICE_NOTIFICATION,
                 buttonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         setUpBroadcastReceiver();
     }
 
     private void setUpBroadcastReceiver() {
-        notificationActionReceiver = new NotificationActionReceiver(this);
-        registerReceiver(notificationActionReceiver, new IntentFilter(CANCEL));
+        notificationActionReceiver = new NotificationActionReceiver();
+        notificationActionReceiver.setNotificationActionInterface(this);
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(CANCEL);
+
+        registerReceiver(notificationActionReceiver, intentFilter);
+
     }
 
     @Override
@@ -147,8 +154,6 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
     }
 
     private void startExecutor() {
-        Logger.e(TAG, "startExecutor");
-
         mTotalToUploadInBytes = pendingFileUploadEntity.getSize();
         mUploadedInBytes = 0;
         lastProgress = 0;
@@ -241,16 +246,11 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
 
     @Override
     public void onProgressUpdate(long mfileLength, long mUploaded, int currentBufferSize) {
-       /* Logger.e(TAG, "currentBufferSize: " + currentBufferSize);
-        Logger.e(TAG, "totalToUploadInBytes: " + mTotalToUploadInBytes);*/
-
         mUploadedInBytes += currentBufferSize;
-        /*Logger.e(TAG, "uploadedInBytes: " + mUploadedInBytes);*/
 
         int currentProgress = (int) ((mUploadedInBytes * 100) / mTotalToUploadInBytes);
 
         String subTitle =  "uploaded " + FileUtils.getReadableFileSize(mUploadedInBytes) + " of " + FileUtils.getReadableFileSize(mTotalToUploadInBytes);
-        Logger.e(TAG, subTitle);
 
         if (lastProgress!=currentProgress){
             lastProgress = currentProgress;
