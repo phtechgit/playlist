@@ -127,6 +127,7 @@ public class MainActivity extends BaseActivity {
                 mediaToPlay = videoEntities;
 
                 if (mediaToPlay.size()>0){
+                    exoPlayer1.setVolume(1f);
                     loadNextVideoIn(EXO_PLAYER_1);
                 }
             }
@@ -168,11 +169,11 @@ public class MainActivity extends BaseActivity {
             //if more media available to play & no pending callbacks
             if ((mediaToPlay.size() - 1)> currentMediaPosition){
                 if (currentPlayer == EXO_PLAYER_1) {
-                    exoPlayer2.setVolume(1f);
-                    loadNextVideoIn(EXO_PLAYER_2);
-                } else {
                     exoPlayer1.setVolume(1f);
                     loadNextVideoIn(EXO_PLAYER_1);
+                } else {
+                    exoPlayer2.setVolume(1f);
+                    loadNextVideoIn(EXO_PLAYER_2);
                 }
             }
 
@@ -196,7 +197,10 @@ public class MainActivity extends BaseActivity {
 
                     //increase volume if player
                     if (mediaToPlay.size()>1 && exoPlayer1.getVolume()<1f) {
-                        exoPlayer1.setVolume(currentDurationOfCurrentMedia/crossFadeValue);
+                        float volume = (float) currentDurationOfCurrentMedia / (float) crossFadeValue;
+                        exoPlayer1.setVolume(volume);
+                        exoPlayer2.setVolume(1f-volume);
+                        Logger.e(TAG, "volume: exoPlayer:" + exoPlayer1.getVolume() + ", exoPlayer2:" + exoPlayer2.getVolume());
                     }
 
                     //if more media available to play
@@ -221,7 +225,11 @@ public class MainActivity extends BaseActivity {
 
                     //increase volume if player
                     if (mediaToPlay.size()>1 && exoPlayer2.getVolume()<1f) {
-                        exoPlayer2.setVolume(currentDurationOfCurrentMedia/crossFadeValue);
+                        float volume = (float) currentDurationOfCurrentMedia / (float) crossFadeValue;
+                        exoPlayer2.setVolume(volume);
+                        exoPlayer1.setVolume(1f-volume);
+
+                        Logger.e(TAG, "volume: exoPlayer2:" + exoPlayer2.getVolume() + ", exoPlayer1:" + exoPlayer1.getVolume());
                     }
 
                     //if more media available to play
