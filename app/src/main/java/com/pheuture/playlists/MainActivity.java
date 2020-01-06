@@ -2,8 +2,11 @@ package com.pheuture.playlists;
 
 import android.app.DownloadManager;
 import android.content.Intent;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -36,6 +39,7 @@ import com.pheuture.playlists.utils.SharedPrefsUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -47,7 +51,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
 import java.util.List;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private ActivityMainBinding binding;
@@ -67,6 +71,12 @@ public class MainActivity extends BaseActivity {
     private long currentDurationOfCurrentMedia = 0;
     private int defaultTimerSec = 1000;
     private AudioManager audioManager;
+    private AudioAttributes playbackAttributes;
+    private AudioFocusRequest audioFocusRequestBuilder;
+    private boolean playbackDelayed = false;
+    private boolean playbackNowAuthorized = false;
+    private boolean resumeOnFocusGain = false;
+    private final Object focusLock = new Object();
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,9 +93,9 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         BottomNavigationView bottomNavView = findViewById(R.id.bottomNav_view);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -94,7 +104,79 @@ public class MainActivity extends BaseActivity {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(bottomNavView, navController);
+
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+
+        playbackAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
+                .build();
+
+        audioFocusRequestBuilder = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(playbackAttributes)
+                .setAcceptsDelayedFocusGain(true)
+                .setOnAudioFocusChangeListener(this, new Handler())
+                .build();
+
+        /*audioManager.abandonAudioFocusRequest(audioFocusRequestBuilder);*/
+
+        int res = audioManager.requestAudioFocus(audioFocusRequestBuilder);
+        synchronized(focusLock) {
+            if (res == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
+                playbackNowAuthorized = false;
+            } else if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                playbackNowAuthorized = true;
+                playbackNow();
+            } else if (res == AudioManager.AUDIOFOCUS_REQUEST_DELAYED) {
+                playbackDelayed = true;
+                playbackNowAuthorized = false;
+            }
+        }
+        super.onCreate(savedInstanceState);
     }
+
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+                if (playbackDelayed || resumeOnFocusGain) {
+                    synchronized(focusLock) {
+                        playbackDelayed = false;
+                        resumeOnFocusGain = false;
+                    }
+                    playbackNow();
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+                synchronized(focusLock) {
+                    resumeOnFocusGain = false;
+                    playbackDelayed = false;
+                }
+                pausePlayback();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                synchronized(focusLock) {
+                    resumeOnFocusGain = true;
+                    playbackDelayed = false;
+                }
+                pausePlayback();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                // ... pausing or ducking depends on your app
+                break;
+        }
+    }
+
+    private void pausePlayback() {
+        exoPlayer1.setPlayWhenReady(false);
+        exoPlayer2.setPlayWhenReady(false);
+    }
+
+    private void playbackNow() {
+        exoPlayer1.setPlayWhenReady(false);
+        exoPlayer2.setPlayWhenReady(false);
+    }
+
 
     @Override
     public void initializations() {
@@ -111,8 +193,6 @@ public class MainActivity extends BaseActivity {
 
         bottomSheetBehavior = BottomSheetBehavior.from( binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer);
         bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
-
-        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
@@ -319,6 +399,7 @@ public class MainActivity extends BaseActivity {
         MediaEntity media = mediaToPlay.get(++currentMediaPosition);
         Uri mediaUri;
 
+        //check if media is available offline then load from it else stream from server
         OfflineMediaEntity offlineMedia = viewModel.getOfflineMediaForMediaID(media.getMediaID());
         if (offlineMedia != null && offlineMedia.getDownloadStatus()== DownloadManager.STATUS_SUCCESSFUL) {
             File file = new File(offlineMedia.getDownloadedFilePath());
@@ -330,6 +411,7 @@ public class MainActivity extends BaseActivity {
             Logger.e(TAG, "media loading Online from: " + mediaUri);
         }
 
+        //create media source
         MediaSource mediaSource = new ProgressiveMediaSource
                 .Factory(viewModel.getDataSourceFactory()).createMediaSource(mediaUri);
         exoPlayer.prepare(mediaSource);
