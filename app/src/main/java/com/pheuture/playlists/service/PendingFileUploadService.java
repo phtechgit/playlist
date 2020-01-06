@@ -85,6 +85,8 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
     public void onCreate() {
         super.onCreate();
         Logger.e(TAG, "started");
+
+        setUpBroadcastReceiver();
         setupNotificationComponents();
 
         remoteRepository = RemoteRepository.getInstance(PendingFileUploadService.this);
@@ -124,7 +126,9 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
 
         notificationManager.notify(NotificationIDConstant.FILE_UPLOAD_SERVICE_NOTIFICATION, progressNotification);
         startForeground(NotificationIDConstant.FILE_UPLOAD_SERVICE_NOTIFICATION, progressNotification);
+    }
 
+    private void setUpBroadcastReceiver() {
         //Create an Intent for the BroadcastReceiver
         Intent buttonIntent = new Intent(this, NotificationActionReceiver.class);
         buttonIntent.setAction(CANCEL);
@@ -134,10 +138,6 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
                 NotificationIDConstant.FILE_UPLOAD_SERVICE_NOTIFICATION,
                 buttonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        setUpBroadcastReceiver();
-    }
-
-    private void setUpBroadcastReceiver() {
         notificationActionReceiver = new NotificationActionReceiver();
         notificationActionReceiver.setNotificationActionInterface(this);
 
@@ -250,10 +250,10 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
 
         int currentProgress = (int) ((mUploadedInBytes * 100) / mTotalToUploadInBytes);
 
-        String subTitle =  "uploaded " + FileUtils.getReadableFileSize(mUploadedInBytes) + " of " + FileUtils.getReadableFileSize(mTotalToUploadInBytes);
-
         if (lastProgress!=currentProgress){
             lastProgress = currentProgress;
+
+            String subTitle =  "uploaded " + FileUtils.getReadableFileSize(mUploadedInBytes) + " of " + FileUtils.getReadableFileSize(mTotalToUploadInBytes);
 
             progressNotification = new NotificationCompat.Builder(PendingFileUploadService.this,
                     NotificationChannelIDConstant.NOTIFICATION_CHANNEL_01)
