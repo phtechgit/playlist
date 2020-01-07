@@ -51,6 +51,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
 import java.util.List;
 
+import static androidx.navigation.Navigation.findNavController;
+
 public class MainActivity extends BaseActivity implements AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -93,34 +95,15 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         return super.onOptionsItemSelected(item);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        BottomNavigationView bottomNavView = findViewById(R.id.bottomNav_view);
+    private void requestAudioFocus(){
+        int res = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            res = audioManager.requestAudioFocus(audioFocusRequestBuilder);
+        } else {
+            res = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
+                    AudioManager.AUDIOFOCUS_GAIN);
+        }
 
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings)
-                .build();
-        navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(bottomNavView, navController);
-
-        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-
-        playbackAttributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
-                .build();
-
-        audioFocusRequestBuilder = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                .setAudioAttributes(playbackAttributes)
-                .setAcceptsDelayedFocusGain(true)
-                .setOnAudioFocusChangeListener(this, new Handler())
-                .build();
-
-        /*audioManager.abandonAudioFocusRequest(audioFocusRequestBuilder);*/
-
-        int res = audioManager.requestAudioFocus(audioFocusRequestBuilder);
         synchronized(focusLock) {
             if (res == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
                 playbackNowAuthorized = false;
@@ -132,38 +115,13 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
                 playbackNowAuthorized = false;
             }
         }
-        super.onCreate(savedInstanceState);
     }
 
-    @Override
-    public void onAudioFocusChange(int focusChange) {
-        switch (focusChange) {
-            case AudioManager.AUDIOFOCUS_GAIN:
-                if (playbackDelayed || resumeOnFocusGain) {
-                    synchronized(focusLock) {
-                        playbackDelayed = false;
-                        resumeOnFocusGain = false;
-                    }
-                    playbackNow();
-                }
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS:
-                synchronized(focusLock) {
-                    resumeOnFocusGain = false;
-                    playbackDelayed = false;
-                }
-                pausePlayback();
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                synchronized(focusLock) {
-                    resumeOnFocusGain = true;
-                    playbackDelayed = false;
-                }
-                pausePlayback();
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                // ... pausing or ducking depends on your app
-                break;
+    private void abandonAudioFocus(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioManager.abandonAudioFocusRequest(audioFocusRequestBuilder);
+        } else {
+            audioManager.abandonAudioFocus(this);
         }
     }
 
@@ -173,21 +131,43 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     }
 
     private void playbackNow() {
-        exoPlayer1.setPlayWhenReady(false);
-        exoPlayer2.setPlayWhenReady(false);
+        exoPlayer1.setPlayWhenReady(true);
+        exoPlayer2.setPlayWhenReady(true);
     }
-
 
     @Override
     public void initializations() {
-        proceedWithPermissions(null, true);
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         binding.toolbar.setNavigationIcon(R.drawable.ic_add_light);
+
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings)
+                .build();
+
+        navController = findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(binding.bottomNavView, navController);
+
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            playbackAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
+                    .build();
+
+            audioFocusRequestBuilder = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                    .setAudioAttributes(playbackAttributes)
+                    .setAcceptsDelayedFocusGain(true)
+                    .setOnAudioFocusChangeListener(this, new Handler())
+                    .build();
+        }
+
+        proceedWithPermissions(null, true);
 
         playerView = binding.layoutBottomSheet.playerView;
 
@@ -228,6 +208,38 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     }
 
     @Override
+    public void onAudioFocusChange(int focusChange) {
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+                if (playbackDelayed || resumeOnFocusGain) {
+                    synchronized(focusLock) {
+                        playbackDelayed = false;
+                        resumeOnFocusGain = false;
+                    }
+                    playbackNow();
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+                synchronized(focusLock) {
+                    resumeOnFocusGain = false;
+                    playbackDelayed = false;
+                }
+                pausePlayback();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                synchronized(focusLock) {
+                    resumeOnFocusGain = true;
+                    playbackDelayed = false;
+                }
+                pausePlayback();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                // ... pausing or ducking depends on your app
+                break;
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         if (v.equals(binding.layoutBottomSheet.imageViewTogglePlay)){
             SimpleExoPlayer exoPlayer = null;
@@ -238,11 +250,11 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
             }
             if (exoPlayer!=null) {
                 if (exoPlayer.getPlayWhenReady()){
+                    abandonAudioFocus();
                     exoPlayer1.setPlayWhenReady(false);
                     exoPlayer2.setPlayWhenReady(false);
                 } else {
-                    exoPlayer1.setPlayWhenReady(true);
-                    exoPlayer2.setPlayWhenReady(true);
+                    requestAudioFocus();
                 }
             }
         } else if (v.equals(binding.layoutBottomSheet.imageViewNext)){
@@ -343,6 +355,7 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
 
     private void resetAllPlayers(){
         try {
+            abandonAudioFocus();
             exoPlayer1.setPlayWhenReady(false);
             exoPlayer2.setPlayWhenReady(false);
 
@@ -415,7 +428,7 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         MediaSource mediaSource = new ProgressiveMediaSource
                 .Factory(viewModel.getDataSourceFactory()).createMediaSource(mediaUri);
         exoPlayer.prepare(mediaSource);
-        exoPlayer.setPlayWhenReady(true);
+        requestAudioFocus();
         playerView.setPlayer(exoPlayer);
 
         //set media info
@@ -622,13 +635,15 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
 
     @Override
     public void onBackPressed() {
-        if (!navController.popBackStack()) {
+        /*if (!navController.popBackStack()) {
             super.onBackPressed();
-        }
+        }*/
+        super.onBackPressed();
     }
 
     @Override
     protected void onDestroy() {
+        abandonAudioFocus();
         timerHandler.removeCallbacks(timerRunnable);
         exoPlayer1.release();
         exoPlayer2.release();
