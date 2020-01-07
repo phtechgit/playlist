@@ -183,6 +183,7 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
             public void onResponse(@NotNull Call<ResponseModel> fileUploadClient, @NotNull retrofit2.Response<ResponseModel> response) {
                 try {
                     if (response.body()==null){
+                        Logger.e(url + ApiConstant.RESPONSE, response.message());
                         stopSelf();
                         return;
                     }

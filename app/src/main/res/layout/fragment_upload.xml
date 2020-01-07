@@ -12,7 +12,7 @@
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:paddingBottom="32dp"
+                android:paddingBottom="80dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -97,8 +97,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
-                    android:lines="3"
-                    android:gravity="start"
+                    android:lines="4"
+                    android:inputType="textMultiLine"
                     android:imeOptions="actionDone"
                     android:textColor="@color/gray3"
                     android:background="@drawable/edittext_background_gray"

@@ -340,8 +340,8 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
                     }
                 }
 
-                Logger.e(TAG, "totalDurationOfCurrentMedia:" + totalDurationOfCurrentMedia + ", currentDurationOfCurrentMedia:" + currentDurationOfCurrentMedia + ", crossFadeValue:" + (SharedPrefsUtils.getIntegerPreference(MainActivity.this,
-                        Constants.CROSS_FADE_VALUE, 0) * 1000));
+                /*Logger.e(TAG, "totalDurationOfCurrentMedia:" + totalDurationOfCurrentMedia + ", currentDurationOfCurrentMedia:" + currentDurationOfCurrentMedia + ", crossFadeValue:" + (SharedPrefsUtils.getIntegerPreference(MainActivity.this,
+                        Constants.CROSS_FADE_VALUE, 0) * 1000));*/
                 //update progress
                 binding.layoutBottomSheet.progressBar.setProgress(calculatePercentage(totalDurationOfCurrentMedia,
                         currentDurationOfCurrentMedia));
