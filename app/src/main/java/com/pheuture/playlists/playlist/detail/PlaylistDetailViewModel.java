@@ -94,7 +94,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         //reset the last Id
         lastID = 0;
 
-        final String url = Url.PLAYLIST_VIDEOS;
+        final String url = Url.BASE_URL + Url.PLAYLIST_VIDEOS;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override

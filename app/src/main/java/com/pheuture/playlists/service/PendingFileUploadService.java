@@ -13,8 +13,6 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.datasource.local.LocalRepository;
@@ -27,7 +25,6 @@ import com.pheuture.playlists.datasource.remote.RemoteRepository;
 import com.pheuture.playlists.datasource.remote.ResponseModel;
 import com.pheuture.playlists.receiver.NotificationActionReceiver;
 import com.pheuture.playlists.utils.ApiConstant;
-import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.FileUtils;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.NetworkUtils;
@@ -89,7 +86,7 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
         setUpBroadcastReceiver();
         setupNotificationComponents();
 
-        remoteRepository = RemoteRepository.getInstance(PendingFileUploadService.this);
+        remoteRepository = RemoteRepository.getInstance();
         fileUploadDao = remoteRepository.create(FileUploadDao.class);
         pendingFileUploadDao = LocalRepository.getInstance(this).pendingUploadDao();
 

@@ -64,8 +64,8 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     private int EXO_PLAYER_1 = 1;
     private int EXO_PLAYER_2 = 2;
     private PlayerView playerView;
-    private static int currentPlayer;
-    private static int currentMediaPosition;
+    private static int currentPlayer = RecyclerView.NO_POSITION;
+    private static int currentMediaPosition = RecyclerView.NO_POSITION;
     private List<PlaylistMediaEntity> mediaToPlay;
     private BottomSheetBehavior bottomSheetBehavior;
     private Handler timerHandler = new Handler();
@@ -182,13 +182,17 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         viewModel.getPlaylistMediaEntities().observe(this, new Observer<List<PlaylistMediaEntity>>() {
             @Override
             public void onChanged(List<PlaylistMediaEntity> videoEntities) {
-                resetAllPlayers();
-
                 mediaToPlay = videoEntities;
 
                 if (mediaToPlay.size()>0){
-                    exoPlayer1.setVolume(1f);
-                    loadNextVideoIn(EXO_PLAYER_1);
+                    if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
+                        exoPlayer1.setVolume(1f);
+                        loadNextVideoIn(EXO_PLAYER_1);
+
+                    } else if (currentPlayer == EXO_PLAYER_2) {
+                        exoPlayer2.setVolume(1f);
+                        loadNextVideoIn(EXO_PLAYER_2);
+                    }
                 }
             }
         });
@@ -245,17 +249,16 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
             SimpleExoPlayer exoPlayer = null;
             if (currentPlayer == EXO_PLAYER_1){
                 exoPlayer = exoPlayer1;
-            } else if (currentPlayer == EXO_PLAYER_2){
+            } else {
                 exoPlayer = exoPlayer2;
             }
-            if (exoPlayer!=null) {
-                if (exoPlayer.getPlayWhenReady()){
-                    abandonAudioFocus();
-                    exoPlayer1.setPlayWhenReady(false);
-                    exoPlayer2.setPlayWhenReady(false);
-                } else {
-                    requestAudioFocus();
-                }
+
+            if (exoPlayer.getPlayWhenReady()){
+                abandonAudioFocus();
+                exoPlayer1.setPlayWhenReady(false);
+                exoPlayer2.setPlayWhenReady(false);
+            } else {
+                requestAudioFocus();
             }
         } else if (v.equals(binding.layoutBottomSheet.imageViewNext)){
             //if more media available to play & no pending callbacks
@@ -272,7 +275,7 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         } else if (v.equals(binding.layoutBottomSheet.imageViewClose)){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             binding.bottomNavView.setVisibility(View.VISIBLE);
-            resetAllPlayers();
+
         }
     }
 
@@ -358,17 +361,14 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
             abandonAudioFocus();
             exoPlayer1.setPlayWhenReady(false);
             exoPlayer2.setPlayWhenReady(false);
-
-            //reset current video position to play as -1
-            currentPlayer = RecyclerView.NO_POSITION;
-            currentMediaPosition = RecyclerView.NO_POSITION;
         } catch (Exception ignore) {
         }
     }
 
-    public void setMedia(PlaylistEntity playlistEntity,  List<PlaylistMediaEntity> playlistMediaEntities){
+    public void setMedia(PlaylistEntity playlistEntity,  List<PlaylistMediaEntity> playlistMediaEntities, int position){
         viewModel.setPlaylist(playlistEntity);
         viewModel.setPlaylistMediaEntities(playlistMediaEntities);
+        currentMediaPosition = position;
     }
 
     private BottomSheetCallback  bottomSheetCallback = new BottomSheetCallback() {

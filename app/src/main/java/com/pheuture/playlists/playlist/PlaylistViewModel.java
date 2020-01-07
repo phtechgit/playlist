@@ -111,7 +111,7 @@ public class PlaylistViewModel extends AndroidViewModel {
         //reset the last Id
         lastID = 0;
 
-        final String url = Url.PLAYLIST_LIST;
+        final String url = Url.BASE_URL + Url.PLAYLIST_LIST;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override
@@ -179,7 +179,7 @@ public class PlaylistViewModel extends AndroidViewModel {
             return;
         }
 
-        final String url = Url.PLAYLIST_LIST;
+        final String url = Url.BASE_URL + Url.PLAYLIST_LIST;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override

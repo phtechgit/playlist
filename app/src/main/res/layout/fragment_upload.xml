@@ -98,6 +98,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:lines="4"
+                    android:gravity="start"
                     android:inputType="textMultiLine"
                     android:imeOptions="actionDone"
                     android:textColor="@color/gray3"

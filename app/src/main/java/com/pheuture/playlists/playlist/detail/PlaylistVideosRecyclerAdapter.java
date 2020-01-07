@@ -155,6 +155,8 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
                     bundle.putInt(Constants.ARG_PARAM1, pos);
                     bundle.putInt(Constants.ARG_PARAM2, 1);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
+
+                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
                 }
             });
 

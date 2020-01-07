@@ -2,6 +2,9 @@ package com.pheuture.playlists;
 
 import android.app.Application;
 import android.content.IntentFilter;
+
+import androidx.appcompat.app.AppCompatDelegate;
+
 import com.pheuture.playlists.receiver.ConnectivityChangeReceiver;
 import com.pheuture.playlists.service.PendingApiExecutorService;
 import com.pheuture.playlists.service.PendingFileUploadService;
@@ -15,6 +18,7 @@ public class AppController extends Application implements ConnectivityChangeRece
     @Override
     public void onCreate() {
         super.onCreate();
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES); //For night mode theme
         setupConnectivityChangeBroadcastReceiver();
     }
 

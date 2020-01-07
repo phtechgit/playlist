@@ -166,7 +166,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
         if (type == 1){
             List<PlaylistMediaEntity> playlistMediaEntities = new ArrayList<>();
             playlistMediaEntities.add(playlistMediaEntity);
-            ((MainActivity) activity).setMedia(null, playlistMediaEntities);
+            ((MainActivity) activity).setMedia(null, playlistMediaEntities, RecyclerView.NO_POSITION);
 
         } else {
             ((MainActivity) activity).showSnack("added to " + playlistModel.getPlaylistName());

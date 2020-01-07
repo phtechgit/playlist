@@ -29,14 +29,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public abstract class RemoteRepository  {
     private static Retrofit mLocalRepository;
 
-    public static Retrofit getInstance(Context context) {
+    public static Retrofit getInstance() {
         if (mLocalRepository == null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.level(HttpLoggingInterceptor.Level.BODY);
 
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
-            httpClient.readTimeout(120, TimeUnit.SECONDS)
+            httpClient
+                    .readTimeout(120, TimeUnit.SECONDS)
                     .retryOnConnectionFailure(false)
                     .connectTimeout(120, TimeUnit.SECONDS);
 

@@ -36,7 +36,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
     public void verifyOtp(String otp) {
         showProgress.postValue(true);
 
-        final String url = Url.VERIFY_OTP;
+        final String url = Url.BASE_URL + Url.VERIFY_OTP;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override

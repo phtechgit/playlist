@@ -48,7 +48,7 @@ public class PendingApiExecutorService extends Service {
         super.onCreate();
         Logger.e(TAG, "started");
 
-        remoteRepository = RemoteRepository.getInstance(PendingApiExecutorService.this);
+        remoteRepository = RemoteRepository.getInstance();
         fileUploadDao = remoteRepository.create(FileUploadDao.class);
         pendingApiDao = LocalRepository.getInstance(this).pendingApiDao();
 

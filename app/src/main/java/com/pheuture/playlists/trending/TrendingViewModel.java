@@ -60,7 +60,7 @@ public class TrendingViewModel extends AndroidViewModel {
         //reset the last Id
         lastID = 0;
 
-        final String url = Url.MEDIA_TRENDING;
+        final String url = Url.BASE_URL + Url.MEDIA_TRENDING;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override
@@ -125,7 +125,7 @@ public class TrendingViewModel extends AndroidViewModel {
             return;
         }
 
-        final String url = Url.MEDIA_TRENDING;
+        final String url = Url.BASE_URL + Url.MEDIA_TRENDING;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override

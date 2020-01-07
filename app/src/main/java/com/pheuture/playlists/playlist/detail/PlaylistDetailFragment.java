@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -32,6 +33,7 @@ import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.NetworkUtils;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistDetailFragment extends BaseFragment implements RecyclerViewInterface {
@@ -135,7 +137,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         } else if (v.equals(binding.imageButtonPlay)) {
             if (playlistMediaEntities.size()>0) {
-                ((MainActivity) activity).setMedia(playlist, playlistMediaEntities);
+                ((MainActivity) activity).setMedia(playlist, playlistMediaEntities, RecyclerView.NO_POSITION);
             }
 
         } else if (v.equals(binding.imageButtonShuffle)) {
@@ -152,7 +154,10 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         PlaylistMediaEntity model = bundle.getParcelable(ARG_PARAM3);
 
         assert model != null;
-        if (type == 2){
+        if (type == 1){
+            ((MainActivity) activity).setMedia(playlist, playlistMediaEntities, (position-1));
+
+        } else if (type == 2){
             showRemoveMediaFromPlaylistAlert(model);
         }
     }

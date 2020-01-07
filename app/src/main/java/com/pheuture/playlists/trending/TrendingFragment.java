@@ -161,7 +161,7 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
         List<PlaylistMediaEntity> mediaEntities = new ArrayList<>();
         mediaEntities.add(playlistMediaEntity);
 
-        ((MainActivity) activity).setMedia(null, mediaEntities);
+        ((MainActivity) activity).setMedia(null, mediaEntities, RecyclerView.NO_POSITION);
     }
 
     @Override

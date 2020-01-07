@@ -32,7 +32,7 @@ public class RequestOtpViewModel extends AndroidViewModel {
         String hashKey = appSignatureHashHelper.getAppSignatures().get(0);
         Log.i(TAG, "HashKey: " + hashKey);
 
-        final String url = Url.REQUEST_OTP;
+        final String url = Url.BASE_URL + Url.REQUEST_OTP;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override
