@@ -8,6 +8,7 @@
         android:layout_height="match_parent">
 
         <ScrollView
+            android:layout_above="@+id/button_submit"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -35,7 +36,7 @@
                     android:layout_marginTop="16dp"
                     android:text="Thumbnail"
                     android:textSize="@dimen/textSizeCaption"
-                    android:textColor="@color/gray4"
+                    android:textColor="@color/grayB"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/playerView" />
 
@@ -59,7 +60,7 @@
                     android:layout_marginTop="16dp"
                     android:text="Video Title"
                     android:textSize="@dimen/textSizeCaption"
-                    android:textColor="@color/gray4"
+                    android:textColor="@color/grayB"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/imageView_thumbnail" />
 
@@ -72,7 +73,7 @@
                     android:lines="1"
                     android:inputType="text"
                     android:imeOptions="actionNext"
-                    android:textColor="@color/gray3"
+                    android:textColor="@color/grayC"
                     android:background="@drawable/edittext_background_gray"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -86,7 +87,7 @@
                     android:layout_marginTop="16dp"
                     android:inputType="text"
                     android:text="Video Description"
-                    android:textColor="@color/gray4"
+                    android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeCaption"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/ediText_title" />
@@ -101,7 +102,7 @@
                     android:gravity="start"
                     android:inputType="textMultiLine"
                     android:imeOptions="actionDone"
-                    android:textColor="@color/gray3"
+                    android:textColor="@color/grayC"
                     android:background="@drawable/edittext_background_gray"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -115,7 +116,7 @@
                     android:layout_marginTop="16dp"
                     android:padding="16dp"
                     android:text="By submitting your videos, you acknowledge that you agree to our Terms of Service and Comunity Guidlines"
-                    android:textColor="@color/gray2"
+                    android:textColor="@color/grayD"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/ediText_description" />
@@ -128,42 +129,20 @@
                     android:gravity="center"
                     android:padding="16dp"
                     android:text="Please be sure not to violate others' Copyright or privacy rights."
-                    android:textColor="@color/gray2"
+                    android:textColor="@color/grayD"
                     app:layout_constraintTop_toBottomOf="@+id/textView_guidline1" />
-
-                <Button
-                    android:id="@+id/button_submit"
-                    android:layout_width="120dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    android:backgroundTint="@color/gray0"
-                    android:text="submit"
-                    android:textColor="@color/WhiteA"
-                    app:layout_constraintEnd_toStartOf="@+id/button_cancel"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView_guidline2" />
-
-                <Button
-                    android:id="@+id/button_cancel"
-                    android:layout_width="120dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    android:backgroundTint="@color/gray0"
-                    android:text="cancel"
-                    android:textColor="@color/WhiteA"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/button_submit"
-                    app:layout_constraintTop_toBottomOf="@+id/textView_guidline2" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </ScrollView>
 
-        <!--<include
-            android:id="@+id/progressLayout"
-            layout="@layout/layout_progress_bar_full_screen_determinate"/>-->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_submit"
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="submit" />
 
     </RelativeLayout>
 

@@ -60,8 +60,6 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
     public void initializations() {
         ((MainActivity) activity).setupToolbar(false, "Playlists");
         binding.layoutSearchBar.editTextSearch.setHint("Find in playlist");
-        /*binding.layoutSearchBar.editTextSearch.setText(viewModel.getSearchQuery().getValue());
-        binding.layoutSearchBar.editTextSearch.setSelection(binding.layoutSearchBar.editTextSearch.getText().length());*/
 
         recyclerAdapter = new PlaylistsRecyclerAdapter(this);
         layoutManager = new LinearLayoutManager(activity);
@@ -174,6 +172,9 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
                 viewModel.createPlaylist(editText.getText().toString());
             }
         });
+
+        editText.requestFocus();
+        KeyboardUtils.showKeyboard(activity, editText);
     }
 
     @Override

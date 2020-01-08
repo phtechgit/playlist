@@ -15,7 +15,7 @@
             android:padding="8dp"
             android:text="Enter your phone number"
             android:textSize="@dimen/textSizeHeadline5"
-            android:textColor="@color/gray4"
+            android:textColor="@color/grayB"
             android:textStyle="bold" />
 
 
@@ -27,7 +27,7 @@
             android:gravity="center"
             android:text="Playlist will send an SMS message to verify your phone number"
             android:textSize="@dimen/textSizeBody1"
-            android:textColor="@color/gray3" />
+            android:textColor="@color/grayC" />
 
         <EditText
             android:id="@+id/ediText_phone"
@@ -43,7 +43,7 @@
             android:inputType="phone"
             android:textSize="@dimen/textSizeBody1"
             android:imeOptions="actionDone"
-            android:textColor="@color/gray3"
+            android:textColor="@color/grayC"
             android:background="@drawable/edittext_background_gray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -57,7 +57,7 @@
             android:gravity="center"
             android:text="Carrier SMS charges may apply"
             android:textSize="@dimen/textSizeCaption"
-            android:textColor="@color/gray2" />
+            android:textColor="@color/grayD" />
 
     </LinearLayout>
 

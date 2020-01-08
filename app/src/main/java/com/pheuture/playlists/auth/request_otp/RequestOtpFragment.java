@@ -22,6 +22,7 @@ import com.pheuture.playlists.auth.AuthActivity;
 import com.pheuture.playlists.databinding.FragmentRequestOtpBinding;
 import com.pheuture.playlists.interfaces.ButtonClickInterface;
 import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.utils.KeyboardUtils;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.NetworkUtils;
 
@@ -58,6 +59,13 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
         } else {
             ((AuthActivity)activity).showNextButton(false);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setUserInteraction(true);
+        binding.ediTextPhone.requestFocus();
     }
 
     @Override

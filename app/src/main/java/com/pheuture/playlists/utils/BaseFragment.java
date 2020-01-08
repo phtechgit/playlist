@@ -44,24 +44,34 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
         super.onActivityCreated(savedInstanceState);
     }
 
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     @Override
     public void onAttach(@NotNull Context context) {
         super.onAttach(context);
         mContext = context;
     }
 
-    public boolean isFragmentAlive() {
-        return mContext != null && isAdded();
+    @Override
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanseState) {
+        View view = myFragmentView(inflater, parent, savedInstanseState);
+        setListeners();
+        initializations();
+        return view;
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mContext = null;
+    }
+
+    public abstract View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
+
+    public abstract void initializations();
+
+    public abstract void setListeners();
+
+    public boolean isFragmentAlive() {
+        return mContext != null && isAdded();
     }
 
     public void showProgress(View progressBar) {
@@ -152,7 +162,7 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
         }
     }*/
 
-    private void setUserInteraction(boolean isActive) {
+    public void setUserInteraction(boolean isActive) {
         if (mContext != null) {
             if (isActive) {
                 ((Activity) mContext).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
@@ -163,20 +173,5 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
         }
 
     }
-
-    @Override
-    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanseState) {
-        View view = myFragmentView(inflater, parent, savedInstanseState);
-        setListeners();
-        initializations();
-        return view;
-    }
-
-    public abstract View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
-
-    public abstract void initializations();
-
-    public abstract void setListeners();
-
 
 }

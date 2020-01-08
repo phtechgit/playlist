@@ -10,7 +10,7 @@ import com.pheuture.playlists.playlist.detail.PlaylistDetailViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
-class UploadViewModelFactory implements ViewModelProvider.Factory {
+class UploadActivityViewModelFactory implements ViewModelProvider.Factory {
     private Application mApplication;
     private Uri mediaUri;
 
@@ -20,7 +20,7 @@ class UploadViewModelFactory implements ViewModelProvider.Factory {
         return (T) new UploadViewModel(mApplication, mediaUri);
     }
 
-    public UploadViewModelFactory(Application application, Uri mediaUri) {
+    public UploadActivityViewModelFactory(Application application, Uri mediaUri) {
         this.mApplication = application;
         this.mediaUri = mediaUri;
     }

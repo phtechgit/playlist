@@ -38,12 +38,18 @@ public class UserProfileActivity extends BaseActivity implements TextWatcher {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        binding.ediTextFirstName.requestFocus();
+    }
+
+    @Override
     public void onClick(View v) {
         viewModel.updateUserDetail(binding.ediTextFirstName.getText().toString(), binding.ediTextLastName.getText().toString());
+        finish();
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-        finish();
     }
 
     @Override

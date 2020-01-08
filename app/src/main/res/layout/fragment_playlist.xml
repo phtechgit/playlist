@@ -34,7 +34,7 @@
                 android:textSize="@dimen/textSizeCaption"
                 android:text="Its easy, we'll help you." />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/button_create_playlist"
                 android:layout_marginTop="32dp"
                 android:layout_width="wrap_content"

@@ -17,13 +17,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/DarkThemeNoActionBar"
         android:usesCleartextTraffic="true">
 
         <activity
             android:name=".auth.AuthActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize|stateVisible">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,6 +37,12 @@
             android:windowSoftInputMode="adjustNothing"/>
 
         <activity android:name=".auth.user_detail.UserProfileActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".upload.UploadActivity"
+            android:label="Upload"
+            android:theme="@style/DarkTheme"
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait"/>
 

@@ -8,7 +8,6 @@
         android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:padding="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -16,8 +15,10 @@
                 android:id="@+id/linearLayout_upload"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="8dp"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
@@ -37,7 +38,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="upload your own video"
-                    android:textColor="@color/gray4"
+                    android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2" />
 
             </LinearLayout>
@@ -46,9 +47,10 @@
                 android:id="@+id/linearLayout_download_playlist_videos_to_offline"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="8dp"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toStartOf="@+id/switch_download_playlist_videos_to_offline"
                 app:layout_constraintStart_toStartOf="parent"
@@ -69,7 +71,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="listen to your playlist while offline"
-                    android:textColor="@color/gray4"
+                    android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -89,9 +91,10 @@
                 android:id="@+id/linearLayout_download_using_cellular"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="8dp"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toStartOf="@+id/switch_download_using_cellular"
                 app:layout_constraintStart_toStartOf="parent"
@@ -108,7 +111,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Recommended Setting: Off"
-                    android:textColor="@color/gray4"
+                    android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2" />
 
             </LinearLayout>
@@ -126,9 +129,10 @@
                 android:id="@+id/linearLayout_download_while_roaming"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="8dp"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toStartOf="@+id/switch_download_using_cellular"
                 app:layout_constraintStart_toStartOf="parent"
@@ -145,7 +149,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Recommended Setting: Off"
-                    android:textColor="@color/gray4"
+                    android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2" />
 
             </LinearLayout>
@@ -163,8 +167,10 @@
                 android:id="@+id/linearLayout_delete_offline_videos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:paddingTop="8dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="8dp"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
@@ -184,7 +190,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="delete all offline videos"
-                    android:textColor="@color/gray4"
+                    android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2" />
 
             </LinearLayout>
@@ -193,8 +199,10 @@
                 android:id="@+id/linearLayout_cross_fade"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:paddingTop="8dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="8dp"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -211,7 +219,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="allow you to crossfade between songs"
-                    android:textColor="@color/gray4"
+                    android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -234,7 +242,7 @@
                         android:id="@+id/seekBar_cross_fade"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:backgroundTint="@color/gray2"
+                        android:backgroundTint="@color/grayD"
                         android:max="12"
                         android:min="0"
                         android:progress="0"

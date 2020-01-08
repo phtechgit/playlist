@@ -21,7 +21,7 @@
                 android:padding="8dp"
                 android:text="Verify phone number"
                 android:textSize="@dimen/textSizeHeadline5"
-                android:textColor="@color/gray4"
+                android:textColor="@color/grayB"
                 android:textStyle="bold" />
 
             <TextView
@@ -32,7 +32,7 @@
                 android:padding="16dp"
                 android:gravity="center"
                 android:textSize="@dimen/textSizeBody1"
-                android:textColor="@color/gray3" />
+                android:textColor="@color/grayC" />
 
             <TextView
                 android:id="@+id/textView_otp"
@@ -45,7 +45,7 @@
                 android:textSize="@dimen/textSizeHeadline5"
                 android:hint="OTP"
                 android:gravity="center"
-                android:textColor="@color/gray3"
+                android:textColor="@color/grayC"
                 android:background="@drawable/edittext_background_gray" />
 
         </LinearLayout>

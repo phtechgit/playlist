@@ -146,7 +146,6 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
         }
     }
 
-
     @Override
     public void onOTPReceived(String otp) {
         if (smsReceiver != null) {
@@ -172,13 +171,13 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
         showToast(error);
     }
 
-
     @Override
     public void onDestroy() {
-        super.onDestroy();
         if (smsReceiver != null) {
             activity.unregisterReceiver(smsReceiver);
         }
+        viewModel.cancelAllApiRequests();
+        super.onDestroy();
     }
 
 

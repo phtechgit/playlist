@@ -1,72 +1,52 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="DarkThemeNoActionBar" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/colorPrimary</item>
-
-        <item name="android:homeAsUpIndicator">@drawable/ic_add_light</item>
-        <item name="homeAsUpIndicator">@drawable/ic_add_light</item>
         <item name="android:textSize">@dimen/textSizeBody1</item>
-        <item name="android:textColor">@color/colorAccent</item>
-        <item name="android:textColorHint">@color/gray1</item>
-        <item name="materialButtonStyle">@style/MaterialButtonStyle</item>
-        <item name="textInputStyle">@style/TextInputLayoutStyle</item>
-        <item name="editTextStyle">@style/EditTextStyle</item>
-        <!--<item name="toolbarStyle">@style/ToolbarStyle</item>-->
-        <item name="seekBarStyle">@style/customSeekBarStyle</item>
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="materialButtonStyle">@style/ButtonStyleDark</item>
     </style>
 
-    <!--button style-->
-    <style name="MaterialButtonStyle" parent="Widget.MaterialComponents.Button">
-        <item name="android:textColor">@color/colorPrimary</item>
+    <style name="DarkTheme" parent="Theme.MaterialComponents">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textSize">@dimen/textSizeBody1</item>
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="materialButtonStyle">@style/ButtonStyleDark</item>
+    </style>
+
+    <!--button styles-->
+    <style name="ButtonStyleDark" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/colorAccent</item>
         <item name="android:textSize">@dimen/textSizeBody2</item>
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
-
-    <!--textInputLayout style-->
-    <style name="TextInputLayoutStyle" parent="Widget.Design.TextInputLayout">
-        <item name="hintTextAppearance">@style/TextAppearance.AppCompat.Light.SearchResult.Title</item>
-        <item name="android:textColorHint">@color/gray4</item>
-        <item name="boxBackgroundMode">outline</item>
-        <item name="boxStrokeColor">@color/gray4</item>
+    <style name="ButtonStyleGray" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/grayF</item>
+        <item name="android:textSize">@dimen/textSizeBody2</item>
+        <item name="android:textColor">@color/grayA</item>
     </style>
-
-    <!--editText style-->
-    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
-        <item name="android:padding">5dp</item>
-        <item name="android:background">@null</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:strokeColor">@color/gray3</item>
-    </style>
-
-    <!--Toolbar Styling-->
-    <style name="ToolbarStyle" parent="Widget.MaterialComponents.Toolbar">
-        <item name="android:textSize">@dimen/textSizeHeadline3</item>
-        <item name="titleTextColor">@color/WhiteF</item>
-        <item name="subtitleTextColor">@color/WhiteF</item>
+    <style name="ButtonStyleLight" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/colorPrimary</item>
+        <item name="android:textSize">@dimen/textSizeBody2</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
     </style>
 
     <style name="EditTextDialogStyle" parent="Widget.AppCompat.EditText">
         <item name="android:background">@drawable/edittext_background_white</item>
-        <item name="android:textCursorDrawable">@null</item>
-    </style>
-
-    <style name="myToolbar">
-<!--        <item name="android:titleTextAppearance">@style/Toolbar.TitleText</item>-->
-        <item name="android:textSize">@dimen/textSizeHeadline2</item>
-        <item name="android:popupTheme">@style/Widget.AppCompat.PopupMenu</item>
-        <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
 
     <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">30sp</item>
     </style>
 
-    <style name="customSeekBarStyle" parent="Widget.AppCompat.SeekBar.Discrete">
-        <item name="android:progressBackgroundTint">@color/WhiteF</item>
-        <item name="android:progressTint">@color/red</item>
+    <style name="TextInputLayoutStyleDark" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="colorControlActivated">@color/colorAccent</item>
+        <item name="android:colorControlActivated">@color/colorAccent</item>
     </style>
 
 </resources>

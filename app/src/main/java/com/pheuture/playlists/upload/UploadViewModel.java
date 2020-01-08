@@ -8,7 +8,6 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.room.util.FileUtil;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -21,7 +20,6 @@ import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_h
 import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler.PendingFileUploadParamEntity;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
-import com.pheuture.playlists.service.PendingApiExecutorService;
 import com.pheuture.playlists.service.PendingFileUploadService;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
@@ -45,20 +43,14 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
     private static final String TAG = UploadViewModel.class.getSimpleName();
     private DataSource.Factory dataSourceFactory;
     private SimpleExoPlayer exoPlayer;
-    private MutableLiveData<Boolean> showProgress = new MutableLiveData<>();
-    private MutableLiveData<Integer>  progressPercentage = new MutableLiveData<>();
     private UserEntity user;
-    private MutableLiveData<Uri> mediaUri;
-    private MutableLiveData<Uri> thumbnailUri = new MutableLiveData<>();
+    private MutableLiveData<Uri> mediaUriLiveData = new MutableLiveData<>();
+    private MutableLiveData<Uri> thumbnailUriLiveData = new MutableLiveData<>();
     private PendingFileUploadDao pendingFileUploadDao;
 
-    public UploadViewModel(@NonNull Application application, Uri newMediaUri) {
+    public UploadViewModel(@NonNull Application application, Uri mediaUri) {
         super(application);
         pendingFileUploadDao = LocalRepository.getInstance(application).pendingUploadDao();
-
-        mediaUri = new MutableLiveData<>(newMediaUri);
-
-        createAndSetThumbnail();
 
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 getApplication(), Constants.USER, ""), UserEntity.class);
@@ -66,6 +58,9 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
         dataSourceFactory = new DefaultDataSourceFactory(application,
                 Util.getUserAgent(application, TAG));
         exoPlayer = ExoPlayerFactory.newSimpleInstance(application);
+
+        mediaUriLiveData.setValue(mediaUri);
+        createAndSetThumbnail();
     }
 
     public SimpleExoPlayer getExoPlayer() {
@@ -81,17 +76,17 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
         pendingFileUploadEntity.setTitle(title);
         pendingFileUploadEntity.setUrl(Url.MEDIA_UPLOAD);
 
-        File thumbnailFile = new File(FileUtils.getPath(getApplication(), thumbnailUri.getValue()));
-        long totalFileSize = FileUtils.getSize(getApplication(), mediaUri.getValue()) + thumbnailFile.length();
+        File thumbnailFile = new File(FileUtils.getPath(getApplication(), thumbnailUriLiveData.getValue()));
+        long totalFileSize = FileUtils.getSize(getApplication(), mediaUriLiveData.getValue()) + thumbnailFile.length();
 
         pendingFileUploadEntity.setSize(totalFileSize);
         Logger.e(TAG, "totalFileSize: " + totalFileSize);
 
         List<PendingFileUploadParamEntity> paramEntities = new ArrayList<>();
         paramEntities.add(new PendingFileUploadParamEntity(FILE, "videofile",
-                RealPathUtil.getRealPath(getApplication(), mediaUri.getValue()), "video/*"));
+                RealPathUtil.getRealPath(getApplication(), mediaUriLiveData.getValue()), "video/*"));
         paramEntities.add(new PendingFileUploadParamEntity(FILE, "videoThumbnail",
-                RealPathUtil.getRealPath(getApplication(), thumbnailUri.getValue()), "image/*"));
+                RealPathUtil.getRealPath(getApplication(), thumbnailUriLiveData.getValue()), "image/*"));
         paramEntities.add(new PendingFileUploadParamEntity(OTHER, MEDIA_TITLE, title, null));
         paramEntities.add(new PendingFileUploadParamEntity(OTHER, MEDIA_DESCRIPTION, description, null));
         paramEntities.add(new PendingFileUploadParamEntity(OTHER, PLAY_DURATION, String.valueOf(getExoPlayer().getDuration()), null));
@@ -109,22 +104,14 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
         PendingFileUploadService.startService(getApplication());
     }
 
-    public MutableLiveData<Boolean> getProgressStatus() {
-        return showProgress;
-    }
-
-    public MutableLiveData<Integer> getProgressPercentage() {
-        return progressPercentage;
-    }
-
-    public MutableLiveData<Uri> getMediaUri() {
-        return mediaUri;
+    public MutableLiveData<Uri> getMediaUriLive() {
+        return mediaUriLiveData;
     }
 
     public void createAndSetThumbnail() {
         Runnable runnable = () -> {
             Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(
-                    RealPathUtil.getRealPath(getApplication(), mediaUri.getValue()), FULL_SCREEN_KIND);
+                    RealPathUtil.getRealPath(getApplication(), mediaUriLiveData.getValue()), FULL_SCREEN_KIND);
 
             try {
                 File thumbnailFile = File.createTempFile("thumbnail", ".png", getApplication().getCacheDir());
@@ -138,7 +125,7 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
                 bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
                 fos.close();
 
-                thumbnailUri.postValue(Uri.fromFile(thumbnailFile));
+                thumbnailUriLiveData.postValue(Uri.fromFile(thumbnailFile));
 
             } catch (Exception e) {
                 Logger.e(TAG, e.toString());
@@ -148,11 +135,11 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
         thread.start();
     }
 
-    public MutableLiveData<Uri> getThumbnailLive() {
-        return thumbnailUri;
+    public MutableLiveData<Uri> getThumbnailUriLive() {
+        return thumbnailUriLiveData;
     }
 
-    public void setThumbnailUri(Uri data) {
-        thumbnailUri.postValue(data);
+    public void setThumbnailUriLiveData(Uri data) {
+        thumbnailUriLiveData.postValue(data);
     }
 }

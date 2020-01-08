@@ -58,8 +58,8 @@
 
     <fragment
         android:id="@+id/navigation_uploads"
-        android:name="com.pheuture.playlists.upload.UploadFragment"
+        android:name="com.pheuture.playlists.upload.UploadActivity"
         android:label="Upload"
-        tools:layout="@layout/fragment_upload" />
+        tools:layout="@layout/activity_upload" />
 
 </navigation>

@@ -18,7 +18,6 @@ public class AppController extends Application implements ConnectivityChangeRece
     @Override
     public void onCreate() {
         super.onCreate();
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES); //For night mode theme
         setupConnectivityChangeBroadcastReceiver();
     }
 

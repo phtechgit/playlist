@@ -9,7 +9,6 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
-            style="@style/myToolbar"
             app:titleTextAppearance="@style/Toolbar.TitleText"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -43,6 +42,7 @@
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNav_view"
+            android:background="@color/grayF"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             app:layout_constraintBottom_toBottomOf="parent"

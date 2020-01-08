@@ -67,7 +67,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:textSize="@dimen/textSizeBody2"
-                android:textColor="@color/gray3"
+                android:textColor="@color/grayC"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/playerView"

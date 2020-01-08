@@ -23,7 +23,6 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback;
 import com.pheuture.playlists.databinding.ActivityMainBinding;
@@ -57,7 +56,6 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private ActivityMainBinding binding;
-    private NavController navController;
     private MainViewModel viewModel;
     private SimpleExoPlayer exoPlayer1;
     private SimpleExoPlayer exoPlayer2;
@@ -140,15 +138,13 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         setSupportActionBar(binding.toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        binding.toolbar.setNavigationIcon(R.drawable.ic_add_light);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings)
                 .build();
 
-        navController = findNavController(this, R.id.nav_host_fragment);
+        NavController navController = findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
 
@@ -631,14 +627,6 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         proceedWithPermissions(null, true);
-    }
-
-    @Override
-    public void onBackPressed() {
-        /*if (!navController.popBackStack()) {
-            super.onBackPressed();
-        }*/
-        super.onBackPressed();
     }
 
     @Override

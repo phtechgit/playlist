@@ -27,6 +27,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
     private String userMobile;
     private MutableLiveData<Boolean> showProgress = new MutableLiveData<>();
     private MutableLiveData<UserEntity> userModelMutableLiveData = new MutableLiveData<>();
+    private StringRequest stringRequest;
 
     public VerifyOtpViewModel(@NonNull Application application, String userMobile) {
         super(application);
@@ -38,7 +39,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
 
         final String url = Url.BASE_URL + Url.VERIFY_OTP;
 
-        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
+        stringRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override
             public void onResponse(String stringResponse) {
                 try {
@@ -82,9 +83,9 @@ public class VerifyOtpViewModel extends AndroidViewModel {
                 return params;
             }
         };
-        jsonObjectRequest.setTag(TAG);
+        stringRequest.setTag(TAG);
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
-        VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
+        VolleyClient.getRequestQueue(getApplication()).add(stringRequest);
     }
 
     public MutableLiveData<UserEntity> getUserLive() {
@@ -93,5 +94,10 @@ public class VerifyOtpViewModel extends AndroidViewModel {
 
     public MutableLiveData<Boolean> getProgressStatus() {
         return showProgress;
+    }
+
+    public void cancelAllApiRequests() {
+        showProgress.postValue(false);
+        VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
     }
 }
