@@ -56,6 +56,7 @@ public class AuthActivity extends BaseActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_auth);
 
         setSupportActionBar(binding.toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_request_otp, R.id.navigation_verify_otp)

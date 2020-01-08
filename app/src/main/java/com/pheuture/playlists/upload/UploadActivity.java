@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -27,19 +28,30 @@ public class UploadActivity extends BaseActivity implements RequestCodes{
     private UploadViewModel viewModel;
     private ActivityUploadBinding binding;
     private SimpleExoPlayer exoPlayer;
-    private PlayerView playerView;
     private Uri mediaUri;
     private Uri thumbnailUri;
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void initializations() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_upload);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         viewModel = ViewModelProviders.of(this,
                 new UploadActivityViewModelFactory(getApplication(),
                         getIntent().getParcelableExtra(ARG_PARAM1))).get(UploadViewModel.class);
 
-        playerView = binding.playerView;
+        PlayerView playerView = binding.playerView;
         exoPlayer = viewModel.getExoPlayer();
         exoPlayer.setPlayWhenReady(false);
         playerView.setPlayer(exoPlayer);

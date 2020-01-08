@@ -94,7 +94,7 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     }
 
     private void requestAudioFocus(){
-        int res = 0;
+        int res;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             res = audioManager.requestAudioFocus(audioFocusRequestBuilder);
         } else {

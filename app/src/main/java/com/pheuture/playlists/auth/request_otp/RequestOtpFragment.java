@@ -36,7 +36,6 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
     private FragmentActivity activity;
     private FragmentRequestOtpBinding binding;
     private RequestOtpViewModel viewModel;
-    private Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

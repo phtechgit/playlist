@@ -17,11 +17,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/DarkThemeNoActionBar"
+        android:theme="@style/DarkTheme"
         android:usesCleartextTraffic="true">
 
         <activity
             android:name=".auth.AuthActivity"
+            android:theme="@style/DarkThemeNoActionBar"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateVisible">
             <intent-filter>
@@ -33,6 +34,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:theme="@style/DarkThemeNoActionBar"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing"/>
 
@@ -42,7 +44,6 @@
 
         <activity android:name=".upload.UploadActivity"
             android:label="Upload"
-            android:theme="@style/DarkTheme"
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait"/>
 

@@ -8,6 +8,8 @@
         <item name="android:textSize">@dimen/textSizeBody1</item>
         <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="materialButtonStyle">@style/ButtonStyleDark</item>
+        <item name="actionBarStyle">@style/ActionBarStyle</item>
+        <item name="toolbarStyle">@style/ToolbarStyle2Dark</item>
     </style>
 
     <style name="DarkTheme" parent="Theme.MaterialComponents">
@@ -17,6 +19,8 @@
         <item name="android:textSize">@dimen/textSizeBody1</item>
         <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="materialButtonStyle">@style/ButtonStyleDark</item>
+        <item name="toolbarStyle">@style/ToolbarStyle2Dark</item>
+        <item name="actionBarStyle">@style/ActionBarStyle</item>
     </style>
 
     <!--button styles-->
@@ -40,7 +44,22 @@
         <item name="android:background">@drawable/edittext_background_white</item>
     </style>
 
-    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+    <style name="ToolbarStyle1Dark" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="titleTextAppearance">@style/ToolbarTitleText</item>
+    </style>
+
+    <style name="ToolbarStyle2Dark" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="titleTextAppearance">@style/ToolbarTitleText</item>
+    </style>
+
+    <style name="ActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="titleTextStyle">@style/ToolbarTitleText</item>
+    </style>
+
+    <style name="ToolbarTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">30sp</item>
     </style>
 
