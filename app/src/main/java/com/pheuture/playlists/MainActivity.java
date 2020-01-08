@@ -79,12 +79,6 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     private final Object focusLock = new Object();
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.master_menu, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
@@ -136,9 +130,6 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     @Override
     public void initializations() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
-        setSupportActionBar(binding.toolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings)
@@ -601,22 +592,8 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         exoPlayer1.setShuffleModeEnabled(!exoPlayer1.getShuffleModeEnabled());
     }
 
-    public void updateActionBarStatus(boolean visible){
-        if (visible){
-            binding.toolbar.setVisibility(View.VISIBLE);
-        } else {
-            binding.toolbar.setVisibility(View.GONE);
-        }
-    }
-
     public void setupToolbar(boolean homeAsUpEnabled, String title){
-        /*if (homeAsUpEnabled){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        } else {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        }
-*/
-        binding.toolbar.setTitle(title);
+        getSupportActionBar().setTitle(title);
     }
 
     public void showSnack(String message) {

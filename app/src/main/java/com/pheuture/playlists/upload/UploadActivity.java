@@ -44,8 +44,8 @@ public class UploadActivity extends BaseActivity implements RequestCodes{
     public void initializations() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_upload);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        /*getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);*/
 
         viewModel = ViewModelProviders.of(this,
                 new UploadActivityViewModelFactory(getApplication(),

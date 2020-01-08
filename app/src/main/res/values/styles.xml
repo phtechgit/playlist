@@ -1,6 +1,6 @@
 <resources>
 
-    <!-- Base application theme. -->
+    <!-- Base application theme1. -->
     <style name="DarkThemeNoActionBar" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -10,8 +10,10 @@
         <item name="materialButtonStyle">@style/ButtonStyleDark</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>
         <item name="toolbarStyle">@style/ToolbarStyle2Dark</item>
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
+    <!-- Base application theme2. -->
     <style name="DarkTheme" parent="Theme.MaterialComponents">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -21,6 +23,7 @@
         <item name="materialButtonStyle">@style/ButtonStyleDark</item>
         <item name="toolbarStyle">@style/ToolbarStyle2Dark</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
     <!--button styles-->
@@ -40,29 +43,29 @@
         <item name="android:textColor">@color/colorPrimaryDark</item>
     </style>
 
-    <style name="EditTextDialogStyle" parent="Widget.AppCompat.EditText">
+    <!--EditText styles-->
+    <style name="EditText1Style" parent="Widget.AppCompat.EditText">
         <item name="android:background">@drawable/edittext_background_white</item>
     </style>
 
+    <!--Toolbar & ActionBar styles-->
     <style name="ToolbarStyle1Dark" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">@color/colorPrimaryDark</item>
-        <item name="titleTextAppearance">@style/ToolbarTitleText</item>
+        <item name="titleTextAppearance">@style/TitleTextStyle</item>
     </style>
-
     <style name="ToolbarStyle2Dark" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">@color/colorPrimaryDark</item>
-        <item name="titleTextAppearance">@style/ToolbarTitleText</item>
+        <item name="titleTextAppearance">@style/TitleTextStyle</item>
     </style>
-
     <style name="ActionBarStyle" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/colorPrimaryDark</item>
-        <item name="titleTextStyle">@style/ToolbarTitleText</item>
+        <item name="titleTextStyle">@style/TitleTextStyle</item>
     </style>
-
-    <style name="ToolbarTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+    <style name="TitleTextStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">30sp</item>
     </style>
 
+    <!--TextInputLayout styles-->
     <style name="TextInputLayoutStyleDark" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="colorControlActivated">@color/colorAccent</item>
         <item name="android:colorControlActivated">@color/colorAccent</item>

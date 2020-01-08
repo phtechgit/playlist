@@ -55,7 +55,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
 
     @Override
     public void initializations() {
-        ((MainActivity) activity).setupToolbar(true, playlistModel.getPlaylistName());
+        ((MainActivity) activity).setupToolbar(false, playlistModel.getPlaylistName());
 
         binding.layoutSearchBar.editTextSearch.setHint("Search new Videos");
 

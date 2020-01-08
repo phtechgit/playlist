@@ -69,7 +69,7 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
     public void initializations() {
         ((AuthActivity)activity).showNextButton(false);
 
-        binding.textViewMessage.setText("Waiting to automatically detect an SMS sent to " + phone);
+        binding.textViewMessage.setText("Waiting to automatically detect an SMS sent to: " + phone);
 
         viewModel.getUserLive().observe(this, new Observer<UserEntity>() {
             @Override
@@ -157,6 +157,8 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
         otp = data[data.length-2];
 
         binding.textViewOtp.setText(otp);
+        binding.progressBar2.setVisibility(View.GONE);
+        binding.textViewMessage.setText("Verifying OTP...");
 
         viewModel.verifyOtp(otp);
     }

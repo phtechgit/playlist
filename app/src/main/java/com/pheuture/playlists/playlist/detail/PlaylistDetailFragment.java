@@ -62,7 +62,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
     @Override
     public void initializations() {
-        ((MainActivity) activity).setupToolbar(true, "");
+        ((MainActivity) activity).setupToolbar(false, "");
 
         viewModel.getPlaylistEntity().observe(this, new Observer<PlaylistEntity>() {
             @Override
@@ -177,7 +177,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
         textViewTitle.setText("Are you sure?");
-        textViewSubtitle.setText("Do you want to remove " + model.getMediaName() + " from the playlist?");
+        textViewSubtitle.setText("Do you want to remove " + model.getMediaTitle() + " from the playlist?");
         textViewSubtitle.setVisibility(View.VISIBLE);
         textViewRight.setText("Remove");
 

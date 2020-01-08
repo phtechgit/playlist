@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/navigation_request_otp"
         android:name="com.pheuture.playlists.auth.request_otp.RequestOtpFragment"
-        android:label="Enter your Number"
+        android:label=" "
         tools:layout="@layout/fragment_request_otp" >
         <action
             android:id="@+id/action_navigation_request_otp_to_navigation_verify_otp"
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/navigation_verify_otp"
-        android:label="OTP"
+        android:label=" "
         android:name="com.pheuture.playlists.auth.verify_otp.VerifyOtpFragment"
         tools:layout="@layout/fragment_verify_otp" />
 

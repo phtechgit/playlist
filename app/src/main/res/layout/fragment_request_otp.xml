@@ -10,12 +10,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:gravity="center"
             android:padding="8dp"
             android:text="Enter your phone number"
             android:textSize="@dimen/textSizeHeadline5"
-            android:textColor="@color/grayB"
             android:textStyle="bold" />
 
 
@@ -26,8 +24,8 @@
             android:padding="16dp"
             android:gravity="center"
             android:text="Playlist will send an SMS message to verify your phone number"
-            android:textSize="@dimen/textSizeBody1"
-            android:textColor="@color/grayC" />
+            android:textSize="@dimen/textSizeBody2"
+            android:textColor="@color/grayA" />
 
         <EditText
             android:id="@+id/ediText_phone"
