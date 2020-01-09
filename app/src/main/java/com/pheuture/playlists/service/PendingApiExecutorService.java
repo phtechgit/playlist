@@ -108,7 +108,6 @@ public class PendingApiExecutorService extends Service {
                         pendingApiEntity = pendingApiEntities.get(0);
                         startExecutor();
                     }
-
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }

@@ -41,7 +41,6 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
     private FragmentPlaylistBinding binding;
     private PlaylistsRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
-    private String searchQuery;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,33 +65,11 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
 
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);
-        /*binding.recyclerView.addItemDecoration(
-                new SimpleDividerItemDecoration(getResources().getDrawable(R.drawable.line_divider),
-                        0, 0));*/
 
-        viewModel.getSearchQuery().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                searchQuery = s;
-                viewModel.getFreshData();
-            }
-        });
-
-        viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean show) {
-                /*if(show){
-                    showProgress(binding.progressLayout.progressFullscreen, true);
-                } else {
-                    hideProgress(binding.progressLayout.progressFullscreen);
-                }*/
-            }
-        });
-
-        viewModel.getPlaylistEntities().observe(this, new Observer<List<PlaylistEntity>>() {
+        viewModel.getPlaylistEntitiesMutableLiveData().observe(this, new Observer<List<PlaylistEntity>>() {
             @Override
             public void onChanged(List<PlaylistEntity> playlistEntities) {
-                if (StringUtils.isEmpty(searchQuery) && playlistEntities.size()==0){
+                if (StringUtils.isEmpty(viewModel.getSearchQuery()) && playlistEntities.size()==0){
                     /*((MainActivity) activity).updateActionBarStatus(false);*/
                     binding.linearLayoutCreatePlaylist.setVisibility(View.VISIBLE);
                     binding.relativeLayoutPlaylists.setVisibility(View.GONE);

@@ -22,6 +22,9 @@ public class PlaylistEntity extends UserEntity implements Parcelable, Cloneable 
 	@SerializedName("createdOn")
 	private long createdOn;
 
+	@SerializedName("modifiedOn")
+	private long modifiedOn;
+
 	@SerializedName("playDuration")
 	private long playDuration;
 
@@ -35,8 +38,10 @@ public class PlaylistEntity extends UserEntity implements Parcelable, Cloneable 
 	}
 
 	protected PlaylistEntity(Parcel in) {
+		super(in);
 		playlistID = in.readLong();
 		createdOn = in.readLong();
+		modifiedOn = in.readLong();
 		playDuration = in.readLong();
 		playlistName = in.readString();
 		songsCount = in.readLong();
@@ -44,8 +49,10 @@ public class PlaylistEntity extends UserEntity implements Parcelable, Cloneable 
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		super.writeToParcel(dest, flags);
 		dest.writeLong(playlistID);
 		dest.writeLong(createdOn);
+		dest.writeLong(modifiedOn);
 		dest.writeLong(playDuration);
 		dest.writeString(playlistName);
 		dest.writeLong(songsCount);
@@ -133,5 +140,29 @@ public class PlaylistEntity extends UserEntity implements Parcelable, Cloneable 
 
 	public String getCreatedByFormatted(){
 		return "by " + getUserFullName();
+	}
+
+	@Override
+	public String toString() {
+		return "PlaylistEntity{" +
+				"playlistID=" + playlistID +
+				", createdOn=" + createdOn +
+				", modifiedOn=" + modifiedOn +
+				", playDuration=" + playDuration +
+				", playlistName='" + playlistName + '\'' +
+				", songsCount=" + songsCount +
+				", userID=" + userID +
+				", userMobile='" + userMobile + '\'' +
+				", userFirstName='" + userFirstName + '\'' +
+				", userLastName='" + userLastName + '\'' +
+				'}';
+	}
+
+	public long getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public void setModifiedOn(long modifiedOn) {
+		this.modifiedOn = modifiedOn;
 	}
 }

@@ -26,12 +26,14 @@ public class PlaylistMediaEntity extends MediaEntity implements Parcelable {
 	}
 
 	protected PlaylistMediaEntity(Parcel in) {
+		super(in);
 		playlistMediaID = in.readLong();
 		playlistID = in.readLong();
 	}
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		super.writeToParcel(dest, flags);
 		dest.writeLong(playlistMediaID);
 		dest.writeLong(playlistID);
 	}

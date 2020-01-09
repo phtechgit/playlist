@@ -13,7 +13,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiDao;
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiEntity;
-import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler.PendingFileUploadEntity;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
@@ -77,7 +76,7 @@ public class MediaViewModel extends AndroidViewModel {
         //reset the last Id
         lastID = 0;
 
-        final String url = Url.BASE_URL + Url.MEDIA_TRENDING;
+        final String url = Url.BASE_URL + Url.MEDIA_LIST;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override
@@ -149,7 +148,7 @@ public class MediaViewModel extends AndroidViewModel {
             return;
         }
 
-        final String url = Url.BASE_URL + Url.MEDIA_TRENDING;
+        final String url = Url.BASE_URL + Url.MEDIA_TRENDING_LIST;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override

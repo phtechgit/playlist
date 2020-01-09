@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -25,6 +26,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback;
+import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.databinding.ActivityMainBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
@@ -39,6 +41,7 @@ import com.pheuture.playlists.utils.SharedPrefsUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -597,7 +600,14 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     }
 
     public void showSnack(String message) {
-        AlerterUtils.showSnack(binding.coordinatorLayout, message);
+        Snackbar mySnack = Snackbar.make(binding.coordinatorLayout, message, Snackbar.LENGTH_SHORT);
+        View snackBarView = mySnack.getView();
+        snackBarView.setBackgroundColor(getResources().getColor(R.color.WhiteC));
+
+        TextView textView = snackBarView.findViewById(R.id.snackbar_text);
+        textView.setTextColor(getResources().getColor(R.color.grayF));
+
+        mySnack.show();
     }
 
     @Override

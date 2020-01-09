@@ -30,6 +30,7 @@ import com.pheuture.playlists.utils.VolleyClient;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -38,38 +39,66 @@ import java.util.Map;
 
 public class PlaylistViewModel extends AndroidViewModel {
     private static final String TAG = PlaylistViewModel.class.getSimpleName();
-    private long lastID;
-    private long limit;
-    private PlaylistDao playlistDao;
-    private MutableLiveData<String> searchQuery;
-    private MutableLiveData<Boolean> reachedLast;
-    private MutableLiveData<Boolean> showProgress;
-    private LiveData<List<PlaylistEntity>> playlists;
-    private PlaylistMediaDao playlistMediaDao;
-    private PendingApiDao pendingApiDao;
+    private int offset;
+    private int limit = 20;
+    private String searchQuery = "";
+    private boolean reachedLast;
     private UserEntity user;
+    private PlaylistDao playlistDao;
+    private PendingApiDao pendingApiDao;
+    private PlaylistMediaDao playlistMediaDao;
+    private MutableLiveData<List<PlaylistEntity>> playlistEntitiesMutableLiveData;
 
     public PlaylistViewModel(@NonNull Application application) {
         super(application);
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 getApplication(), Constants.USER, ""), UserEntity.class);
 
-        limit = 20;
-
-        reachedLast = new MutableLiveData<>();
-        searchQuery = new MutableLiveData<>();
-
-        showProgress = new MutableLiveData<>();
-
         pendingApiDao = LocalRepository.getInstance(application).pendingApiDao();
         playlistDao = LocalRepository.getInstance(application).playlistDao();
         playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
-        playlists = playlistDao.getPlaylistsLive();
+        playlistEntitiesMutableLiveData = new MutableLiveData<>();
 
         getFreshData();
     }
 
+    private void getFreshData() {
+        offset = 0;
+        reachedLast = false;
+
+        List<PlaylistEntity> playlistEntities = playlistEntitiesMutableLiveData.getValue();
+        playlistEntities.addAll(playlistDao.getPlaylistList(searchQuery, limit, offset++));
+        playlistEntitiesMutableLiveData.postValue(playlistEntities);
+
+        reachedLast = playlistEntities.size() < limit;
+    }
+
+    public MutableLiveData<List<PlaylistEntity>> getPlaylistEntitiesMutableLiveData() {
+        return playlistEntitiesMutableLiveData;
+    }
+
+    public void setSearchQuery(String query) {
+        searchQuery = query;
+        getFreshData();
+    }
+
+    public void getMoreData() {
+        if (reachedLast){
+            return;
+        }
+        List<PlaylistEntity> playlistEntities = playlistEntitiesMutableLiveData.getValue();
+        playlistEntities.addAll(playlistDao.getPlaylistList(searchQuery, limit, offset++));
+        playlistEntitiesMutableLiveData.postValue(playlistEntities);
+
+        reachedLast = playlistEntities.size() < limit;
+    }
+
+    private long generatePlaylistID() {
+        return Long.valueOf(user.getUserID() + "" + Calendar.getInstance().getTimeInMillis());
+    }
+
     public void createPlaylist(String playlistName) {
+        Calendar calendar = Calendar.getInstance();
         PlaylistEntity playlistEntity = new PlaylistEntity();
         playlistEntity.setPlaylistID(generatePlaylistID());
         playlistEntity.setPlaylistName(playlistName);
@@ -77,6 +106,8 @@ public class PlaylistViewModel extends AndroidViewModel {
         playlistEntity.setUserFirstName(user.getUserFirstName());
         playlistEntity.setSongsCount(0);
         playlistEntity.setPlayDuration(0);
+        playlistEntity.setCreatedOn(calendar.getTimeInMillis());
+        playlistEntity.setModifiedOn(calendar.getTimeInMillis());
 
         //insert newly created playlist
         playlistDao.insert(playlistEntity);
@@ -89,155 +120,6 @@ public class PlaylistViewModel extends AndroidViewModel {
 
         //start ExecutorService
         PendingApiExecutorService.startService(getApplication());
-    }
-
-    private long generatePlaylistID() {
-        return Long.valueOf(user.getUserID() + "" + Calendar.getInstance().getTimeInMillis());
-    }
-
-    public LiveData<List<PlaylistEntity>> getPlaylistEntities() {
-        return playlists;
-    }
-
-    public void setSearchQuery(String query) {
-        searchQuery.postValue(query);
-    }
-
-    public MutableLiveData<String> getSearchQuery() {
-        return searchQuery;
-    }
-
-    public void getFreshData() {
-        //reset the last Id
-        lastID = 0;
-
-        final String url = Url.BASE_URL + Url.PLAYLIST_LIST;
-
-        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
-            @Override
-            public void onResponse(String stringResponse) {
-                try {
-                    showProgress.postValue(false);
-
-                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
-
-                    JSONObject response = new JSONObject(stringResponse);
-
-                    if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
-                        return;
-                    }
-
-                    List<PlaylistEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), PlaylistEntity[].class));
-                    playlistDao.deleteAll();
-                    playlistDao.insertAll(list);
-
-                    if (list.size()>0){
-                        PlaylistEntity videoEntity = list.get(list.size() - 1);
-                        lastID = videoEntity.getPlaylistID();
-
-                        if (list.size()<limit) {
-                            reachedLast.postValue(true);
-                        } else {
-                            reachedLast.postValue(false);
-                        }
-                    } else {
-                        lastID = 0;
-                        reachedLast.postValue(true);
-                    }
-                } catch (Exception e) {
-                    Logger.e(TAG, e.toString());
-                }
-            }}, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError e) {
-                try {
-                    showProgress.postValue(false);
-                    Logger.e(url, e.toString());
-                } catch (Exception ex) {
-                    Logger.e(TAG, ex.toString());
-                }
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
-                params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
-                params.put(ApiConstant.LIMIT, String.valueOf(limit));
-                params.put(ApiConstant.USER_ID, String.valueOf(user.getUserID()));
-                Logger.e(url + ApiConstant.PARAMS, params.toString());
-                return params;
-            }
-        };
-        jsonObjectRequest.setTag(TAG);
-        VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
-        VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
-    }
-
-    public void getMoreData() {
-        if (reachedLast.getValue()!=null && reachedLast.getValue()){
-            return;
-        }
-
-        final String url = Url.BASE_URL + Url.PLAYLIST_LIST;
-
-        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
-            @Override
-            public void onResponse(String stringResponse) {
-                try {
-                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
-
-                    JSONObject response = new JSONObject(stringResponse);
-
-                    if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
-                        return;
-                    }
-
-                    List<PlaylistEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), PlaylistEntity[].class));
-
-                    playlistDao.insertAll(list);
-
-                    if (list.size()>0){
-                        PlaylistEntity videoEntity = list.get(list.size() - 1);
-                        lastID = videoEntity.getPlaylistID();
-
-                        if (list.size()<limit) {
-                            reachedLast.postValue(true);
-                        } else {
-                            reachedLast.postValue(false);
-                        }
-                    } else {
-                        lastID = 0;
-                        reachedLast.postValue(true);
-                    }
-                } catch (Exception e) {
-                    Logger.e(TAG, e.toString());
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError e) {
-                Logger.e(TAG, e.toString());
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
-                params.put(ApiConstant.LIMIT, String.valueOf(limit));
-                params.put(ApiConstant.SEARCH_QUERY, ((searchQuery.getValue()==null)?"":searchQuery.getValue()));
-                params.put(ApiConstant.USER_ID, String.valueOf(user.getUserID()));
-                Logger.e(url + ApiConstant.PARAMS, params.toString());
-                return params;
-            }
-        };
-        jsonObjectRequest.setTag(TAG);
-        VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
-        VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
-    }
-
-    public MutableLiveData<Boolean> getProgressStatus() {
-        return showProgress;
     }
 
     public void deletePlaylist(PlaylistEntity playlistModel) {
@@ -255,5 +137,9 @@ public class PlaylistViewModel extends AndroidViewModel {
     public boolean isExistingPlaylist(String playlistName) {
         List<PlaylistEntity> existingPlaylist = playlistDao.getPlaylist(playlistName);
         return existingPlaylist != null && existingPlaylist.size() != 0;
+    }
+
+    public String getSearchQuery() {
+        return searchQuery;
     }
 }

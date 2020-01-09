@@ -20,6 +20,60 @@ import org.json.JSONObject;
 @Entity
 public class MediaEntity implements Parcelable {
 
+	protected MediaEntity(Parcel in) {
+		mediaID = in.readLong();
+		mediaDescription = in.readString();
+		mediaUrl = in.readString();
+		mediaThumbnail = in.readString();
+		mediaName = in.readString();
+		mediaTitle = in.readString();
+		playDuration = in.readLong();
+		postDate = in.readString();
+		status = in.readString();
+		createdOn = in.readLong();
+		modifiedOn = in.readLong();
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeLong(mediaID);
+		dest.writeString(mediaDescription);
+		dest.writeString(mediaUrl);
+		dest.writeString(mediaThumbnail);
+		dest.writeString(mediaName);
+		dest.writeString(mediaTitle);
+		dest.writeLong(playDuration);
+		dest.writeString(postDate);
+		dest.writeString(status);
+		dest.writeLong(createdOn);
+		dest.writeLong(modifiedOn);
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	public static final Creator<MediaEntity> CREATOR = new Creator<MediaEntity>() {
+		@Override
+		public MediaEntity createFromParcel(Parcel in) {
+			return new MediaEntity(in);
+		}
+
+		@Override
+		public MediaEntity[] newArray(int size) {
+			return new MediaEntity[size];
+		}
+	};
+
+	public long getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public void setModifiedOn(long modifiedOn) {
+		this.modifiedOn = modifiedOn;
+	}
+
 	public interface MediaColumns{
 		String MEDIA_DESCRIPTION = "mediaDescription";
 		String MEDIA_URL = "mediaUrl";
@@ -58,58 +112,17 @@ public class MediaEntity implements Parcelable {
 	@SerializedName("postDate")
 	private String postDate;
 
-	@SerializedName("createdOn")
-	private long createdOn;
-
 	@SerializedName("status")
 	private String status;
 
+	@SerializedName("createdOn")
+	private long createdOn;
+
+	@SerializedName("modifiedOn")
+	private long modifiedOn;
+
 	public MediaEntity() {
 	}
-
-	protected MediaEntity(Parcel in) {
-		mediaID = in.readLong();
-		mediaDescription = in.readString();
-		mediaUrl = in.readString();
-		mediaThumbnail = in.readString();
-		mediaName = in.readString();
-		mediaTitle = in.readString();
-		playDuration = in.readLong();
-		postDate = in.readString();
-		createdOn = in.readLong();
-		status = in.readString();
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeLong(mediaID);
-		dest.writeString(mediaDescription);
-		dest.writeString(mediaUrl);
-		dest.writeString(mediaThumbnail);
-		dest.writeString(mediaName);
-		dest.writeString(mediaTitle);
-		dest.writeLong(playDuration);
-		dest.writeString(postDate);
-		dest.writeLong(createdOn);
-		dest.writeString(status);
-	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	public static final Creator<MediaEntity> CREATOR = new Creator<MediaEntity>() {
-		@Override
-		public MediaEntity createFromParcel(Parcel in) {
-			return new MediaEntity(in);
-		}
-
-		@Override
-		public MediaEntity[] newArray(int size) {
-			return new MediaEntity[size];
-		}
-	};
 
 	public long getMediaID() {
 		return mediaID;

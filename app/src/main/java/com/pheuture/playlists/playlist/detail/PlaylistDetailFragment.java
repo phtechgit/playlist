@@ -1,5 +1,6 @@
 package com.pheuture.playlists.playlist.detail;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
@@ -12,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.provider.Telephony;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,11 +29,8 @@ import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.KeyboardUtils;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.NetworkUtils;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistDetailFragment extends BaseFragment implements RecyclerViewInterface {
@@ -78,7 +75,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);
 
-        viewModel.getPlaylistMediaLive().observe(this, new Observer<List<PlaylistMediaEntity>>() {
+        viewModel.getPlaylistMediaEntitiesMutableLiveData().observe(this, new Observer<List<PlaylistMediaEntity>>() {
             @Override
             public void onChanged(List<PlaylistMediaEntity> newPalylistMediaEntities) {
                 playlistMediaEntities = newPalylistMediaEntities;
@@ -103,17 +100,6 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
                 if (downloadPlaylistMediaStatus) {
                     viewModel.addToOfflineMedia(playlistMediaEntities);
                 }
-            }
-        });
-
-        viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean show) {
-                /*if(show){
-                    showProgress(binding.progressLayout.progressFullscreen, true);
-                } else {
-                    hideProgress(binding.progressLayout.progressFullscreen);
-                }*/
             }
         });
     }
@@ -209,4 +195,23 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     public void onRecyclerViewItemLongClick(Bundle bundle) {
 
     }
+
+    private RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+        }
+
+        @Override
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            int totalItemCount = layoutManager.getItemCount();
+            int visibleItemCount = layoutManager.getChildCount();
+            int currentPosition = layoutManager.findLastVisibleItemPosition();
+            int remainingItems = totalItemCount - currentPosition;
+            if (dy > 0 && remainingItems < visibleItemCount) {
+                viewModel.getMoreData();
+            }
+        }
+    };
 }

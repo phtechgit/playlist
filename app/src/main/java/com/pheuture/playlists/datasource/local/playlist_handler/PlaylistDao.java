@@ -7,6 +7,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -37,4 +38,7 @@ public interface PlaylistDao {
 
     @Query("select * from PlaylistEntity where playlistName like:playlistName")
     List<PlaylistEntity> getPlaylist(String playlistName);
+
+    @Query("select * from PlaylistEntity where playlistName like:searchQuery LIMIT :limits OFFSET :offsets")
+    List<PlaylistEntity> getPlaylistList(String searchQuery, int limits, int offsets);
 }
