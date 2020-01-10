@@ -13,11 +13,11 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaDao;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaEntity;
-import com.pheuture.playlists.datasource.local.video_handler.MediaDao;
+import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaDao;
+import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaEntity;
+import com.pheuture.playlists.datasource.local.media_handler.MediaDao;
 import com.pheuture.playlists.utils.Converters;
-import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
+import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 
 /**
  * creator: Shashank
@@ -40,8 +40,8 @@ public abstract class LocalRepository extends RoomDatabase {
     public abstract PendingFileUploadDao pendingUploadDao();
     public abstract PlaylistDao playlistDao();
     public abstract PlaylistMediaDao playlistMediaDao();
-    public abstract OfflineMediaDao offlineVideoDao();
-    public abstract MediaDao videoDao();
+    public abstract OfflineMediaDao offlineMediaDao();
+    public abstract MediaDao mediaDao();
 
     public static LocalRepository getInstance(Context context) {
         if (mLocalRepository == null) {

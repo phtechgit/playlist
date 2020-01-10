@@ -67,6 +67,9 @@ public class PendingApiExecutorService extends Service {
     }
 
     private void startExecutor() {
+
+        final String url = pendingApiEntity.getUrl();
+
         Map<String, String> params = new HashMap<>();
         try {
             JSONObject jsonObject = new JSONObject(pendingApiEntity.getParams());
@@ -75,11 +78,10 @@ public class PendingApiExecutorService extends Service {
                 String key = iterator.next();
                 params.put(key, jsonObject.optString(key));
             }
+            Logger.e(url + ApiConstant.PARAMS, jsonObject.toString());
         } catch (Exception e) {
             Logger.e(TAG, e.toString());
         }
-
-        final String url = pendingApiEntity.getUrl();
 
         fileUploadDao = remoteRepository.create(FileUploadDao.class);
         Call<ResponseModel> fileUploadClient = fileUploadDao.simpleApiCall(url, params);

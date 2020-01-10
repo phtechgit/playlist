@@ -1,15 +1,14 @@
-package com.pheuture.playlists.datasource.local.video_handler.offline;
+package com.pheuture.playlists.datasource.local.media_handler.offline;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.room.Entity;
 
-import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
+import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 
 @Entity
 public class OfflineMediaEntity extends MediaEntity implements Parcelable {
-    
     private long downloadID;
     private int downloadStatus;
     private String downloadedFilePath;
@@ -71,5 +70,14 @@ public class OfflineMediaEntity extends MediaEntity implements Parcelable {
 
     public void setDownloadedFilePath(String downloadedFilePath) {
         this.downloadedFilePath = downloadedFilePath;
+    }
+
+    @Override
+    public String toString() {
+        return "OfflineMediaEntity{" +
+                "downloadID=" + downloadID +
+                ", downloadStatus=" + downloadStatus +
+                ", downloadedFilePath='" + downloadedFilePath + '\'' +
+                '}';
     }
 }

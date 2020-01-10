@@ -27,7 +27,13 @@ public class UserEntity implements Parcelable {
 	@SerializedName("userLastName")
 	protected String userLastName;
 
-	public UserEntity() {
+	@SerializedName("createdOn")
+	protected long createdOn;
+
+	@SerializedName("modifiedOn")
+	protected long modifiedOn;
+
+	protected UserEntity() {
 
     }
 
@@ -36,6 +42,8 @@ public class UserEntity implements Parcelable {
 		userMobile = in.readString();
 		userFirstName = in.readString();
 		userLastName = in.readString();
+		createdOn = in.readLong();
+		modifiedOn = in.readLong();
 	}
 
 	@Override
@@ -44,6 +52,8 @@ public class UserEntity implements Parcelable {
 		dest.writeString(userMobile);
 		dest.writeString(userFirstName);
 		dest.writeString(userLastName);
+		dest.writeLong(createdOn);
+		dest.writeLong(modifiedOn);
 	}
 
 	@Override
@@ -103,5 +113,33 @@ public class UserEntity implements Parcelable {
 			stringBuilder.append(userLastName);
 		}
 		return stringBuilder.toString();
+	}
+
+	public long getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(long createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public long getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public void setModifiedOn(long modifiedOn) {
+		this.modifiedOn = modifiedOn;
+	}
+
+	@Override
+	public String toString() {
+		return "UserEntity{" +
+				"userID=" + userID +
+				", userMobile='" + userMobile + '\'' +
+				", userFirstName='" + userFirstName + '\'' +
+				", userLastName='" + userLastName + '\'' +
+				", createdOn=" + createdOn +
+				", modifiedOn=" + modifiedOn +
+				'}';
 	}
 }

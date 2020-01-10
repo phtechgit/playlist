@@ -13,7 +13,11 @@ public class StringUtils {
     }
 
     public static boolean isEmpty(String text) {
-        return text == null || text.length() == 0 || TextUtils.getTrimmedLength(text) == 0 || text.equalsIgnoreCase("null");
+        return text == null || text.length() == 0 || TextUtils.getTrimmedLength(text) == 0;
+    }
+
+    public static boolean isEmpty(CharSequence text) {
+        return text == null || text.length() == 0 || TextUtils.getTrimmedLength(text) == 0;
     }
 
     public static String format (String text) {

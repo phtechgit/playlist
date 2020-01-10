@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiDao;
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiEntity;
@@ -17,8 +18,8 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaDao;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaEntity;
+import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaDao;
+import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaEntity;
 import com.pheuture.playlists.service.PendingApiExecutorService;
 import com.pheuture.playlists.utils.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
@@ -30,6 +31,8 @@ import com.pheuture.playlists.utils.Url;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
@@ -41,14 +44,14 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     private int offset;
     private int limit = 20;
     private String searchQuery = "";
-    private boolean reachedLast = false;
-    private MutableLiveData<List<PlaylistMediaEntity>> playlistMediaEntitiesMutableLiveData;
+    private boolean reachedLast;
     private LiveData<PlaylistEntity> playlistEntity;
     private PlaylistDao playlistDao;
     private PlaylistMediaDao playlistMediaDao;
     private OfflineMediaDao offlineMediaDao;
     private DownloadManager downloadManager;
     private PendingApiDao pendingApiDao;
+    private MutableLiveData<List<PlaylistMediaEntity>> playlistMediaEntitiesMutableLiveData;
 
     public PlaylistDetailViewModel(@NonNull Application application, long playlistID) {
         super(application);
@@ -61,13 +64,14 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         pendingApiDao = LocalRepository.getInstance(application).pendingApiDao();
         playlistDao = LocalRepository.getInstance(application).playlistDao();
         playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
-        offlineMediaDao = LocalRepository.getInstance(application).offlineVideoDao();
+        offlineMediaDao = LocalRepository.getInstance(application).offlineMediaDao();
 
-        playlistMediaEntitiesMutableLiveData = new MutableLiveData<>();
+        playlistMediaEntitiesMutableLiveData = new MutableLiveData<>(new ArrayList<>());
 
         playlistEntity = playlistDao.getPlaylistLive(playlistID);
 
         getFreshData();
+        Logger.e(TAG, "PlaylistDetailViewModel created");
     }
 
     public LiveData<PlaylistEntity> getPlaylistEntity() {
@@ -75,18 +79,16 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     }
 
     private void getFreshData() {
-        offset = 0;
+        offset = RecyclerView.NO_POSITION;
         reachedLast = false;
-
-        List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaEntitiesMutableLiveData.getValue();
-        playlistMediaEntities.addAll(playlistMediaDao.getPlaylistMediaEntities(playlistID, searchQuery, limit, offset++));
-        playlistMediaEntitiesMutableLiveData.postValue(playlistMediaEntities);
-
+        List<PlaylistMediaEntity> playlistMediaEntities;
+        if (searchQuery.length() == 0){
+            playlistMediaEntities = playlistMediaDao.getPlaylistMediaEntities(playlistID, limit, ++offset);
+        } else {
+            playlistMediaEntities = playlistMediaDao.getPlaylistMediaEntities(playlistID, "%" + searchQuery + "%", limit, ++offset);
+        }
         reachedLast = playlistMediaEntities.size() < limit;
-    }
-
-    public MutableLiveData<List<PlaylistMediaEntity>> getPlaylistMediaEntitiesMutableLiveData() {
-        return playlistMediaEntitiesMutableLiveData;
+        playlistMediaEntitiesMutableLiveData.postValue(playlistMediaEntities);
     }
 
     public void setSearchQuery(String query) {
@@ -94,16 +96,28 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         getFreshData();
     }
 
+    public MutableLiveData<List<PlaylistMediaEntity>> getPlaylistMediaEntitiesMutableLiveData() {
+        return playlistMediaEntitiesMutableLiveData;
+    }
+
     public void getMoreData() {
         if (reachedLast){
             return;
         }
+        List<PlaylistMediaEntity> oldPlaylistMediaEntities = playlistMediaEntitiesMutableLiveData.getValue();
+        if (oldPlaylistMediaEntities == null){
+            oldPlaylistMediaEntities = new ArrayList<>();
+        }
+        List<PlaylistMediaEntity> newPlaylistMediaEntities;
+        if (searchQuery.length() == 0){
+            newPlaylistMediaEntities = playlistMediaDao.getPlaylistMediaEntities(playlistID, limit, ++offset);
+        } else {
+            newPlaylistMediaEntities = playlistMediaDao.getPlaylistMediaEntities(playlistID, "%" + searchQuery + "%", limit, ++offset);
+        }
+        reachedLast = newPlaylistMediaEntities.size() < limit;
 
-        List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaEntitiesMutableLiveData.getValue();
-        playlistMediaEntities.addAll(playlistMediaDao.getPlaylistMediaEntities(playlistID, searchQuery, limit, offset++));
-        playlistMediaEntitiesMutableLiveData.postValue(playlistMediaEntities);
-
-        reachedLast = playlistMediaEntities.size() < limit;
+        oldPlaylistMediaEntities.addAll(newPlaylistMediaEntities);
+        playlistMediaEntitiesMutableLiveData.postValue(oldPlaylistMediaEntities);
     }
 
     public synchronized void addToOfflineMedia(List<PlaylistMediaEntity> videoEntities) {
@@ -179,6 +193,9 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
     }
 
     public void removeMediaFromPlaylist(PlaylistMediaEntity playlistMediaEntity) {
+        Calendar calendar = Calendar.getInstance();
+        long date = calendar.getTimeInMillis();
+
         //update playlist media
         playlistMediaDao.deleteMediaFromPlaylist(playlistID, playlistMediaEntity.getMediaID());
 
@@ -186,15 +203,17 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         PlaylistEntity newPlaylistEntity = playlistEntity.getValue();
         newPlaylistEntity.setSongsCount(newPlaylistEntity.getSongsCount() - 1);
         newPlaylistEntity.setPlayDuration(newPlaylistEntity.getPlayDuration() - playlistMediaEntity.getPlayDuration());
+        newPlaylistEntity.setModifiedOn(date);
         playlistDao.insert(newPlaylistEntity);
 
-        //add to pending uploads
         //add to pending uploads
         JSONObject params = new JSONObject();
         try {
             params.put(ApiConstant.PLAYLIST_ID, playlistMediaEntity.getPlaylistID());
             params.put(ApiConstant.MEDIA_ID, playlistMediaEntity.getMediaID());
             params.put(ApiConstant.USER_ID, user.getUserID());
+            params.put(ApiConstant.MODIFIED_ON, date);
+            params.put(ApiConstant.CREATED_ON, date);
         } catch (JSONException e) {
             Logger.e(TAG, e.toString());
         }

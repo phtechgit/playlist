@@ -24,6 +24,8 @@ public final class ApiConstant {
     public static final String STATUS = "Status";
     public static final String MESSAGE = "message";
     public static final String DATA = "data";
+    public static final String MODIFIED_ON = "modifiedOn";
+    public static final String CREATED_ON = "createdOn";
 
 
 }

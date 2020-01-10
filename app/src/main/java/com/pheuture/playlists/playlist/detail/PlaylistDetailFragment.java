@@ -94,10 +94,10 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
                     binding.imageButtonShuffle.setImageResource(R.drawable.ic_shuffle_grey);
                 }
 
-                boolean downloadPlaylistMediaStatus = SharedPrefsUtils.getBooleanPreference(activity,
+                boolean downloadPlaylistMedia = SharedPrefsUtils.getBooleanPreference(activity,
                         Constants.DOWNLOAD_PLAYLIST_MEDIA, false);
 
-                if (downloadPlaylistMediaStatus) {
+                if (downloadPlaylistMedia) {
                     viewModel.addToOfflineMedia(playlistMediaEntities);
                 }
             }

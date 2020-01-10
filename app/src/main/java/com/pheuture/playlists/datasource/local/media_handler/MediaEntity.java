@@ -1,21 +1,14 @@
-package com.pheuture.playlists.datasource.local.video_handler;
+package com.pheuture.playlists.datasource.local.media_handler;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.BindingAdapter;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.bumptech.glide.Glide;
 import com.google.gson.annotations.SerializedName;
 import com.pheuture.playlists.utils.CalenderUtils;
-import com.pheuture.playlists.utils.Constants;
-import com.pheuture.playlists.utils.StringUtils;
-
-import org.json.JSONObject;
 
 @Entity
 public class MediaEntity implements Parcelable {
@@ -72,6 +65,23 @@ public class MediaEntity implements Parcelable {
 
 	public void setModifiedOn(long modifiedOn) {
 		this.modifiedOn = modifiedOn;
+	}
+
+	@Override
+	public String toString() {
+		return "MediaEntity{" +
+				"mediaID=" + mediaID +
+				", mediaDescription='" + mediaDescription + '\'' +
+				", mediaUrl='" + mediaUrl + '\'' +
+				", mediaThumbnail='" + mediaThumbnail + '\'' +
+				", mediaName='" + mediaName + '\'' +
+				", mediaTitle='" + mediaTitle + '\'' +
+				", playDuration=" + playDuration +
+				", postDate='" + postDate + '\'' +
+				", status='" + status + '\'' +
+				", createdOn=" + createdOn +
+				", modifiedOn=" + modifiedOn +
+				'}';
 	}
 
 	public interface MediaColumns{

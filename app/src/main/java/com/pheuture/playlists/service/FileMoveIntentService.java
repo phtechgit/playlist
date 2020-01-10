@@ -6,16 +6,14 @@ import android.content.Intent;
 import android.content.Context;
 
 import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaDao;
+import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaDao;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Calendar;
 
 public class FileMoveIntentService extends IntentService {
@@ -31,7 +29,7 @@ public class FileMoveIntentService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        offlineMediaDao = LocalRepository.getInstance(this).offlineVideoDao();
+        offlineMediaDao = LocalRepository.getInstance(this).offlineMediaDao();
     }
 
     public static void startActionMove(Context context, long downloadID, String source) {

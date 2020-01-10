@@ -9,7 +9,7 @@ import android.net.Uri;
 
 import com.pheuture.playlists.service.FileMoveIntentService;
 import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaDao;
+import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaDao;
 
 import java.io.File;
 
@@ -22,7 +22,7 @@ public class DownloadReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);
-        offlineMediaDao = LocalRepository.getInstance(context).offlineVideoDao();
+        offlineMediaDao = LocalRepository.getInstance(context).offlineMediaDao();
 
         long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
         if (downloadId>-1){

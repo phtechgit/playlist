@@ -79,6 +79,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
                     binding.linearLayoutCreatePlaylist.setVisibility(View.GONE);
                     binding.relativeLayoutPlaylists.setVisibility(View.VISIBLE);
                 }
+
                 recyclerAdapter.setData(playlistEntities);
             }
         });
@@ -146,7 +147,16 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
                     return;
                 }
                 dialog.dismiss();
-                viewModel.createPlaylist(editText.getText().toString());
+
+                long playlistID = viewModel.createPlaylist(editText.getText().toString());
+
+                //go to playlist detail page
+                Bundle bundle = new Bundle();
+                bundle.putLong(ARG_PARAM1, playlistID);
+
+                Navigation.findNavController(binding.getRoot())
+                        .navigate(R.id.action_navigation_playlist_to_navigation_playlist_detail, bundle);
+
             }
         });
 
@@ -169,7 +179,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
 
     }
 
-    private void showDeletePlaylistDialog(PlaylistEntity model) {
+    private void showDeletePlaylistDialog(int position, PlaylistEntity model) {
         Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -207,7 +217,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
 
         textViewRight.setOnClickListener(view -> {
             dialog.dismiss();
-            viewModel.deletePlaylist(model);
+            viewModel.deletePlaylist(position, model);
         });
         /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/
     }
@@ -220,7 +230,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
 
         assert model != null;
         if (type == 1) {
-            if (position == 0){
+            if (model.getPlaylistID() == RecyclerView.NO_ID){
                 showCreatePlaylistNameDialog();
 
             } else {
@@ -231,7 +241,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
                         .navigate(R.id.action_navigation_playlist_to_navigation_playlist_detail, bundle);
             }
         } else {
-            showDeletePlaylistDialog(model);
+            showDeletePlaylistDialog(position, model);
         }
 
     }

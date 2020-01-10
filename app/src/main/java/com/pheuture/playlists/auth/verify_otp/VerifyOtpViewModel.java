@@ -64,13 +64,13 @@ public class VerifyOtpViewModel extends AndroidViewModel {
                     }
 
                     UserEntity userEntity = ParserUtil.getInstance().fromJson(response.optString(
-                            ApiConstant.DATA), UserEntity.class);
+                            "userdetail"), UserEntity.class);
                     if (userEntity == null){
                         return;
                     }
 
                     SharedPrefsUtils.setStringPreference(getApplication(), Constants.USER,
-                            response.optString(ApiConstant.DATA));
+                            response.optString("userdetail"));
 
                     List<PlaylistEntity> playlistEntities = Arrays.asList(ParserUtil.getInstance()
                             .fromJson(response.optString("playlistdetail"),

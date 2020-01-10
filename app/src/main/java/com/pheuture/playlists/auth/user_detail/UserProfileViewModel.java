@@ -28,8 +28,11 @@ public class UserProfileViewModel extends AndroidViewModel  {
     }
 
     public void updateUserDetail(String firstName, String lastName) {
+        Calendar calendar = Calendar.getInstance();
         userEntity.setUserFirstName(firstName);
         userEntity.setUserLastName(lastName);
+        userEntity.setCreatedOn(calendar.getTimeInMillis());
+        userEntity.setModifiedOn(calendar.getTimeInMillis());
 
         SharedPrefsUtils.setStringPreference(getApplication(), Constants.USER,
                 ParserUtil.getInstance().toJson(userEntity, UserEntity.class));

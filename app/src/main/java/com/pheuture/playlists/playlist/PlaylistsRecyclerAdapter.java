@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -45,7 +46,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         PlaylistEntity model = oldList.get(position);
         holder.binding.setModel(model);
         holder.binding.setPosition(position);
-        if (position == 0){
+        if (model.getPlaylistID() == RecyclerView.NO_ID){
             holder.binding.imageViewThumbnail.setImageResource(R.drawable.ic_plus_light);
             holder.binding.imageViewRemove.setVisibility(View.GONE);
         } else {
@@ -57,12 +58,6 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
     void setData(List<PlaylistEntity> newData) {
         List<PlaylistEntity> newList = new ArrayList<>(newData);
-        PlaylistEntity addNewPlaylistModel = new PlaylistEntity();
-        addNewPlaylistModel.setPlaylistID(RecyclerView.NO_ID);
-        addNewPlaylistModel.setPlaylistName("Create playlist");
-
-        newList.add(0, addNewPlaylistModel);
-
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList));
         oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);

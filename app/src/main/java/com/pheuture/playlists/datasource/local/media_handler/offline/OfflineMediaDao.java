@@ -1,4 +1,4 @@
-package com.pheuture.playlists.datasource.local.video_handler.offline;
+package com.pheuture.playlists.datasource.local.media_handler.offline;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;

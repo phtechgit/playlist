@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,9 +20,8 @@ import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentMediaBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
+import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
-import com.pheuture.playlists.utils.AlerterUtils;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.ParserUtil;
 import java.util.ArrayList;
@@ -67,37 +65,10 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
         binding.recyclerView.setAdapter(recyclerAdapter);
         binding.recyclerView.setHasFixedSize(true);
 
-        viewModel.getVideosLive().observe(this, new Observer<List<MediaEntity>>() {
+        viewModel.getPlaylistMediaListLive().observe(this, new Observer<List<MediaEntity>>() {
             @Override
             public void onChanged(List<MediaEntity> videoEntities) {
                 recyclerAdapter.setData(videoEntities);
-            }
-        });
-
-        viewModel.getSearchQuery().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                viewModel.getFreshData();
-            }
-        });
-
-        viewModel.getNeedToUpdateParent().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean value) {
-                if (value) {
-
-                }
-            }
-        });
-
-        viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean show) {
-                /*if(show){
-                    showProgress(binding.progressLayout.progressFullscreen, true);
-                } else {
-                    hideProgress(binding.progressLayout.progressFullscreen);
-                }*/
             }
         });
     }

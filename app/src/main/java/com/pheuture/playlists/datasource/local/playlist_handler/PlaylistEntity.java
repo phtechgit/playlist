@@ -19,12 +19,6 @@ public class PlaylistEntity extends UserEntity implements Parcelable, Cloneable 
 	@SerializedName("playlistID")
 	public long playlistID;
 
-	@SerializedName("createdOn")
-	private long createdOn;
-
-	@SerializedName("modifiedOn")
-	private long modifiedOn;
-
 	@SerializedName("playDuration")
 	private long playDuration;
 
@@ -40,8 +34,6 @@ public class PlaylistEntity extends UserEntity implements Parcelable, Cloneable 
 	protected PlaylistEntity(Parcel in) {
 		super(in);
 		playlistID = in.readLong();
-		createdOn = in.readLong();
-		modifiedOn = in.readLong();
 		playDuration = in.readLong();
 		playlistName = in.readString();
 		songsCount = in.readLong();
@@ -51,8 +43,6 @@ public class PlaylistEntity extends UserEntity implements Parcelable, Cloneable 
 	public void writeToParcel(Parcel dest, int flags) {
 		super.writeToParcel(dest, flags);
 		dest.writeLong(playlistID);
-		dest.writeLong(createdOn);
-		dest.writeLong(modifiedOn);
 		dest.writeLong(playDuration);
 		dest.writeString(playlistName);
 		dest.writeLong(songsCount);
@@ -87,14 +77,6 @@ public class PlaylistEntity extends UserEntity implements Parcelable, Cloneable 
 
 	public void setPlaylistID(long playlistID) {
 		this.playlistID = playlistID;
-	}
-
-	public long getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(long createdOn) {
-		this.createdOn = createdOn;
 	}
 
 	public long getPlayDuration() {
@@ -146,8 +128,6 @@ public class PlaylistEntity extends UserEntity implements Parcelable, Cloneable 
 	public String toString() {
 		return "PlaylistEntity{" +
 				"playlistID=" + playlistID +
-				", createdOn=" + createdOn +
-				", modifiedOn=" + modifiedOn +
 				", playDuration=" + playDuration +
 				", playlistName='" + playlistName + '\'' +
 				", songsCount=" + songsCount +
@@ -156,13 +136,5 @@ public class PlaylistEntity extends UserEntity implements Parcelable, Cloneable 
 				", userFirstName='" + userFirstName + '\'' +
 				", userLastName='" + userLastName + '\'' +
 				'}';
-	}
-
-	public long getModifiedOn() {
-		return modifiedOn;
-	}
-
-	public void setModifiedOn(long modifiedOn) {
-		this.modifiedOn = modifiedOn;
 	}
 }

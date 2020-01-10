@@ -11,15 +11,11 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaDao;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaEntity;
-import com.pheuture.playlists.utils.Constants;
-import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
+import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaDao;
+import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaEntity;
 
 import java.util.List;
 
@@ -40,7 +36,7 @@ public class MainViewModel extends AndroidViewModel {
         exoPlayer1 = ExoPlayerFactory.newSimpleInstance(application);
         exoPlayer2 = ExoPlayerFactory.newSimpleInstance(application);
 
-        offlineMediaDao = LocalRepository.getInstance(application).offlineVideoDao();
+        offlineMediaDao = LocalRepository.getInstance(application).offlineMediaDao();
 
         playlist = new MutableLiveData<>();
         playlistMediaEntites = new MutableLiveData<>();

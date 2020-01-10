@@ -1,17 +1,7 @@
 package com.pheuture.playlists.datasource.remote;
 
-import android.content.Context;
-
-import androidx.room.Database;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
-import androidx.room.TypeConverters;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.pheuture.playlists.datasource.local.video_handler.MediaDao;
-import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
-import com.pheuture.playlists.utils.Converters;
 import com.pheuture.playlists.utils.Url;
 
 import java.util.concurrent.TimeUnit;

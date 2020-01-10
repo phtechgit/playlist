@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemMediaBinding;
-import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
+import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.Constants;
 

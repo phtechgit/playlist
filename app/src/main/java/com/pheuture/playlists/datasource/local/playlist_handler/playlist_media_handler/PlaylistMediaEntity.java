@@ -2,14 +2,13 @@ package com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.provider.Telephony;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import androidx.room.Entity;
+
 import com.google.gson.annotations.SerializedName;
-import com.pheuture.playlists.datasource.local.video_handler.MediaEntity;
+import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 
 @Entity
 public class PlaylistMediaEntity extends MediaEntity implements Parcelable {

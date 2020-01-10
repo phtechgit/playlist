@@ -4,20 +4,13 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.material.tabs.TabLayout;
 import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
-import com.pheuture.playlists.datasource.local.video_handler.offline.OfflineMediaDao;
+import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaDao;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
 
 import java.io.File;
-import java.lang.reflect.Field;
 
 public class SettingsViewModel extends AndroidViewModel {
     private static final String TAG = SettingsViewModel.class.getSimpleName();
@@ -25,7 +18,7 @@ public class SettingsViewModel extends AndroidViewModel {
 
     public SettingsViewModel(@NonNull Application application) {
         super(application);
-        offlineMediaDao = LocalRepository.getInstance(application).offlineVideoDao();
+        offlineMediaDao = LocalRepository.getInstance(application).offlineMediaDao();
     }
 
     public void deleteOfflineMedia() {

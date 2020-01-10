@@ -24,9 +24,6 @@ public interface PlaylistDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<PlaylistEntity> playlistEntities);
 
-    @Query("select * from PlaylistEntity order by createdOn desc")
-    LiveData<List<PlaylistEntity>> getPlaylistsLive();
-
     @Query("select * from PlaylistEntity where playlistID=:playlistID")
     LiveData<PlaylistEntity> getPlaylistLive(long playlistID);
 
@@ -36,9 +33,12 @@ public interface PlaylistDao {
     @Query("delete from PlaylistEntity where playlistID=:playlistID")
     void deletePlaylist(long playlistID);
 
-    @Query("select * from PlaylistEntity where playlistName like:playlistName")
-    List<PlaylistEntity> getPlaylist(String playlistName);
+    @Query("select * from PlaylistEntity where playlistName =:playlistName")
+    List<PlaylistEntity> getPlaylistEntities(String playlistName);
 
-    @Query("select * from PlaylistEntity where playlistName like:searchQuery LIMIT :limits OFFSET :offsets")
-    List<PlaylistEntity> getPlaylistList(String searchQuery, int limits, int offsets);
+    @Query("select * from PlaylistEntity where playlistName like:playlistName order by modifiedOn desc limit:limit offset:offset")
+    List<PlaylistEntity> getPlaylistEntities(String playlistName, int limit, int offset);
+
+    @Query("select * from PlaylistEntity order by modifiedOn desc limit:limit offset:offset")
+    List<PlaylistEntity> getPlaylistEntities(int limit, int offset);
 }
