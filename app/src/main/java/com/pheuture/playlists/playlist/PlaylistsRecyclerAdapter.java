@@ -58,7 +58,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
     void setData(List<PlaylistEntity> newData) {
         List<PlaylistEntity> newList = new ArrayList<>(newData);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList));
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList), true);
         oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
     }

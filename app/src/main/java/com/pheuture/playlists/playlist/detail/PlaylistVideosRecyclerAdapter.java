@@ -51,7 +51,7 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
     }
 
     void setData(List<PlaylistMediaEntity> newList) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList));
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList), true);
         oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
     }
@@ -127,23 +127,7 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
             this.binding = binding;
             binding.imageViewRemove.setVisibility(View.VISIBLE);
 
-            /*binding.getRoot().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int adapterPosition = getAdapterPosition();
-                    if (adapterPosition == RecyclerView.NO_POSITION) {
-                        return;
-                    }
-
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(Constants.ARG_PARAM1, adapterPosition);
-                    bundle.putParcelable(Constants.ARG_PARAM2, oldList.get(adapterPosition));
-
-                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
-                }
-            });*/
-
-            binding.imageViewThumbnail.setOnClickListener(new View.OnClickListener() {
+            binding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int pos = getAdapterPosition();
@@ -159,6 +143,23 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
                     recyclerViewInterface.onRecyclerViewItemClick(bundle);
                 }
             });
+
+            /*binding.imageViewThumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    if (pos == RecyclerView.NO_POSITION){
+                        return;
+                    }
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Constants.ARG_PARAM1, pos);
+                    bundle.putInt(Constants.ARG_PARAM2, 1);
+                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
+
+                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
+                }
+            });*/
 
             binding.imageViewRemove.setOnClickListener(new View.OnClickListener() {
                 @Override

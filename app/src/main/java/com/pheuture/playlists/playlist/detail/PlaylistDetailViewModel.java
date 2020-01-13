@@ -191,12 +191,16 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         return offlineVideoEntity == null;
     }
 
-    public void removeMediaFromPlaylist(PlaylistMediaEntity playlistMediaEntity) {
-        Calendar calendar = Calendar.getInstance();
-        long date = calendar.getTimeInMillis();
+    public void removeMediaFromPlaylist(int position, PlaylistMediaEntity playlistMediaEntity) {
+        List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaEntitiesMutableLiveData.getValue();
+        playlistMediaEntities.remove(position);
+        playlistMediaEntitiesMutableLiveData.postValue(playlistMediaEntities);
 
         //update playlist media
         playlistMediaDao.deleteMediaFromPlaylist(playlistID, playlistMediaEntity.getMediaID());
+
+        Calendar calendar = Calendar.getInstance();
+        long date = calendar.getTimeInMillis();
 
         //update playlist
         PlaylistEntity newPlaylistEntity = playlistEntity.getValue();

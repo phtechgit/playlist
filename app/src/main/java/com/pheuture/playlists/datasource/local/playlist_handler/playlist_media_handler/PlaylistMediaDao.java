@@ -37,9 +37,9 @@ public interface PlaylistMediaDao {
     @Query("select * from PlaylistMediaEntity where playlistID=:playlistID and mediaID=:mediaID")
     PlaylistMediaEntity getPlaylistMedia(long playlistID, long mediaID);
 
-    @Query("select * from PlaylistMediaEntity where playlistID=:playlistID and mediaTitle like:mediaTitle order by modifiedOn desc limit:limit offset:offset")
+    @Query("select * from PlaylistMediaEntity where playlistID=:playlistID and mediaTitle like:mediaTitle limit:limit offset:offset")
     List<PlaylistMediaEntity> getPlaylistMediaEntities(long playlistID, String mediaTitle, int limit, int offset);
 
-    @Query("select * from PlaylistMediaEntity where playlistID=:playlistID order by modifiedOn desc limit:limit offset:offset")
+    @Query("select * from PlaylistMediaEntity where playlistID=:playlistID limit:limit offset:offset")
     List<PlaylistMediaEntity> getPlaylistMediaEntities(long playlistID, int limit, int offset);
 }

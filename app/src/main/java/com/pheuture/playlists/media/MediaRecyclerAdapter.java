@@ -139,23 +139,7 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             this.binding = binding;
             binding.imageViewAdd.setVisibility(View.VISIBLE);
 
-            /*binding.getRoot().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int adapterPosition = getAdapterPosition();
-                    if (adapterPosition == RecyclerView.NO_POSITION) {
-                        return;
-                    }
-
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(Constants.ARG_PARAM1, adapterPosition);
-                    bundle.putParcelable(Constants.ARG_PARAM2, oldList.get(adapterPosition));
-
-                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
-                }
-            });*/
-
-            binding.imageViewThumbnail.setOnClickListener(new View.OnClickListener() {
+            binding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int pos = getAdapterPosition();
@@ -170,6 +154,22 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                     recyclerViewInterface.onRecyclerViewItemClick(bundle);
                 }
             });
+
+            /*binding.imageViewThumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    if (pos == RecyclerView.NO_POSITION){
+                        return;
+                    }
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Constants.ARG_PARAM1, 1);
+                    bundle.putInt(Constants.ARG_PARAM2, pos);
+                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
+                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
+                }
+            });*/
 
             binding.imageViewAdd.setOnClickListener(new View.OnClickListener() {
                 @Override

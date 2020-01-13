@@ -45,10 +45,6 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     private List<PlaylistMediaEntity> playlistMediaEntities;
     private FragmentActivity activity;
 
-    public interface Actions{
-        int newMediaAdded = 1;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,11 +157,11 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
             ((MainActivity) activity).setMedia(playlist, playlistMediaEntities, (position-1));
 
         } else if (type == 2){
-            showRemoveMediaFromPlaylistAlert(model);
+            showRemoveMediaFromPlaylistAlert(position, model);
         }
     }
 
-    private void showRemoveMediaFromPlaylistAlert(PlaylistMediaEntity model) {
+    private void showRemoveMediaFromPlaylistAlert(int position, PlaylistMediaEntity model) {
         Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -204,7 +200,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         textViewRight.setOnClickListener(view -> {
             dialog.dismiss();
             ((MainActivity) activity).showSnack("removed from " + playlist.getPlaylistName());
-            viewModel.removeMediaFromPlaylist(model);
+            viewModel.removeMediaFromPlaylist(position, model);
         });
     }
 

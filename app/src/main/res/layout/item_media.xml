@@ -122,6 +122,9 @@
                 android:id="@+id/imageView_add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_add_light" />
 
             <ImageView
@@ -129,7 +132,9 @@
                 android:id="@+id/imageView_remove"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_remove_circle" />
 
         </LinearLayout>
