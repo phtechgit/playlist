@@ -1,5 +1,6 @@
 package com.pheuture.playlists.trending;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,7 +24,10 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;

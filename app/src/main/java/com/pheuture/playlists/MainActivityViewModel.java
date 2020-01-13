@@ -4,6 +4,7 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -19,16 +20,17 @@ import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMedi
 
 import java.util.List;
 
-public class MainViewModel extends AndroidViewModel {
-    private static final String TAG = MainViewModel.class.getSimpleName();
+public class MainActivityViewModel extends AndroidViewModel {
+    private static final String TAG = MainActivityViewModel.class.getSimpleName();
     private DataSource.Factory dataSourceFactory;
     private SimpleExoPlayer exoPlayer1;
     private SimpleExoPlayer exoPlayer2;
-    private MutableLiveData<PlaylistEntity> playlist;
-    private MutableLiveData<List<PlaylistMediaEntity>> playlistMediaEntites;
+    private MutableLiveData<PlaylistEntity> playlistMutableLiveData;
+    private MutableLiveData<List<PlaylistMediaEntity>> playlistMediaEntitesMutableLiveData;
     private OfflineMediaDao offlineMediaDao;
+    private boolean isNewMediaAddedTroPlaylist;
 
-    public MainViewModel(@NonNull Application application) {
+    public MainActivityViewModel(@NonNull Application application) {
         super(application);
 
         dataSourceFactory = new DefaultDataSourceFactory(application,
@@ -38,28 +40,29 @@ public class MainViewModel extends AndroidViewModel {
 
         offlineMediaDao = LocalRepository.getInstance(application).offlineMediaDao();
 
-        playlist = new MutableLiveData<>();
-        playlistMediaEntites = new MutableLiveData<>();
+        playlistMutableLiveData = new MutableLiveData<>();
+        playlistMediaEntitesMutableLiveData = new MutableLiveData<>();
+        isNewMediaAddedTroPlaylist = false;
     }
 
     public SimpleExoPlayer getExoPlayer1() {
         return exoPlayer1;
     }
 
-    public void setPlaylist(PlaylistEntity newPlaylist) {
-        playlist.postValue(newPlaylist);
+    public void setPlaylistMutableLiveData(PlaylistEntity newPlaylist) {
+        playlistMutableLiveData.postValue(newPlaylist);
     }
 
-    public MutableLiveData<PlaylistEntity> getPlaylist() {
-        return playlist;
+    public MutableLiveData<PlaylistEntity> getPlaylistMutableLiveData() {
+        return playlistMutableLiveData;
     }
 
     public void setPlaylistMediaEntities(List<PlaylistMediaEntity> playlistMediaEntities) {
-        playlistMediaEntites.postValue(playlistMediaEntities);
+        playlistMediaEntitesMutableLiveData.postValue(playlistMediaEntities);
     }
 
     public MutableLiveData<List<PlaylistMediaEntity>> getPlaylistMediaEntities() {
-        return playlistMediaEntites;
+        return playlistMediaEntitesMutableLiveData;
     }
 
     public DataSource.Factory getDataSourceFactory() {
@@ -72,5 +75,13 @@ public class MainViewModel extends AndroidViewModel {
 
     public OfflineMediaEntity getOfflineMediaForMediaID(long mediaID) {
         return offlineMediaDao.getOfflineMedia(mediaID);
+    }
+
+    public void setNewMediaAdded(boolean b) {
+        isNewMediaAddedTroPlaylist = b;
+    }
+
+    public boolean isNewMediaAddedToPlaylist(){
+        return isNewMediaAddedTroPlaylist;
     }
 }

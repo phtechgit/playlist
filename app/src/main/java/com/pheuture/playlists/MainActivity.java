@@ -34,7 +34,6 @@ import com.pheuture.playlists.utils.BaseActivity;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -44,16 +43,16 @@ import androidx.navigation.NavController;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.io.File;
 import java.util.List;
-
 import static androidx.navigation.Navigation.findNavController;
 
 public class MainActivity extends BaseActivity implements AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private ActivityMainBinding binding;
-    private MainViewModel viewModel;
+    private MainActivityViewModel viewModel;
     private SimpleExoPlayer exoPlayer1;
     private SimpleExoPlayer exoPlayer2;
     private int EXO_PLAYER_1 = 1;
@@ -158,7 +157,7 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         bottomSheetBehavior = BottomSheetBehavior.from( binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer);
         bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
 
-        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         exoPlayer1 = viewModel.getExoPlayer1();
         exoPlayer2 = viewModel.getExoPlayer2();
@@ -350,7 +349,7 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     }
 
     public void setMedia(PlaylistEntity playlistEntity,  List<PlaylistMediaEntity> playlistMediaEntities, int position){
-        viewModel.setPlaylist(playlistEntity);
+        viewModel.setPlaylistMutableLiveData(playlistEntity);
         viewModel.setPlaylistMediaEntities(playlistMediaEntities);
         currentMediaPosition = position;
     }
@@ -618,5 +617,4 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         exoPlayer2.release();
         super.onDestroy();
     }
-
 }

@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,20 +17,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.pheuture.playlists.MainActivity;
+import com.pheuture.playlists.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentMediaBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewInterface;
+import com.pheuture.playlists.playlist.detail.PlaylistDetailFragment;
 import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MediaFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
     private static final String TAG = MediaFragment.class.getSimpleName();
     private FragmentMediaBinding binding;
+    private MainActivityViewModel parentViewModel;
     private MediaViewModel viewModel;
     private MediaRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
@@ -45,6 +53,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         playlistModel = getArguments().getParcelable(ARG_PARAM1);
+        parentViewModel = ViewModelProviders.of(activity).get(MainActivityViewModel.class);
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_media, container, false);
         viewModel = ViewModelProviders.of(this, new MediaViewModelFactory(
                 activity.getApplication(), playlistModel)).get(MediaViewModel.class);
@@ -142,6 +151,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
         } else {
             ((MainActivity) activity).showSnack("added to " + playlistModel.getPlaylistName());
             viewModel.addMediaToPlaylist(position, playlistMediaEntity);
+            parentViewModel.setNewMediaAdded(true);
         }
     }
 
@@ -149,5 +159,4 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
     public void onRecyclerViewItemLongClick(Bundle bundle) {
 
     }
-
 }

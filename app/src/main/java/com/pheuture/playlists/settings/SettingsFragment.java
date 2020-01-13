@@ -2,6 +2,7 @@ package com.pheuture.playlists.settings;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -25,10 +26,14 @@ import com.pheuture.playlists.upload.UploadActivity;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.KeyboardUtils;
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.RequestCodes;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 
-public class SettingsFragment extends BaseFragment implements RequestCodes, CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
+import org.jetbrains.annotations.NotNull;
+
+public class SettingsFragment extends BaseFragment implements RequestCodes,
+        CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
     private static final String TAG = SettingsFragment.class.getSimpleName();
     private SettingsViewModel viewModel;
     private FragmentSettingsBinding binding;

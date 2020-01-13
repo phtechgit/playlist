@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.pheuture.playlists.MainActivity;
+import com.pheuture.playlists.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentPlaylistDetailBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
@@ -34,14 +35,19 @@ import com.pheuture.playlists.utils.SharedPrefsUtils;
 import java.util.List;
 
 public class PlaylistDetailFragment extends BaseFragment implements RecyclerViewInterface {
-    private static final String TAG = PlaylistDetailFragment.class.getSimpleName();
+    public static final String TAG = PlaylistDetailFragment.class.getSimpleName();
     private FragmentPlaylistDetailBinding binding;
+    private MainActivityViewModel parentViewModel;
     private PlaylistDetailViewModel viewModel;
     private PlaylistVideosRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
     private PlaylistEntity playlist;
     private List<PlaylistMediaEntity> playlistMediaEntities;
     private FragmentActivity activity;
+
+    public interface Actions{
+        int newMediaAdded = 1;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,13 +58,24 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_playlist_detail, container, false);
+        parentViewModel = ViewModelProviders.of(activity).get(MainActivityViewModel.class);
         viewModel = ViewModelProviders.of(this, new PlaylistDetailViewModelFactory(
                 activity.getApplication(), getArguments().getLong(ARG_PARAM1))).get(PlaylistDetailViewModel.class);
         return binding.getRoot();
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (parentViewModel.isNewMediaAddedToPlaylist()){
+            parentViewModel.setNewMediaAdded(false);
+            viewModel.getFreshData();
+        }
+    }
+
+    @Override
     public void initializations() {
+
         ((MainActivity) activity).setupToolbar(false, "");
 
         viewModel.getPlaylistEntity().observe(this, new Observer<PlaylistEntity>() {

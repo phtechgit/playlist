@@ -236,6 +236,7 @@ public class MediaViewModel extends AndroidViewModel {
         searchQuery = query;
         getFreshData();
     }
+
     public String getSearchQuery() {
         return searchQuery;
     }

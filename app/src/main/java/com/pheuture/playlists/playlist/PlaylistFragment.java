@@ -1,6 +1,7 @@
 package com.pheuture.playlists.playlist;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
@@ -31,7 +32,11 @@ import com.pheuture.playlists.interfaces.RecyclerViewInterface;
 import com.pheuture.playlists.utils.BaseFragment;
 import com.pheuture.playlists.utils.EditTextInputFilter;
 import com.pheuture.playlists.utils.KeyboardUtils;
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.StringUtils;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 public class PlaylistFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
@@ -41,6 +46,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
     private FragmentPlaylistBinding binding;
     private PlaylistsRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

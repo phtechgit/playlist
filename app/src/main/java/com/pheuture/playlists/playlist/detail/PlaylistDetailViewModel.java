@@ -71,14 +71,13 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         playlistEntity = playlistDao.getPlaylistLive(playlistID);
 
         getFreshData();
-        Logger.e(TAG, "PlaylistDetailViewModel created");
     }
 
     public LiveData<PlaylistEntity> getPlaylistEntity() {
         return playlistEntity;
     }
 
-    private void getFreshData() {
+    public void getFreshData() {
         offset = RecyclerView.NO_POSITION;
         reachedLast = false;
         List<PlaylistMediaEntity> playlistMediaEntities;
