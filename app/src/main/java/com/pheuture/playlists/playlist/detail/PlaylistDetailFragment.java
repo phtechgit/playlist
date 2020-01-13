@@ -65,17 +65,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (parentViewModel.isNewMediaAddedToPlaylist()){
-            parentViewModel.setNewMediaAdded(false);
-            viewModel.getFreshData();
-        }
-    }
-
-    @Override
     public void initializations() {
-
         ((MainActivity) activity).setupToolbar(false, "");
 
         viewModel.getPlaylistEntity().observe(this, new Observer<PlaylistEntity>() {
@@ -116,6 +106,16 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
                 if (downloadPlaylistMedia) {
                     viewModel.addToOfflineMedia(playlistMediaEntities);
+                }
+            }
+        });
+
+        parentViewModel.isNewMediaAddedToPlaylist().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (aBoolean){
+                    parentViewModel.setNewMediaAdded(false);
+                    viewModel.getFreshData();
                 }
             }
         });

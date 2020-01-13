@@ -4,7 +4,6 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -28,7 +27,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     private MutableLiveData<PlaylistEntity> playlistMutableLiveData;
     private MutableLiveData<List<PlaylistMediaEntity>> playlistMediaEntitesMutableLiveData;
     private OfflineMediaDao offlineMediaDao;
-    private boolean isNewMediaAddedTroPlaylist;
+    private MutableLiveData<Boolean> isNewMediaAddedToPlaylist;
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
@@ -42,7 +41,7 @@ public class MainActivityViewModel extends AndroidViewModel {
 
         playlistMutableLiveData = new MutableLiveData<>();
         playlistMediaEntitesMutableLiveData = new MutableLiveData<>();
-        isNewMediaAddedTroPlaylist = false;
+        isNewMediaAddedToPlaylist = new MutableLiveData<>();
     }
 
     public SimpleExoPlayer getExoPlayer1() {
@@ -78,10 +77,10 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
     public void setNewMediaAdded(boolean b) {
-        isNewMediaAddedTroPlaylist = b;
+        isNewMediaAddedToPlaylist.postValue(b);
     }
 
-    public boolean isNewMediaAddedToPlaylist(){
-        return isNewMediaAddedTroPlaylist;
+    public MutableLiveData<Boolean> isNewMediaAddedToPlaylist(){
+        return isNewMediaAddedToPlaylist;
     }
 }
