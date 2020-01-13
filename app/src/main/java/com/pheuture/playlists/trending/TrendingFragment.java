@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.pheuture.playlists.MainActivity;
+import com.pheuture.playlists.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentTrendingsBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
@@ -35,6 +36,7 @@ import java.util.List;
 public class TrendingFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
     private static final String TAG = TrendingFragment.class.getSimpleName();
     private FragmentActivity activity;
+    private MainActivityViewModel parentViewModel;
     private FragmentTrendingsBinding binding;
     private TrendingViewModel viewModel;
     private TrendingRecyclerAdapter recyclerAdapter;
@@ -49,13 +51,14 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_trendings, container, false);
+        parentViewModel = ViewModelProviders.of(activity).get(MainActivityViewModel.class);
         viewModel = ViewModelProviders.of(this).get(TrendingViewModel.class);
         return binding.getRoot();
     }
 
     @Override
     public void initializations() {
-        ((MainActivity) activity).setupToolbar(false, "Trending");
+        parentViewModel.setTitle("Trendings");
         binding.layoutSearchBar.editTextSearch.setHint("Find in trending");
 
         recyclerAdapter = new TrendingRecyclerAdapter(this);

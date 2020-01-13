@@ -21,6 +21,7 @@ import java.util.List;
 
 public class MainActivityViewModel extends AndroidViewModel {
     private static final String TAG = MainActivityViewModel.class.getSimpleName();
+    private MutableLiveData<String> title;
     private DataSource.Factory dataSourceFactory;
     private SimpleExoPlayer exoPlayer1;
     private SimpleExoPlayer exoPlayer2;
@@ -31,6 +32,8 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
+
+        title = new MutableLiveData<>();
 
         dataSourceFactory = new DefaultDataSourceFactory(application,
                 Util.getUserAgent(application, TAG));
@@ -82,5 +85,13 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public MutableLiveData<Boolean> isNewMediaAddedToPlaylist(){
         return isNewMediaAddedToPlaylist;
+    }
+
+    public MutableLiveData<String> getTitle() {
+        return title;
+    }
+
+    public MutableLiveData<String> setTitle(String playlists) {
+        return title;
     }
 }

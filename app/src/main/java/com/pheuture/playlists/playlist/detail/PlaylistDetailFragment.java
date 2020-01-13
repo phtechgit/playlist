@@ -62,7 +62,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
     @Override
     public void initializations() {
-        ((MainActivity) activity).setupToolbar(false, "");
+        parentViewModel.setTitle(" ");
 
         viewModel.getPlaylistEntity().observe(this, new Observer<PlaylistEntity>() {
             @Override

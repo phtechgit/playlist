@@ -25,6 +25,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.pheuture.playlists.MainActivity;
+import com.pheuture.playlists.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentPlaylistBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
@@ -42,6 +43,7 @@ import java.util.List;
 public class PlaylistFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
     private static final String TAG = PlaylistFragment.class.getSimpleName();
     private FragmentActivity activity;
+    private MainActivityViewModel parentViewModel;
     private PlaylistViewModel viewModel;
     private FragmentPlaylistBinding binding;
     private PlaylistsRecyclerAdapter recyclerAdapter;
@@ -57,13 +59,15 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_playlist, container, false);
+        parentViewModel = ViewModelProviders.of(activity).get(MainActivityViewModel.class);
         viewModel = ViewModelProviders.of(this).get(PlaylistViewModel.class);
         return binding.getRoot();
     }
 
     @Override
     public void initializations() {
-        ((MainActivity) activity).setupToolbar(false, "Playlists");
+        parentViewModel.setTitle("Playlists");
+
         binding.layoutSearchBar.editTextSearch.setHint("Find in playlist");
 
         recyclerAdapter = new PlaylistsRecyclerAdapter(this);

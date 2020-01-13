@@ -7,7 +7,9 @@ import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -43,7 +45,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.io.File;
 import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
@@ -58,14 +59,14 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     private int EXO_PLAYER_1 = 1;
     private int EXO_PLAYER_2 = 2;
     private PlayerView playerView;
-    private static int currentPlayer = RecyclerView.NO_POSITION;
-    private static int currentMediaPosition = RecyclerView.NO_POSITION;
+    private int currentPlayer = RecyclerView.NO_POSITION;
+    private int currentMediaPosition = RecyclerView.NO_POSITION;
     private List<PlaylistMediaEntity> mediaToPlay;
     private BottomSheetBehavior bottomSheetBehavior;
     private Handler timerHandler = new Handler();
     private long totalDurationOfCurrentMedia = 0;
     private long currentDurationOfCurrentMedia = 0;
-    private int defaultTimerSec = 1000;
+    private int defaultTimerSec = 100;
     private AudioManager audioManager;
     private AudioAttributes playbackAttributes;
     private AudioFocusRequest audioFocusRequestBuilder;
@@ -162,6 +163,13 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         exoPlayer1 = viewModel.getExoPlayer1();
         exoPlayer2 = viewModel.getExoPlayer2();
 
+        viewModel.getTitle().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                setTitle(s);
+            }
+        });
+
         viewModel.getPlaylistMediaEntities().observe(this, new Observer<List<PlaylistMediaEntity>>() {
             @Override
             public void onChanged(List<PlaylistMediaEntity> videoEntities) {
@@ -183,6 +191,11 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         //set timerHandler that runs every second to update progress and check if need to change track
         // for crossFade feature
         timerHandler.postDelayed(timerRunnable, defaultTimerSec);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override
@@ -285,12 +298,9 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
                     if ((mediaToPlay.size()-1)> currentMediaPosition) {
                         if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
                                 - currentDurationOfCurrentMedia) <= crossFadeValue) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    exoPlayer2.setVolume(0f);
-                                    loadNextVideoIn(EXO_PLAYER_2);
-                                }
+                            runOnUiThread(() -> {
+                                exoPlayer2.setVolume(0f);
+                                loadNextVideoIn(EXO_PLAYER_2);
                             });
                         }
                     }
@@ -315,12 +325,9 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
                         //if remaining duration of current media <= 2sec
                         if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
                                 - currentDurationOfCurrentMedia) <= crossFadeValue) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    exoPlayer1.setVolume(0f);
-                                    loadNextVideoIn(EXO_PLAYER_1);
-                                }
+                            runOnUiThread(() -> {
+                                exoPlayer1.setVolume(0f);
+                                loadNextVideoIn(EXO_PLAYER_1);
                             });
                         }
                     }
