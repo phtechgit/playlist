@@ -26,4 +26,10 @@ public final class Constants{
     public static final String DOWNLOAD_WHILE_ROAMING = "download_while_roaming";
     public static final String CROSS_FADE_VALUE = "cross_fade_value";
 
+    public interface SnackBarConstants{
+        String SNACK_BAR_SHOW = "snack_bar_show";
+        String SNACK_BAR_MESSAGE = "snack_bar_message";
+        String SNACK_BAR_LENGTH = "snack_bar_length";
+    }
+
 }

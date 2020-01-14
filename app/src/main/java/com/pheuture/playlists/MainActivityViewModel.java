@@ -3,7 +3,6 @@ package com.pheuture.playlists;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -16,10 +15,12 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaDao;
 import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaEntity;
+import com.pheuture.playlists.base.BaseAndroidViewModel;
+import com.pheuture.playlists.utils.Constants;
 
 import java.util.List;
 
-public class MainActivityViewModel extends AndroidViewModel {
+public class MainActivityViewModel extends BaseAndroidViewModel implements Constants.SnackBarConstants {
     private static final String TAG = MainActivityViewModel.class.getSimpleName();
     private MutableLiveData<String> title;
     private DataSource.Factory dataSourceFactory;
@@ -93,5 +94,12 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public MutableLiveData<String> setTitle(String playlists) {
         return title;
+    }
+
+    @Override
+    protected void onCleared() {
+        exoPlayer1.release();
+        exoPlayer2.release();
+        super.onCleared();
     }
 }

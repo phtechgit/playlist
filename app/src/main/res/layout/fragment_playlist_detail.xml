@@ -71,8 +71,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView_creator" />
 
-            <ImageButton
-                android:id="@+id/imageButton_play"
+            <ImageView
+                android:id="@+id/imageView_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -81,13 +81,25 @@
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:background="@color/grayF"
                 android:src="@drawable/ic_play_circular_grey"
-                app:layout_constraintEnd_toStartOf="@+id/imageButton_shuffle"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_shuffle"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView_songs_count" />
 
-            <ImageButton
-                android:id="@+id/imageButton_shuffle"
+            <TextView
+                android:id="@+id/textView_playDummy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="PLAY"
+                android:textColor="@color/grayB"
+                android:textSize="@dimen/textSizeCaption"
+                app:layout_constraintEnd_toEndOf="@+id/imageView_play"
+                app:layout_constraintStart_toStartOf="@+id/imageView_play"
+                app:layout_constraintTop_toBottomOf="@+id/imageView_play" />
+
+            <ImageView
+                android:id="@+id/imageView_shuffle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -96,13 +108,25 @@
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:background="@color/grayF"
                 android:src="@drawable/ic_shuffle_grey"
-                app:layout_constraintEnd_toStartOf="@+id/imageButton_add_new_song"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_add_new_song"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/imageButton_play"
+                app:layout_constraintStart_toEndOf="@+id/imageView_play"
                 app:layout_constraintTop_toBottomOf="@+id/textView_songs_count" />
 
-            <ImageButton
-                android:id="@+id/imageButton_add_new_song"
+            <TextView
+                android:id="@+id/textView_shuffleDummy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="SHUFFLE"
+                android:textColor="@color/grayB"
+                android:textSize="@dimen/textSizeCaption"
+                app:layout_constraintEnd_toEndOf="@+id/imageView_shuffle"
+                app:layout_constraintStart_toStartOf="@+id/imageView_shuffle"
+                app:layout_constraintTop_toBottomOf="@+id/imageView_shuffle" />
+
+            <ImageView
+                android:id="@+id/imageView_add_new_song"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -113,8 +137,20 @@
                 android:src="@drawable/ic_add_light"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/imageButton_shuffle"
+                app:layout_constraintStart_toEndOf="@+id/imageView_shuffle"
                 app:layout_constraintTop_toBottomOf="@+id/textView_songs_count" />
+
+            <TextView
+                android:id="@+id/textView_add_new_media_dummy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:text="ADD"
+                android:textColor="@color/grayB"
+                android:textSize="@dimen/textSizeCaption"
+                app:layout_constraintEnd_toEndOf="@+id/imageView_add_new_song"
+                app:layout_constraintStart_toStartOf="@+id/imageView_add_new_song"
+                app:layout_constraintTop_toBottomOf="@+id/imageView_add_new_song" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -131,16 +167,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
-
-        <include
-            android:id="@+id/progress_layout"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            layout="@layout/layout_progress_bar_full_screen"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/recyclerView"
-            app:layout_constraintStart_toStartOf="@+id/recyclerView"
-            app:layout_constraintTop_toBottomOf="@+id/textView_duration" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

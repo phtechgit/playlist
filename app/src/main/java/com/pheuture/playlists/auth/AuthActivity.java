@@ -1,6 +1,5 @@
 package com.pheuture.playlists.auth;
 
-import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
@@ -8,9 +7,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import android.content.Intent;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.pheuture.playlists.MainActivity;
@@ -18,8 +14,8 @@ import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.user_detail.UserProfileActivity;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.databinding.ActivityAuthBinding;
-import com.pheuture.playlists.interfaces.ButtonClickInterface;
-import com.pheuture.playlists.utils.BaseActivity;
+import com.pheuture.playlists.interfaces.ButtonClickListener;
+import com.pheuture.playlists.base.BaseActivity;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
@@ -28,7 +24,7 @@ import com.pheuture.playlists.utils.StringUtils;
 public class AuthActivity extends BaseActivity {
     private static final String TAG = AuthActivity.class.getSimpleName();
     private ActivityAuthBinding binding;
-    private ButtonClickInterface buttonClickInterface;
+    private ButtonClickListener buttonClickListener;
     private NavController navController;
 
 
@@ -66,13 +62,13 @@ public class AuthActivity extends BaseActivity {
     @Override
     public void onClick(View v) {
         if (v.equals(binding.fab)) {
-            buttonClickInterface.onButtonClick();
+            buttonClickListener.onButtonClick();
         }
     }
 
     public void setOnButtonClickListener(Fragment fragment){
-        if (fragment instanceof ButtonClickInterface) {
-            this.buttonClickInterface = (ButtonClickInterface) fragment;
+        if (fragment instanceof ButtonClickListener) {
+            this.buttonClickListener = (ButtonClickListener) fragment;
         }
     }
 

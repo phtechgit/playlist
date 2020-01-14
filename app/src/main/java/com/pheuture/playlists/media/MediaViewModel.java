@@ -19,7 +19,7 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.service.PendingApiExecutorService;
-import com.pheuture.playlists.utils.ApiConstant;
+import com.pheuture.playlists.interfaces.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;

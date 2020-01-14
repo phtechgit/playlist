@@ -21,7 +21,7 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaDao;
 import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaEntity;
 import com.pheuture.playlists.service.PendingApiExecutorService;
-import com.pheuture.playlists.utils.ApiConstant;
+import com.pheuture.playlists.interfaces.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
@@ -227,6 +227,18 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         pendingApiDao.insert(pendingFileUploadEntity);
 
         //start ExecutorService
+        PendingApiExecutorService.startService(getApplication());
+    }
+
+    public void deletePlaylist() {
+        playlistMediaDao.deleteAllMediaFromPlaylist(playlistID);
+        playlistDao.deletePlaylist(playlistID);
+
+        PendingApiEntity pendingApiEntity = new PendingApiEntity();
+        pendingApiEntity.setUrl(Url.PLAYLIST_DELETE);
+        pendingApiEntity.setParams(ParserUtil.getInstance().toJson(playlistEntity, PlaylistEntity.class));
+        pendingApiDao.insert(pendingApiEntity);
+
         PendingApiExecutorService.startService(getApplication());
     }
 }

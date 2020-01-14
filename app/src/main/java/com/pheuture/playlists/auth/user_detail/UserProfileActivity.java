@@ -11,7 +11,7 @@ import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ActivityUserProfileBinding;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
-import com.pheuture.playlists.utils.BaseActivity;
+import com.pheuture.playlists.base.BaseActivity;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;

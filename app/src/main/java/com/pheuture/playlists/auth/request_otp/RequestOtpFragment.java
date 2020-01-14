@@ -1,7 +1,6 @@
 package com.pheuture.playlists.auth.request_otp;
 
 
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.databinding.DataBindingUtil;
@@ -20,18 +19,14 @@ import android.widget.Toast;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AuthActivity;
 import com.pheuture.playlists.databinding.FragmentRequestOtpBinding;
-import com.pheuture.playlists.interfaces.ButtonClickInterface;
-import com.pheuture.playlists.utils.BaseFragment;
-import com.pheuture.playlists.utils.KeyboardUtils;
-import com.pheuture.playlists.utils.Logger;
+import com.pheuture.playlists.interfaces.ButtonClickListener;
+import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.NetworkUtils;
-
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RequestOtpFragment extends BaseFragment implements TextWatcher, ButtonClickInterface {
+public class RequestOtpFragment extends BaseFragment implements TextWatcher, ButtonClickListener {
     private static final String TAG = RequestOtpFragment.class.getSimpleName();
     private FragmentActivity activity;
     private FragmentRequestOtpBinding binding;

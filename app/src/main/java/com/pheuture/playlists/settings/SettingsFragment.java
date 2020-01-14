@@ -2,7 +2,6 @@ package com.pheuture.playlists.settings;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -19,22 +18,21 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
-import com.pheuture.playlists.MainActivity;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.pheuture.playlists.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentSettingsBinding;
 import com.pheuture.playlists.upload.UploadActivity;
-import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.KeyboardUtils;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.RequestCodes;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 
-import org.jetbrains.annotations.NotNull;
-
-public class SettingsFragment extends BaseFragment implements RequestCodes,
+public class SettingsFragment extends BaseFragment implements
         CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
     private static final String TAG = SettingsFragment.class.getSimpleName();
+    private MainActivityViewModel parentViewModel;
     private SettingsViewModel viewModel;
     private FragmentSettingsBinding binding;
     private FragmentActivity activity;
@@ -48,13 +46,14 @@ public class SettingsFragment extends BaseFragment implements RequestCodes,
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false);
+        parentViewModel = ViewModelProviders.of(activity).get(MainActivityViewModel.class);
         viewModel = ViewModelProviders.of(this).get(SettingsViewModel.class);
         return binding.getRoot();
     }
 
     @Override
     public void initializations() {
-        ((MainActivity) getActivity()).setupToolbar(false, "Settings");
+        parentViewModel.setTitle("Settings");
 
         boolean downloadPlaylistMediaStatus = SharedPrefsUtils.getBooleanPreference(activity,
                 Constants.DOWNLOAD_PLAYLIST_MEDIA, false);
@@ -132,9 +131,8 @@ public class SettingsFragment extends BaseFragment implements RequestCodes,
         textViewRight.setOnClickListener(view -> {
             dialog.dismiss();
             viewModel.deleteOfflineMedia();
-            ((MainActivity) activity).showSnack("Offline songs removed.");
+            parentViewModel.showSnackBar("Offline songs removed.", Snackbar.LENGTH_SHORT);
         });
-        /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/
     }
 
     private void openFileSelector() {

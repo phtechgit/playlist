@@ -13,6 +13,10 @@ import androidx.annotation.Nullable;
 final public class SharedPrefsUtils {
     private SharedPrefsUtils() {}
 
+    private static SharedPreferences getSharedPreferences(Context context){
+        return PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
     /**
      * Helper method to retrieve a String value from {@link SharedPreferences}.
      *

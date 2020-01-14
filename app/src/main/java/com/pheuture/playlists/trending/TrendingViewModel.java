@@ -14,7 +14,7 @@ import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.MediaDao;
-import com.pheuture.playlists.utils.ApiConstant;
+import com.pheuture.playlists.interfaces.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;

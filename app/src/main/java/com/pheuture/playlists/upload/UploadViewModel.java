@@ -21,7 +21,7 @@ import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_h
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.service.PendingFileUploadService;
-import com.pheuture.playlists.utils.ApiConstant;
+import com.pheuture.playlists.interfaces.ApiConstant;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.FileUtils;
 import com.pheuture.playlists.utils.Logger;

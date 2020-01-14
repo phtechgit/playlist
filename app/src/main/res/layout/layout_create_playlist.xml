@@ -51,7 +51,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="16dp"
             android:padding="10dp"
-            android:hint="My playlist #1"
+            android:hint="Playlist name"
             android:textColorHint="@color/grayC"
             android:textColor="@color/grayF"
             android:imeOptions="actionDone"

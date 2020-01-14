@@ -1,6 +1,5 @@
 package com.pheuture.playlists.trending;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,17 +22,14 @@ import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentTrendingsBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewInterface;
-import com.pheuture.playlists.utils.BaseFragment;
-import com.pheuture.playlists.utils.Logger;
+import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.ParserUtil;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrendingFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
+public class TrendingFragment extends BaseFragment implements TextWatcher, RecyclerViewClickListener {
     private static final String TAG = TrendingFragment.class.getSimpleName();
     private FragmentActivity activity;
     private MainActivityViewModel parentViewModel;

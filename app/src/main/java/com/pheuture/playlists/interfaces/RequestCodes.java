@@ -1,4 +1,4 @@
-package com.pheuture.playlists.utils;
+package com.pheuture.playlists.interfaces;
 
 public interface RequestCodes {
     int REQUEST_CODE_DEFAULT = 100;

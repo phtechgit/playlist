@@ -26,8 +26,12 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
            return;
         }
 
-        if (connectivityChangeListener!=null){
-            connectivityChangeListener.onConnectivityChange(NetworkUtils.online(context));
+        if (!isInitialStickyBroadcast()) {
+            // Do not ignore this call, as this is not the sticky broadcast and the connectivity
+            // state has actually changed
+            if (connectivityChangeListener!=null){
+                connectivityChangeListener.onConnectivityChange(NetworkUtils.online(context));
+            }
         }
     }
 

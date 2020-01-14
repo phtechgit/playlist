@@ -24,12 +24,12 @@ import com.pheuture.playlists.datasource.remote.ProgressRequestBody;
 import com.pheuture.playlists.datasource.remote.RemoteRepository;
 import com.pheuture.playlists.datasource.remote.ResponseModel;
 import com.pheuture.playlists.receiver.NotificationActionReceiver;
-import com.pheuture.playlists.utils.ApiConstant;
+import com.pheuture.playlists.interfaces.ApiConstant;
 import com.pheuture.playlists.utils.FileUtils;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.NetworkUtils;
-import com.pheuture.playlists.utils.NotificationChannelIDConstant;
-import com.pheuture.playlists.utils.NotificationIDConstant;
+import com.pheuture.playlists.interfaces.NotificationChannelID;
+import com.pheuture.playlists.interfaces.NotificationID;
 import com.pheuture.playlists.utils.ParserUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +47,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class PendingFileUploadService extends Service implements PendingFileUploadParamEntity.MediaType,
+public class PendingFileUploadService extends Service implements NotificationChannelID,
+        NotificationID, PendingFileUploadParamEntity.MediaType,
         ProgressRequestBody.UploadCallbacks,
         NotificationActionReceiver.NotificationActions,
         NotificationActionReceiver.NotificationActionInterface {
@@ -105,15 +106,15 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
         //create channel for notification
         if (Build.VERSION.SDK_INT >=  Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel  =  new NotificationChannel(
-                    NotificationChannelIDConstant.NOTIFICATION_CHANNEL_01,
-                    NotificationChannelIDConstant.NOTIFICATION_CHANNEL_01,
+                    NOTIFICATION_CHANNEL_ID_01,
+                    NOTIFICATION_CHANNEL_ID_01,
                     NotificationManager.IMPORTANCE_DEFAULT);
 
             notificationManager.createNotificationChannel(serviceChannel);
         }
 
         progressNotification = new NotificationCompat.Builder(this,
-                NotificationChannelIDConstant.NOTIFICATION_CHANNEL_01)
+                NOTIFICATION_CHANNEL_ID_01)
                 .setContentTitle("checking pending uploads")
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setOnlyAlertOnce(true)
@@ -121,8 +122,8 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
                 .setProgress(0, 0, true)
                 .build();
 
-        notificationManager.notify(NotificationIDConstant.FILE_UPLOAD_SERVICE_NOTIFICATION, progressNotification);
-        startForeground(NotificationIDConstant.FILE_UPLOAD_SERVICE_NOTIFICATION, progressNotification);
+        notificationManager.notify(FILE_UPLOAD_SERVICE_NOTIFICATION_ID, progressNotification);
+        startForeground(FILE_UPLOAD_SERVICE_NOTIFICATION_ID, progressNotification);
     }
 
     private void setUpBroadcastReceiver() {
@@ -132,7 +133,7 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
 
         //Create the PendingIntent
         btPendingIntent = PendingIntent.getBroadcast(this,
-                NotificationIDConstant.FILE_UPLOAD_SERVICE_NOTIFICATION,
+                FILE_UPLOAD_SERVICE_NOTIFICATION_ID,
                 buttonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         notificationActionReceiver = new NotificationActionReceiver();
@@ -215,7 +216,7 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
 
     private void showSuccessNotification() {
         Notification successNotification = new NotificationCompat.Builder(this,
-                NotificationChannelIDConstant.NOTIFICATION_CHANNEL_01)
+                NOTIFICATION_CHANNEL_ID_01)
                 .setContentTitle(pendingFileUploadEntity.getTitle())
                 .setSubText("uploaded successfully")
                 .setSmallIcon(R.mipmap.ic_launcher_round)
@@ -254,7 +255,7 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
             String subTitle =  "uploaded " + FileUtils.getReadableFileSize(mUploadedInBytes) + " of " + FileUtils.getReadableFileSize(mTotalToUploadInBytes);
 
             progressNotification = new NotificationCompat.Builder(PendingFileUploadService.this,
-                    NotificationChannelIDConstant.NOTIFICATION_CHANNEL_01)
+                    NOTIFICATION_CHANNEL_ID_01)
                     .setContentTitle(pendingFileUploadEntity.getTitle())
                     .setSubText(subTitle)
                     .setSmallIcon(R.mipmap.ic_launcher_round)
@@ -263,7 +264,7 @@ public class PendingFileUploadService extends Service implements PendingFileUplo
                     .setProgress(100, lastProgress, false)
                     .build();
 
-            notificationManager.notify(NotificationIDConstant.FILE_UPLOAD_SERVICE_NOTIFICATION, progressNotification);
+            notificationManager.notify(FILE_UPLOAD_SERVICE_NOTIFICATION_ID, progressNotification);
         }
     }
 

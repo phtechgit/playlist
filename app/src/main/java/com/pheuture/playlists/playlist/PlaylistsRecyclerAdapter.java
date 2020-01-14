@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -15,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemPlaylistBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewInterface;
+import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.utils.Constants;
 
 import java.util.ArrayList;
@@ -25,11 +24,11 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
     private static final String TAG = PlaylistsRecyclerAdapter.class.getSimpleName();
     private Context mContext;
     private List<PlaylistEntity> oldList;
-    private RecyclerViewInterface recyclerViewInterface;
+    private RecyclerViewClickListener recyclerViewClickListener;
 
     PlaylistsRecyclerAdapter(PlaylistFragment context) {
         this.mContext = context.getContext();
-        this.recyclerViewInterface = context;
+        this.recyclerViewClickListener = context;
     }
 
     @NonNull
@@ -140,7 +139,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                     bundle.putInt(Constants.ARG_PARAM1, adapterPosition);
                     bundle.putInt(Constants.ARG_PARAM2, 1);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(adapterPosition));
-                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
                 }
             });
 
@@ -156,7 +155,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                     bundle.putInt(Constants.ARG_PARAM1, adapterPosition);
                     bundle.putInt(Constants.ARG_PARAM2, 2);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(adapterPosition));
-                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
                 }
             });
 

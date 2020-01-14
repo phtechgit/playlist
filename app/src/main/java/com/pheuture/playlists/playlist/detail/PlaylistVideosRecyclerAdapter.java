@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemMediaBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewInterface;
+import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.utils.Constants;
 
 import java.util.ArrayList;
@@ -22,11 +22,11 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
     private static final String TAG = PlaylistVideosRecyclerAdapter.class.getSimpleName();
     private Context mContext;
     private List<PlaylistMediaEntity> oldList;
-    private RecyclerViewInterface recyclerViewInterface;
+    private RecyclerViewClickListener recyclerViewClickListener;
 
     PlaylistVideosRecyclerAdapter(PlaylistDetailFragment context) {
         this.mContext = context.getContext();
-        this.recyclerViewInterface = context;
+        this.recyclerViewClickListener = context;
     }
 
     @NonNull
@@ -140,7 +140,7 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
                     bundle.putInt(Constants.ARG_PARAM2, 1);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
                 }
             });
 
@@ -174,7 +174,7 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
                     bundle.putInt(Constants.ARG_PARAM2, 2);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
                 }
             });
         }

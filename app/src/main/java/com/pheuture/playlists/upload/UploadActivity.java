@@ -20,8 +20,8 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ActivityUploadBinding;
-import com.pheuture.playlists.utils.BaseActivity;
-import com.pheuture.playlists.utils.RequestCodes;
+import com.pheuture.playlists.base.BaseActivity;
+import com.pheuture.playlists.interfaces.RequestCodes;
 
 public class UploadActivity extends BaseActivity implements RequestCodes{
     private static final String TAG = UploadActivity.class.getSimpleName();

@@ -1,7 +1,6 @@
 package com.pheuture.playlists.playlist;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
@@ -12,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,23 +24,20 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.pheuture.playlists.MainActivity;
+
 import com.pheuture.playlists.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentPlaylistBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewInterface;
-import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.EditTextInputFilter;
 import com.pheuture.playlists.utils.KeyboardUtils;
-import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.StringUtils;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class PlaylistFragment extends BaseFragment implements TextWatcher, RecyclerViewInterface {
+public class PlaylistFragment extends BaseFragment implements TextWatcher, RecyclerViewClickListener {
     private static final String TAG = PlaylistFragment.class.getSimpleName();
     private FragmentActivity activity;
     private MainActivityViewModel parentViewModel;
@@ -115,6 +112,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
         dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         dialog.setContentView(R.layout.layout_create_playlist);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         dialog.show();
 
         TextView textViewTitle = dialog.findViewById(R.id.textView_title);

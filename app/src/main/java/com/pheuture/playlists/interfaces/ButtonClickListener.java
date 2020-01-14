@@ -1,5 +1,5 @@
 package com.pheuture.playlists.interfaces;
 
-public interface ButtonClickInterface {
+public interface ButtonClickListener {
     void onButtonClick();
 }

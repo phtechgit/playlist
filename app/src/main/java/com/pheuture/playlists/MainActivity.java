@@ -9,10 +9,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PersistableBundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -26,13 +25,12 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback;
-import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.databinding.ActivityMainBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaEntity;
-import com.pheuture.playlists.utils.BaseActivity;
+import com.pheuture.playlists.base.BaseActivity;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
@@ -49,7 +47,8 @@ import java.io.File;
 import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
 
-public class MainActivity extends BaseActivity implements AudioManager.OnAudioFocusChangeListener {
+public class MainActivity extends BaseActivity implements AudioManager.OnAudioFocusChangeListener,
+        Constants.SnackBarConstants {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private ActivityMainBinding binding;
@@ -74,6 +73,12 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     private boolean playbackNowAuthorized = false;
     private boolean resumeOnFocusGain = false;
     private final Object focusLock = new Object();
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.master_menu, menu);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -191,11 +196,17 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         //set timerHandler that runs every second to update progress and check if need to change track
         // for crossFade feature
         timerHandler.postDelayed(timerRunnable, defaultTimerSec);
-    }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+        viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
+            @Override
+            public void onChanged(Bundle bundle) {
+                if (bundle.getBoolean(SNACK_BAR_SHOW, false)){
+                    showSnack(binding.coordinatorLayout, bundle);
+                } else {
+                    hideSnack();
+                }
+            }
+        });
     }
 
     @Override
@@ -422,7 +433,7 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         playerView.setPlayer(exoPlayer);
 
         //set media info
-        binding.layoutBottomSheet.textViewTitle.setText(media.getMediaName());
+        binding.layoutBottomSheet.textViewTitle.setText(media.getMediaTitle());
         binding.layoutBottomSheet.textViewCreator.setText(media.getMediaDescription());
 
         //if more media available to play
@@ -595,21 +606,6 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         exoPlayer1.setShuffleModeEnabled(!exoPlayer1.getShuffleModeEnabled());
     }
 
-    public void setupToolbar(boolean homeAsUpEnabled, String title){
-        getSupportActionBar().setTitle(title);
-    }
-
-    public void showSnack(String message) {
-        Snackbar mySnack = Snackbar.make(binding.coordinatorLayout, message, Snackbar.LENGTH_SHORT);
-        View snackBarView = mySnack.getView();
-        snackBarView.setBackgroundColor(getResources().getColor(R.color.WhiteC));
-
-        TextView textView = snackBarView.findViewById(R.id.snackbar_text);
-        textView.setTextColor(getResources().getColor(R.color.grayF));
-
-        mySnack.show();
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -617,11 +613,14 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    @Override
     protected void onDestroy() {
         abandonAudioFocus();
         timerHandler.removeCallbacks(timerRunnable);
-        exoPlayer1.release();
-        exoPlayer2.release();
         super.onDestroy();
     }
 }

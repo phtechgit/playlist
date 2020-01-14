@@ -30,7 +30,7 @@ import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.auth.request_otp.RequestOtpFragment;
 import com.pheuture.playlists.databinding.FragmentVerifyOtpBinding;
 import com.pheuture.playlists.receiver.SMSReceiver;
-import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.StringUtils;
 
 /**

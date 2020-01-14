@@ -1,4 +1,4 @@
-package com.pheuture.playlists.utils;
+package com.pheuture.playlists.base;
 
 import android.Manifest;
 import android.app.Activity;
@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -23,12 +22,14 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.pheuture.playlists.MainActivity;
+import com.pheuture.playlists.interfaces.NotificationID;
+import com.pheuture.playlists.interfaces.RequestCodes;
 
 import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
-public abstract class BaseFragment extends Fragment implements View.OnClickListener {
+public abstract class BaseFragment extends Fragment implements NotificationID, RequestCodes,
+        View.OnClickListener {
     public final String ARG_PARAM1 = "param1";
     public final String ARG_PARAM2 = "param2";
     public final String ARG_PARAM3 = "param3";
@@ -53,8 +54,8 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     }
 
     @Override
-    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanseState) {
-        View view = myFragmentView(inflater, parent, savedInstanseState);
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        View view = myFragmentView(inflater, parent, savedInstanceState);
         setListeners();
         initializations();
         return view;

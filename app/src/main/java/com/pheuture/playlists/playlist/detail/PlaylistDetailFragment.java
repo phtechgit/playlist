@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,27 +15,31 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentPlaylistDetailBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewInterface;
-import com.pheuture.playlists.utils.BaseFragment;
+import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.KeyboardUtils;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 
 import java.util.List;
 
-public class PlaylistDetailFragment extends BaseFragment implements RecyclerViewInterface {
+public class PlaylistDetailFragment extends BaseFragment implements RecyclerViewClickListener {
     public static final String TAG = PlaylistDetailFragment.class.getSimpleName();
     private FragmentPlaylistDetailBinding binding;
     private MainActivityViewModel parentViewModel;
@@ -48,7 +53,25 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         activity = getActivity();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.findItem(R.id.menu_delete).setVisible(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_delete) {
+            parentViewModel.showSnackBar(playlist.getPlaylistName() + " deleted.", Snackbar.LENGTH_SHORT);
+            viewModel.deletePlaylist();
+            activity.onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -86,15 +109,15 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
                 //show/hide play pause button
                 if (newPalylistMediaEntities.size()>0){
-                    binding.imageButtonPlay.setImageResource(R.drawable.ic_play_circular_white);
+                    binding.imageViewPlay.setImageResource(R.drawable.ic_play_circular_white);
                     if (newPalylistMediaEntities.size()>2) {
-                        binding.imageButtonShuffle.setImageResource(R.drawable.ic_shuffle_light);
+                        binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_light);
                     } else {
-                        binding.imageButtonShuffle.setImageResource(R.drawable.ic_shuffle_grey);
+                        binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_grey);
                     }
                 } else {
-                    binding.imageButtonPlay.setImageResource(R.drawable.ic_play_circular_grey);
-                    binding.imageButtonShuffle.setImageResource(R.drawable.ic_shuffle_grey);
+                    binding.imageViewPlay.setImageResource(R.drawable.ic_play_circular_grey);
+                    binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_grey);
                 }
 
                 boolean downloadPlaylistMedia = SharedPrefsUtils.getBooleanPreference(activity,
@@ -119,14 +142,14 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
     @Override
     public void setListeners() {
-        binding.imageButtonPlay.setOnClickListener(this);
-        binding.imageButtonShuffle.setOnClickListener(this);
-        binding.imageButtonAddNewSong.setOnClickListener(this);
+        binding.imageViewPlay.setOnClickListener(this);
+        binding.imageViewShuffle.setOnClickListener(this);
+        binding.imageViewAddNewSong.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        if (v.equals(binding.imageButtonAddNewSong)){
+        if (v.equals(binding.imageViewAddNewSong)){
             Bundle bundle = new Bundle();
             bundle.putParcelable(ARG_PARAM1, playlist);
             bundle.putString("title", playlist.getPlaylistName());
@@ -134,12 +157,12 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
             Navigation.findNavController(binding.getRoot())
                     .navigate(R.id.action_navigation_playlist_detail_to_navigation_media, bundle);
 
-        } else if (v.equals(binding.imageButtonPlay)) {
+        } else if (v.equals(binding.imageViewPlay)) {
             if (playlistMediaEntities.size()>0) {
                 ((MainActivity) activity).setMedia(playlist, playlistMediaEntities, RecyclerView.NO_POSITION);
             }
 
-        } else if (v.equals(binding.imageButtonShuffle)) {
+        } else if (v.equals(binding.imageViewShuffle)) {
             if (playlistMediaEntities.size()>2) {
                 ((MainActivity) activity).toggleShuffleMode();
             }
@@ -199,7 +222,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         textViewRight.setOnClickListener(view -> {
             dialog.dismiss();
-            ((MainActivity) activity).showSnack("removed from " + playlist.getPlaylistName());
+            parentViewModel.showSnackBar("removed from " + playlist.getPlaylistName(), Snackbar.LENGTH_SHORT);
             viewModel.removeMediaFromPlaylist(position, model);
         });
     }

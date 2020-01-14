@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemMediaBinding;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewInterface;
+import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.StringUtils;
 
@@ -28,12 +28,12 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     private Context mContext;
     private List<MediaEntity> masterList;
     private List<MediaEntity> filteredList;
-    private RecyclerViewInterface recyclerViewInterface;
+    private RecyclerViewClickListener recyclerViewClickListener;
     private int playerPosition = RecyclerView.NO_POSITION;
 
     TrendingRecyclerAdapter(TrendingFragment context) {
         this.mContext = context.getContext();
-        this.recyclerViewInterface = context;
+        this.recyclerViewClickListener = context;
     }
 
     @NonNull
@@ -147,7 +147,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                     bundle.putInt(Constants.ARG_PARAM1, pos);
                     bundle.putParcelable(Constants.ARG_PARAM2, masterList.get(pos));
 
-                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
                 }
             });
 
