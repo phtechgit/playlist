@@ -2,6 +2,7 @@ package com.pheuture.playlists;
 
 import android.app.DownloadManager;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -25,12 +26,14 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback;
+import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.databinding.ActivityMainBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaEntity;
 import com.pheuture.playlists.base.BaseActivity;
+import com.pheuture.playlists.receiver.ConnectivityChangeReceiver;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
@@ -47,10 +50,12 @@ import java.io.File;
 import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
 
-public class MainActivity extends BaseActivity implements AudioManager.OnAudioFocusChangeListener,
+public class MainActivity extends BaseActivity implements
+        ConnectivityChangeReceiver.ConnectivityChangeListener,
+        AudioManager.OnAudioFocusChangeListener,
         Constants.SnackBarConstants {
     private static final String TAG = MainActivity.class.getSimpleName();
-
+    private ConnectivityChangeReceiver connectivityChangeReceiver;
     private ActivityMainBinding binding;
     private MainActivityViewModel viewModel;
     private SimpleExoPlayer exoPlayer1;
@@ -73,6 +78,17 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     private boolean playbackNowAuthorized = false;
     private boolean resumeOnFocusGain = false;
     private final Object focusLock = new Object();
+    private boolean connectToNetwork = false;
+    private boolean playingFromNetwork;
+
+    private void setupConnectivityChangeBroadcastReceiver() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+
+        connectivityChangeReceiver = new ConnectivityChangeReceiver();
+
+        registerReceiver(connectivityChangeReceiver, intentFilter);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -132,6 +148,8 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     @Override
     public void initializations() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        setupConnectivityChangeBroadcastReceiver();
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings)
@@ -262,8 +280,7 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
 
             if (exoPlayer.getPlayWhenReady()){
                 abandonAudioFocus();
-                exoPlayer1.setPlayWhenReady(false);
-                exoPlayer2.setPlayWhenReady(false);
+                pausePlayback();
             } else {
                 requestAudioFocus();
             }
@@ -418,10 +435,13 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
         if (offlineMedia != null && offlineMedia.getDownloadStatus()== DownloadManager.STATUS_SUCCESSFUL) {
             File file = new File(offlineMedia.getDownloadedFilePath());
             mediaUri = Uri.fromFile(file);
+            playingFromNetwork = false;
             Logger.e(TAG, "media loading Offline from: " + mediaUri);
+
 
         } else {
             mediaUri = Uri.parse(media.getMediaUrl());
+            playingFromNetwork = true;
             Logger.e(TAG, "media loading Online from: " + mediaUri);
         }
 
@@ -495,7 +515,7 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
 
         @Override
         public void onPlayerError(ExoPlaybackException error) {
-            /*Logger.e(TAG, "onPlayerError: " + error.getMessage());*/
+            Logger.e(TAG, "onPlayerError: " + error.getMessage());
         }
 
         @Override
@@ -574,21 +594,30 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     private void checkPlayBackState(boolean playWhenReady, int playbackState) {
         switch (playbackState) {
             case Player.STATE_BUFFERING:
+                Logger.e(TAG, "state_buffering");
                 binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.GONE);
                 binding.layoutBottomSheet.progressBuffering.setVisibility(View.VISIBLE);
+                if (playingFromNetwork && !connectToNetwork){
+                    abandonAudioFocus();
+                    pausePlayback();
+                    viewModel.showSnackBar("No internet connectivity...", Snackbar.LENGTH_LONG);
+                }
                 break;
             case Player.STATE_ENDED:
+                Logger.e(TAG, "state_ended");
                 binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
                 binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
                 binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
                 break;
             case Player.STATE_READY:
                 if (playWhenReady) {
+                    Logger.e(TAG, "state_ready_playing");
                     // media actually playing
                     binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
                     binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
                     binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
                 } else {
+                    Logger.e(TAG, "state_ready_paused");
                     // player paused in any state
                     binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
                     binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
@@ -596,6 +625,10 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
                 }
                 break;
             case Player.STATE_IDLE:
+                Logger.e(TAG, "state_idle");
+                binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
+                binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
+                binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
                 break;
             default:
                 break;
@@ -603,7 +636,11 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
     }
 
     public void toggleShuffleMode() {
-        exoPlayer1.setShuffleModeEnabled(!exoPlayer1.getShuffleModeEnabled());
+        if (currentPlayer == EXO_PLAYER_1) {
+            exoPlayer1.setShuffleModeEnabled(!exoPlayer1.getShuffleModeEnabled());
+        } else {
+            exoPlayer2.setShuffleModeEnabled(!exoPlayer2.getShuffleModeEnabled());
+        }
     }
 
     @Override
@@ -619,8 +656,14 @@ public class MainActivity extends BaseActivity implements AudioManager.OnAudioFo
 
     @Override
     protected void onDestroy() {
+        unregisterReceiver(connectivityChangeReceiver);
         abandonAudioFocus();
         timerHandler.removeCallbacks(timerRunnable);
         super.onDestroy();
+    }
+
+    @Override
+    public void onConnectivityChange(boolean connected) {
+        connectToNetwork = connected;
     }
 }
