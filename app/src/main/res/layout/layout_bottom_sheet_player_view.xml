@@ -23,6 +23,16 @@
             app:use_controller="false" />
 
         <ProgressBar
+            android:id="@+id/progress_buffering"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:padding="16dp"
+            app:layout_constraintTop_toTopOf="@+id/playerView"
+            app:layout_constraintBottom_toBottomOf="@+id/playerView"
+            app:layout_constraintStart_toStartOf="@+id/playerView"
+            app:layout_constraintEnd_toEndOf="@+id/playerView"/>
+
+        <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="0dp"
@@ -92,12 +102,6 @@
                 android:focusable="true"
                 android:padding="16dp"
                 android:src="@android:drawable/ic_media_pause" />
-
-            <ProgressBar
-                android:id="@+id/progress_buffering"
-                android:layout_width="?actionBarSize"
-                android:layout_height="?actionBarSize"
-                android:padding="16dp" />
 
         </RelativeLayout>
 

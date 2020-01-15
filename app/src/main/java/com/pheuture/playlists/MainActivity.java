@@ -279,8 +279,8 @@ public class MainActivity extends BaseActivity implements
             }
 
             if (exoPlayer.getPlayWhenReady()){
-                abandonAudioFocus();
                 pausePlayback();
+                abandonAudioFocus();
             } else {
                 requestAudioFocus();
             }
@@ -375,12 +375,8 @@ public class MainActivity extends BaseActivity implements
     };
 
     private void resetAllPlayers(){
-        try {
-            abandonAudioFocus();
-            exoPlayer1.setPlayWhenReady(false);
-            exoPlayer2.setPlayWhenReady(false);
-        } catch (Exception ignore) {
-        }
+        pausePlayback();
+        abandonAudioFocus();
     }
 
     public void setMedia(PlaylistEntity playlistEntity,  List<PlaylistMediaEntity> playlistMediaEntities, int position){
@@ -595,13 +591,9 @@ public class MainActivity extends BaseActivity implements
         switch (playbackState) {
             case Player.STATE_BUFFERING:
                 Logger.e(TAG, "state_buffering");
-                binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.GONE);
+                binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
+                binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
                 binding.layoutBottomSheet.progressBuffering.setVisibility(View.VISIBLE);
-                if (playingFromNetwork && !connectToNetwork){
-                    abandonAudioFocus();
-                    pausePlayback();
-                    viewModel.showSnackBar("No internet connectivity...", Snackbar.LENGTH_LONG);
-                }
                 break;
             case Player.STATE_ENDED:
                 Logger.e(TAG, "state_ended");
@@ -629,6 +621,11 @@ public class MainActivity extends BaseActivity implements
                 binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
                 binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
                 binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+                if (playingFromNetwork && !connectToNetwork){
+                    pausePlayback();
+                    abandonAudioFocus();
+                    viewModel.showSnackBar("No internet connectivity...", Snackbar.LENGTH_LONG);
+                }
                 break;
             default:
                 break;

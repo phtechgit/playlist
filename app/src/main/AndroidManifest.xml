@@ -36,6 +36,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing"/>
 
         <activity android:name=".auth.user_detail.UserProfileActivity"
