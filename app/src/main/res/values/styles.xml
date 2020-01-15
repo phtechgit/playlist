@@ -5,9 +5,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-
+        <item name="android:colorBackground">@color/BlackF</item>
         <item name="android:textSize">@dimen/textSizeBody1</item>
-        <item name="android:windowBackground">@drawable/splash_background</item>
+        <!--<item name="android:windowBackground">@drawable/splash_background</item>-->
         <item name="materialButtonStyle">@style/ButtonStyleDark</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>
         <item name="toolbarStyle">@style/ToolbarStyle2Dark</item>
@@ -21,9 +21,10 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@color/BlackF</item>
 
         <item name="android:textSize">@dimen/textSizeBody1</item>
-        <item name="android:windowBackground">@drawable/splash_background</item>
+        <!--<item name="android:windowBackground">@drawable/splash_background</item>-->
         <item name="materialButtonStyle">@style/ButtonStyleDark</item>
         <item name="toolbarStyle">@style/ToolbarStyle2Dark</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>

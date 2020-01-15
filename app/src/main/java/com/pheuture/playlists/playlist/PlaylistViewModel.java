@@ -61,13 +61,18 @@ public class PlaylistViewModel extends AndroidViewModel {
         reachedLast = playlistEntities.size() < limit;
 
         //add create button at the
-        if (searchQuery.length() == 0){
+        addCreateButton(playlistEntities);
+
+        playlistEntitiesMutableLiveData.postValue(playlistEntities);
+    }
+
+    private void addCreateButton(List<PlaylistEntity> playlistEntities) {
+        if (searchQuery.length() == 0 && playlistEntities.size()>0){
             PlaylistEntity addNewPlaylistModel = new PlaylistEntity();
             addNewPlaylistModel.setPlaylistID(RecyclerView.NO_ID);
             addNewPlaylistModel.setPlaylistName("Create playlist");
             playlistEntities.add(0, addNewPlaylistModel);
         }
-        playlistEntitiesMutableLiveData.postValue(playlistEntities);
     }
 
     public MutableLiveData<List<PlaylistEntity>> getPlaylistEntitiesMutableLiveData() {
@@ -118,7 +123,14 @@ public class PlaylistViewModel extends AndroidViewModel {
         //insert newly created playlist
         playlistDao.insert(playlistEntity);
         List<PlaylistEntity> playlistEntities = playlistEntitiesMutableLiveData.getValue();
-        playlistEntities.add(1, playlistEntity);
+        if (playlistEntities == null || playlistEntities.size() == 0) {
+            playlistEntities = new ArrayList<>();
+            playlistEntities.add(0, playlistEntity);
+
+            addCreateButton(playlistEntities);
+        } else {
+            playlistEntities.add(1, playlistEntity);
+        }
         playlistEntitiesMutableLiveData.postValue(playlistEntities);
 
         //add to pending uploads
@@ -134,7 +146,14 @@ public class PlaylistViewModel extends AndroidViewModel {
 
     public void deletePlaylist(int position, PlaylistEntity playlistEntity) {
         List<PlaylistEntity> playlistEntities = playlistEntitiesMutableLiveData.getValue();
+        if (playlistEntities == null || playlistEntities.size() == 0){
+            playlistEntities = new ArrayList<>();
+        }
         playlistEntities.remove(position);
+
+        //remove create button
+        removeCreateButton(playlistEntities);
+
         playlistEntitiesMutableLiveData.postValue(playlistEntities);
 
         playlistMediaDao.deleteAllMediaFromPlaylist(playlistEntity.getPlaylistID());
@@ -146,6 +165,12 @@ public class PlaylistViewModel extends AndroidViewModel {
         pendingApiDao.insert(pendingApiEntity);
 
         PendingApiExecutorService.startService(getApplication());
+    }
+
+    private void removeCreateButton(List<PlaylistEntity> playlistEntities) {
+        if (searchQuery.length()==0 && playlistEntities.size()==1){
+            playlistEntities.remove(0);
+        }
     }
 
     public boolean isExistingPlaylist(String playlistName) {

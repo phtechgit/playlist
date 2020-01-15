@@ -236,7 +236,7 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
 
         PendingApiEntity pendingApiEntity = new PendingApiEntity();
         pendingApiEntity.setUrl(Url.PLAYLIST_DELETE);
-        pendingApiEntity.setParams(ParserUtil.getInstance().toJson(playlistEntity, PlaylistEntity.class));
+        pendingApiEntity.setParams(ParserUtil.getInstance().toJson(playlistEntity.getValue(), PlaylistEntity.class));
         pendingApiDao.insert(pendingApiEntity);
 
         PendingApiExecutorService.startService(getApplication());
