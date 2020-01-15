@@ -13,9 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemMediaBinding;
+import com.pheuture.playlists.databinding.ItemQueueNotPlayingMediaBinding;
+import com.pheuture.playlists.databinding.ItemQueuePlayingMediaBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
-import com.pheuture.playlists.playlist.detail.PlaylistDetailFragment;
 import com.pheuture.playlists.utils.Constants;
 
 import java.util.ArrayList;
@@ -23,7 +24,10 @@ import java.util.List;
 
 public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = MediaQueueRecyclerAdapter.class.getSimpleName();
+    private int PLAYING_MEDIA = 1;
+    private int NOT_PLAYING_MEDIA = 2;
     private Context mContext;
+    private int currentMediaPosition;
     private List<PlaylistMediaEntity> oldList;
     private RecyclerViewClickListener recyclerViewClickListener;
 
@@ -32,25 +36,37 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         this.recyclerViewClickListener = listener;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        if (position == currentMediaPosition){
+            return PLAYING_MEDIA;
+        } else {
+            return NOT_PLAYING_MEDIA;
+        }
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new MyViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
-                R.layout.item_queue_media, parent, false));
+        if (viewType == PLAYING_MEDIA) {
+            return new PlayingMediaViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
+                    R.layout.item_queue_playing_media, parent, false));
+        } else {
+            return new NotPlayingMediaViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
+                    R.layout.item_queue_not_playing_media, parent, false));
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder recyclerHOlder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder recyclerHolder, int position) {
         if (position == RecyclerView.NO_POSITION){
             return;
         }
-        MyViewHolder holder = (MyViewHolder) recyclerHOlder;
-
-        PlaylistMediaEntity model = oldList.get(position);
-        holder.binding.setMediaTitle(model.getMediaTitle());
-        holder.binding.setMediaDescription(model.getMediaDescription());
-        holder.binding.setMediaThumbnail(model.getMediaThumbnail());
-        holder.binding.setMediaDuration(model.getFormattedPlayDuration());
+        if (getItemViewType(position) == PLAYING_MEDIA){
+            ((PlayingMediaViewHolder) recyclerHolder).setData(oldList.get(position));
+        } else {
+            ((NotPlayingMediaViewHolder) recyclerHolder).setData(oldList.get(position));
+        }
     }
 
     public void setData(List<PlaylistMediaEntity> newList) {
@@ -65,7 +81,8 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
     }
 
     public void setCurrentMediaPosition(int currentMediaPosition) {
-
+        this.currentMediaPosition = currentMediaPosition;
+        notifyItemChanged(currentMediaPosition);
     }
 
     class DiffCallBack extends DiffUtil.Callback{
@@ -126,10 +143,10 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         return !oldData.equals(newData);
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-        private ItemMediaBinding binding;
+    public class PlayingMediaViewHolder extends RecyclerView.ViewHolder {
+        private ItemQueuePlayingMediaBinding binding;
 
-        MyViewHolder(@NonNull ItemMediaBinding binding) {
+        PlayingMediaViewHolder(@NonNull ItemQueuePlayingMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             binding.imageViewRemove.setVisibility(View.VISIBLE);
@@ -184,6 +201,64 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
                     recyclerViewClickListener.onRecyclerViewItemClick(bundle);
                 }
             });
+        }
+
+        public void setData(PlaylistMediaEntity model) {
+            binding.setMediaTitle(model.getMediaTitle());
+            binding.setMediaDescription(model.getMediaDescription());
+            binding.setMediaThumbnail(model.getMediaThumbnail());
+            binding.setMediaDuration(model.getFormattedPlayDuration());
+        }
+    }
+
+    public class NotPlayingMediaViewHolder extends RecyclerView.ViewHolder {
+        private ItemQueueNotPlayingMediaBinding binding;
+
+        NotPlayingMediaViewHolder(@NonNull ItemQueueNotPlayingMediaBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+            binding.imageViewRemove.setVisibility(View.VISIBLE);
+
+            binding.getRoot().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    if (pos == RecyclerView.NO_POSITION){
+                        return;
+                    }
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Constants.ARG_PARAM1, pos);
+                    bundle.putInt(Constants.ARG_PARAM2, 1);
+                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
+
+                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
+                }
+            });
+
+            binding.imageViewRemove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    if (pos == RecyclerView.NO_POSITION){
+                        return;
+                    }
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Constants.ARG_PARAM1, pos);
+                    bundle.putInt(Constants.ARG_PARAM2, 2);
+                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
+
+                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
+                }
+            });
+        }
+
+        public void setData(PlaylistMediaEntity model) {
+            binding.setMediaTitle(model.getMediaTitle());
+            binding.setMediaDescription(model.getMediaDescription());
+            binding.setMediaThumbnail(model.getMediaThumbnail());
+            binding.setMediaDuration(model.getFormattedPlayDuration());
         }
     }
 
