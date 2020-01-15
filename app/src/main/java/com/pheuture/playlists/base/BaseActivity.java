@@ -33,7 +33,7 @@ import com.pheuture.playlists.interfaces.RequestCodes;
 import java.util.List;
 
 public abstract class BaseActivity extends AppCompatActivity implements NotificationID, RequestCodes,
-        Constants.SnackBarConstants, View.OnClickListener {
+        Constants.SnackBarActions, View.OnClickListener {
     public static final String ARG_PARAM1 = "param1";
     public static final String ARG_PARAM2 = "param2";
     public static final String ARG_PARAM3 = "param3";

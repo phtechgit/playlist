@@ -7,7 +7,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
-import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,7 +43,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     private FragmentPlaylistDetailBinding binding;
     private MainActivityViewModel parentViewModel;
     private PlaylistDetailViewModel viewModel;
-    private PlaylistVideosRecyclerAdapter recyclerAdapter;
+    private PlaylistMediaRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
     private PlaylistEntity playlist;
     private List<PlaylistMediaEntity> playlistMediaEntities;
@@ -96,7 +95,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         });
 
         layoutManager = new LinearLayoutManager(activity);
-        recyclerAdapter = new PlaylistVideosRecyclerAdapter(this);
+        recyclerAdapter = new PlaylistMediaRecyclerAdapter(this);
 
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(recyclerAdapter);

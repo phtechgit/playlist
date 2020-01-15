@@ -33,6 +33,8 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaEntity;
 import com.pheuture.playlists.base.BaseActivity;
+import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.queue.MediaQueueRecyclerAdapter;
 import com.pheuture.playlists.receiver.ConnectivityChangeReceiver;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
@@ -45,15 +47,18 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
 import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
 
 public class MainActivity extends BaseActivity implements
+        RecyclerViewClickListener,
         ConnectivityChangeReceiver.ConnectivityChangeListener,
         AudioManager.OnAudioFocusChangeListener,
-        Constants.SnackBarConstants {
+        Constants.SnackBarActions {
+
     private static final String TAG = MainActivity.class.getSimpleName();
     private ConnectivityChangeReceiver connectivityChangeReceiver;
     private ActivityMainBinding binding;
@@ -70,9 +75,8 @@ public class MainActivity extends BaseActivity implements
     private Handler timerHandler = new Handler();
     private long totalDurationOfCurrentMedia = 0;
     private long currentDurationOfCurrentMedia = 0;
-    private int defaultTimerSec = 100;
+    private int defaultTimerMillisec = 100;
     private AudioManager audioManager;
-    private AudioAttributes playbackAttributes;
     private AudioFocusRequest audioFocusRequestBuilder;
     private boolean playbackDelayed = false;
     private boolean playbackNowAuthorized = false;
@@ -80,6 +84,8 @@ public class MainActivity extends BaseActivity implements
     private final Object focusLock = new Object();
     private boolean connectToNetwork = false;
     private boolean playingFromNetwork;
+    private MediaQueueRecyclerAdapter recyclerAdapter;
+    private LinearLayoutManager layoutManager;
 
     private void setupConnectivityChangeBroadcastReceiver() {
         IntentFilter intentFilter = new IntentFilter();
@@ -162,7 +168,7 @@ public class MainActivity extends BaseActivity implements
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            playbackAttributes = new AudioAttributes.Builder()
+            AudioAttributes playbackAttributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
                     .build();
@@ -186,6 +192,12 @@ public class MainActivity extends BaseActivity implements
         exoPlayer1 = viewModel.getExoPlayer1();
         exoPlayer2 = viewModel.getExoPlayer2();
 
+        layoutManager = new LinearLayoutManager(this);
+        recyclerAdapter = new MediaQueueRecyclerAdapter(this, this);
+
+        binding.layoutBottomSheet.recyclerViewMediaQueue.setLayoutManager(layoutManager);
+        binding.layoutBottomSheet.recyclerViewMediaQueue.setAdapter(recyclerAdapter);
+
         viewModel.getTitle().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
@@ -207,13 +219,16 @@ public class MainActivity extends BaseActivity implements
                         exoPlayer2.setVolume(1f);
                         loadNextVideoIn(EXO_PLAYER_2);
                     }
+
+                    recyclerAdapter.setData(mediaToPlay);
+                    recyclerAdapter.setCurrentMediaPosition(currentMediaPosition);
                 }
             }
         });
 
         //set timerHandler that runs every second to update progress and check if need to change track
         // for crossFade feature
-        timerHandler.postDelayed(timerRunnable, defaultTimerSec);
+        timerHandler.postDelayed(timerRunnable, defaultTimerMillisec);
 
         viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
             @Override
@@ -306,71 +321,66 @@ public class MainActivity extends BaseActivity implements
     private Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
-            try {
-                if (currentPlayer == EXO_PLAYER_1) {
-                    totalDurationOfCurrentMedia = exoPlayer1.getDuration();
-                    currentDurationOfCurrentMedia = exoPlayer1.getCurrentPosition();
+            if (currentPlayer == EXO_PLAYER_1) {
+                totalDurationOfCurrentMedia = exoPlayer1.getDuration();
+                currentDurationOfCurrentMedia = exoPlayer1.getCurrentPosition();
 
-                    int crossFadeValue = (SharedPrefsUtils.getIntegerPreference(MainActivity.this,
-                            Constants.CROSS_FADE_VALUE, 0) * 1000);
+                int crossFadeValue = (SharedPrefsUtils.getIntegerPreference(MainActivity.this,
+                        Constants.CROSS_FADE_VALUE, 0) * 1000);
 
-                    //increase volume if player
-                    if (mediaToPlay.size()>1 && exoPlayer1.getVolume()<1f) {
-                        float volume = (float) currentDurationOfCurrentMedia / (float) crossFadeValue;
-                        exoPlayer1.setVolume(volume);
-                        exoPlayer2.setVolume(1f-volume);
-                        Logger.e(TAG, "volume: exoPlayer:" + exoPlayer1.getVolume() + ", exoPlayer2:" + exoPlayer2.getVolume());
-                    }
-
-                    //if more media available to play
-                    if ((mediaToPlay.size()-1)> currentMediaPosition) {
-                        if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
-                                - currentDurationOfCurrentMedia) <= crossFadeValue) {
-                            runOnUiThread(() -> {
-                                exoPlayer2.setVolume(0f);
-                                loadNextVideoIn(EXO_PLAYER_2);
-                            });
-                        }
-                    }
-                } else if (currentPlayer == EXO_PLAYER_2) {
-                    totalDurationOfCurrentMedia = exoPlayer2.getDuration();
-                    currentDurationOfCurrentMedia = exoPlayer2.getCurrentPosition();
-
-                    int crossFadeValue = (SharedPrefsUtils.getIntegerPreference(MainActivity.this,
-                            Constants.CROSS_FADE_VALUE, 0) * 1000);
-
-                    //increase volume if player
-                    if (mediaToPlay.size()>1 && exoPlayer2.getVolume()<1f) {
-                        float volume = (float) currentDurationOfCurrentMedia / (float) crossFadeValue;
-                        exoPlayer2.setVolume(volume);
-                        exoPlayer1.setVolume(1f-volume);
-
-                        Logger.e(TAG, "volume: exoPlayer2:" + exoPlayer2.getVolume() + ", exoPlayer1:" + exoPlayer1.getVolume());
-                    }
-
-                    //if more media available to play
-                    if ((mediaToPlay.size()-1)> currentMediaPosition){
-                        //if remaining duration of current media <= 2sec
-                        if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
-                                - currentDurationOfCurrentMedia) <= crossFadeValue) {
-                            runOnUiThread(() -> {
-                                exoPlayer1.setVolume(0f);
-                                loadNextVideoIn(EXO_PLAYER_1);
-                            });
-                        }
-                    }
+                //increase volume if player
+                if (mediaToPlay.size()>1 && exoPlayer1.getVolume()<1f) {
+                    float volume = (float) currentDurationOfCurrentMedia / (float) crossFadeValue;
+                    exoPlayer1.setVolume(volume);
+                    exoPlayer2.setVolume(1f-volume);
+                    Logger.e(TAG, "volume: exoPlayer:" + exoPlayer1.getVolume() + ", exoPlayer2:" + exoPlayer2.getVolume());
                 }
 
-                /*Logger.e(TAG, "totalDurationOfCurrentMedia:" + totalDurationOfCurrentMedia + ", currentDurationOfCurrentMedia:" + currentDurationOfCurrentMedia + ", crossFadeValue:" + (SharedPrefsUtils.getIntegerPreference(MainActivity.this,
-                        Constants.CROSS_FADE_VALUE, 0) * 1000));*/
-                //update progress
-                binding.layoutBottomSheet.progressBar.setProgress(calculatePercentage(totalDurationOfCurrentMedia,
-                        currentDurationOfCurrentMedia));
-            } catch (Exception e) {
-                Logger.e(TAG, e.toString());
+                //if more media available to play
+                if ((mediaToPlay.size()-1)> currentMediaPosition) {
+                    if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
+                            - currentDurationOfCurrentMedia) <= crossFadeValue) {
+                        runOnUiThread(() -> {
+                            exoPlayer2.setVolume(0f);
+                            loadNextVideoIn(EXO_PLAYER_2);
+                        });
+                    }
+                }
+            } else if (currentPlayer == EXO_PLAYER_2) {
+                totalDurationOfCurrentMedia = exoPlayer2.getDuration();
+                currentDurationOfCurrentMedia = exoPlayer2.getCurrentPosition();
+
+                int crossFadeValue = (SharedPrefsUtils.getIntegerPreference(MainActivity.this,
+                        Constants.CROSS_FADE_VALUE, 0) * 1000);
+
+                //increase volume if player
+                if (mediaToPlay.size()>1 && exoPlayer2.getVolume()<1f) {
+                    float volume = (float) currentDurationOfCurrentMedia / (float) crossFadeValue;
+                    exoPlayer2.setVolume(volume);
+                    exoPlayer1.setVolume(1f-volume);
+
+                    Logger.e(TAG, "volume: exoPlayer2:" + exoPlayer2.getVolume() + ", exoPlayer1:" + exoPlayer1.getVolume());
+                }
+
+                //if more media available to play
+                if ((mediaToPlay.size()-1)> currentMediaPosition){
+                    //if remaining duration of current media <= 2sec
+                    if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
+                            - currentDurationOfCurrentMedia) <= crossFadeValue) {
+                        runOnUiThread(() -> {
+                            exoPlayer1.setVolume(0f);
+                            loadNextVideoIn(EXO_PLAYER_1);
+                        });
+                    }
+                }
             }
 
-            timerHandler.postDelayed(timerRunnable, defaultTimerSec);
+            //update progress
+            binding.layoutBottomSheet.progressBar.setProgress(calculatePercentage(totalDurationOfCurrentMedia,
+                    currentDurationOfCurrentMedia));
+
+            //reset handler
+            timerHandler.postDelayed(timerRunnable, defaultTimerMillisec);
         }
     };
 
@@ -395,7 +405,7 @@ public class MainActivity extends BaseActivity implements
                     break;
                 case BottomSheetBehavior.STATE_EXPANDED:
                 case BottomSheetBehavior.STATE_HALF_EXPANDED:
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    /*bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);*/
                     break;
                 case BottomSheetBehavior.STATE_COLLAPSED:
                     break;
@@ -464,7 +474,9 @@ public class MainActivity extends BaseActivity implements
 
         //show bottomSheet for player
         binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer.setVisibility(View.VISIBLE);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN ) {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
     }
 
     private int calculatePercentage(long totalDuration, long currentDuration) {
@@ -561,7 +573,7 @@ public class MainActivity extends BaseActivity implements
 
         @Override
         public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-            String data = shuffleModeEnabled?"Enabled":"Disabled";
+            String data = shuffleModeEnabled ? "Enabled" : "Disabled";
             Toast.makeText(MainActivity.this, "Shuffle " + data , Toast.LENGTH_SHORT).show();
         }
 
@@ -648,7 +660,13 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN
+                || bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+            super.onBackPressed();
+        } else {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)                                                                                              ;
+        }
+
     }
 
     @Override
@@ -662,5 +680,15 @@ public class MainActivity extends BaseActivity implements
     @Override
     public void onConnectivityChange(boolean connected) {
         connectToNetwork = connected;
+    }
+
+    @Override
+    public void onRecyclerViewItemClick(Bundle bundle) {
+
+    }
+
+    @Override
+    public void onRecyclerViewItemLongClick(Bundle bundle) {
+
     }
 }

@@ -1,39 +1,42 @@
-package com.pheuture.playlists.playlist.detail;
+package com.pheuture.playlists.queue;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemMediaBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.playlist.detail.PlaylistDetailFragment;
 import com.pheuture.playlists.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private static final String TAG = PlaylistVideosRecyclerAdapter.class.getSimpleName();
+public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private static final String TAG = MediaQueueRecyclerAdapter.class.getSimpleName();
     private Context mContext;
     private List<PlaylistMediaEntity> oldList;
     private RecyclerViewClickListener recyclerViewClickListener;
 
-    PlaylistVideosRecyclerAdapter(PlaylistDetailFragment context) {
-        this.mContext = context.getContext();
-        this.recyclerViewClickListener = context;
+    public MediaQueueRecyclerAdapter(Context context, RecyclerViewClickListener listener) {
+        this.mContext = context;
+        this.recyclerViewClickListener = listener;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new MyViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
-                R.layout.item_media, parent, false));
+                R.layout.item_queue_media, parent, false));
     }
 
     @Override
@@ -50,7 +53,7 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
         holder.binding.setMediaDuration(model.getFormattedPlayDuration());
     }
 
-    void setData(List<PlaylistMediaEntity> newList) {
+    public void setData(List<PlaylistMediaEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList), true);
         oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
@@ -59,6 +62,10 @@ public class PlaylistVideosRecyclerAdapter extends RecyclerView.Adapter<Recycler
     public void removeItem(int position) {
         oldList.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public void setCurrentMediaPosition(int currentMediaPosition) {
+
     }
 
     class DiffCallBack extends DiffUtil.Callback{

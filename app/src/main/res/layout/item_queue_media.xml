@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="mediaTitle"
+            type="String" />
+        <variable
+            name="mediaDescription"
+            type="String" />
+        <variable
+            name="mediaThumbnail"
+            type="String" />
+        <variable
+            name="mediaDuration"
+            type="String" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="2dp"
+        android:paddingTop="2dp"
+        app:layout_constraintEnd_toStartOf="@+id/textView_title"
+        app:layout_constraintStart_toStartOf="@+id/textView_title">
+
+        <ImageView
+            android:id="@+id/imageView_thumbnail"
+            android:layout_width="140dp"
+            android:layout_height="90dp"
+            android:scaleType="center"
+            android:background="@color/grayE"
+            app:imageUrl="@{mediaThumbnail}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:textColor="@color/WhiteC"
+            android:textSize="@dimen/textSizeCaption"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="1dp"
+            android:paddingBottom="1dp"
+            android:background="@drawable/edittext_background_gray"
+            android:textStyle="bold"
+            android:text="@{mediaDuration}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/imageView_thumbnail" />
+
+        <LinearLayout
+            android:id="@+id/linear_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView_thumbnail"
+            app:layout_constraintEnd_toStartOf="@+id/linearLayout_2"
+            app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail"
+            app:layout_constraintTop_toTopOf="@+id/imageView_thumbnail">
+
+            <TextView
+                android:id="@+id/textView_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="2"
+                android:tag="decorator_ending_view"
+                android:text="@{mediaTitle}"
+                android:textSize="@dimen/textSizeBody2"
+                app:layout_constraintBottom_toTopOf="@+id/textView_creator"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <TextView
+                android:id="@+id/textView_creator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{mediaDescription}"
+                android:textColor="@color/grayC"
+                android:textSize="@dimen/textSizeCaption"
+                app:layout_constraintBottom_toTopOf="@+id/imageView_add"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail"
+                app:layout_constraintTop_toBottomOf="@+id/textView_title" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/imageView_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_add_light" />
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/imageView_remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_remove_circle" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
+
+

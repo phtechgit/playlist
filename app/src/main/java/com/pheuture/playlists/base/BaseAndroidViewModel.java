@@ -13,7 +13,7 @@ import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.interfaces.NotificationID;
 
 public class BaseAndroidViewModel extends AndroidViewModel implements NotificationID,
-        Constants.SnackBarConstants {
+        Constants.SnackBarActions {
 
     private MutableLiveData<Bundle> snackBarBundleMutableLiveData;
     private Handler snackBarHandler = new Handler();
@@ -33,9 +33,9 @@ public class BaseAndroidViewModel extends AndroidViewModel implements Notificati
 
     public void showSnackBar(String message, int length){
         Bundle bundle = new Bundle();
-        bundle.putBoolean(Constants.SnackBarConstants.SNACK_BAR_SHOW, true);
-        bundle.putString(Constants.SnackBarConstants.SNACK_BAR_MESSAGE, message);
-        bundle.putInt(Constants.SnackBarConstants.SNACK_BAR_LENGTH, length);
+        bundle.putBoolean(Constants.SnackBarActions.SNACK_BAR_SHOW, true);
+        bundle.putString(Constants.SnackBarActions.SNACK_BAR_MESSAGE, message);
+        bundle.putInt(Constants.SnackBarActions.SNACK_BAR_LENGTH, length);
 
         snackBarBundleMutableLiveData.postValue(bundle);
 

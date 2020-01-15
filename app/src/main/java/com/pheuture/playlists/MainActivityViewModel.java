@@ -1,7 +1,6 @@
 package com.pheuture.playlists;
 
 import android.app.Application;
-import android.content.IntentFilter;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
@@ -17,13 +16,12 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaDao;
 import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaEntity;
 import com.pheuture.playlists.base.BaseAndroidViewModel;
-import com.pheuture.playlists.receiver.ConnectivityChangeReceiver;
 import com.pheuture.playlists.utils.Constants;
 
 import java.util.List;
 
 public class MainActivityViewModel extends BaseAndroidViewModel implements
-        Constants.SnackBarConstants {
+        Constants.SnackBarActions {
     private static final String TAG = MainActivityViewModel.class.getSimpleName();
     private MutableLiveData<String> title;
     private DataSource.Factory dataSourceFactory;
