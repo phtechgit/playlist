@@ -5,6 +5,9 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
+
+import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaDao;
+import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiDao;
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiEntity;
 import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler.PendingFileUploadDao;
@@ -29,7 +32,8 @@ import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
                 PlaylistEntity.class,
                 PlaylistMediaEntity.class,
                 MediaEntity.class,
-                OfflineMediaEntity.class
+                OfflineMediaEntity.class,
+                QueueMediaEntity.class
         }, exportSchema = false)
 
 @TypeConverters({Converters.class})
@@ -42,6 +46,7 @@ public abstract class LocalRepository extends RoomDatabase {
     public abstract PlaylistMediaDao playlistMediaDao();
     public abstract OfflineMediaDao offlineMediaDao();
     public abstract MediaDao mediaDao();
+    public abstract QueueMediaDao queueMediaDao();
 
     public static LocalRepository getInstance(Context context) {
         if (mLocalRepository == null) {

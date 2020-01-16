@@ -12,10 +12,9 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.databinding.ItemMediaBinding;
 import com.pheuture.playlists.databinding.ItemQueueNotPlayingMediaBinding;
 import com.pheuture.playlists.databinding.ItemQueuePlayingMediaBinding;
-import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
+import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.utils.Constants;
 
@@ -28,8 +27,13 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
     private int NOT_PLAYING_MEDIA = 2;
     private Context mContext;
     private int currentMediaPosition;
-    private List<PlaylistMediaEntity> oldList;
+    private List<QueueMediaEntity> oldList;
     private RecyclerViewClickListener recyclerViewClickListener;
+
+    public interface ClickType {
+        int SELECT = 1;
+        int REMOVE = 2;
+    }
 
     public MediaQueueRecyclerAdapter(Context context, RecyclerViewClickListener listener) {
         this.mContext = context;
@@ -69,27 +73,21 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         }
     }
 
-    public void setData(List<PlaylistMediaEntity> newList) {
+    public void setData(List<QueueMediaEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList), true);
         oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
     }
 
-    public void removeItem(int position) {
-        oldList.remove(position);
-        notifyItemRemoved(position);
-    }
-
-    public void setCurrentMediaPosition(int currentMediaPosition) {
-        this.currentMediaPosition = currentMediaPosition;
-        notifyItemChanged(currentMediaPosition);
+    public List<QueueMediaEntity> getDataList() {
+        return oldList;
     }
 
     class DiffCallBack extends DiffUtil.Callback{
-        private List<PlaylistMediaEntity> oldList;
-        private List<PlaylistMediaEntity> newList;
+        private List<QueueMediaEntity> oldList;
+        private List<QueueMediaEntity> newList;
 
-        public DiffCallBack(List<PlaylistMediaEntity> oldList, List<PlaylistMediaEntity> newList) {
+        public DiffCallBack(List<QueueMediaEntity> oldList, List<QueueMediaEntity> newList) {
             this.oldList = oldList;
             this.newList = newList;
         }
@@ -111,8 +109,8 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
 
         @Override
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            PlaylistMediaEntity oldModel = oldList.get(oldItemPosition);
-            PlaylistMediaEntity newModel = newList.get(newItemPosition);
+            QueueMediaEntity oldModel = oldList.get(oldItemPosition);
+            QueueMediaEntity newModel = newList.get(newItemPosition);
 
             if (contentsDifferent(oldModel.getMediaUrl(), newModel.getMediaUrl())){
                 return false;
@@ -203,7 +201,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             });
         }
 
-        public void setData(PlaylistMediaEntity model) {
+        public void setData(QueueMediaEntity model) {
             binding.setMediaTitle(model.getMediaTitle());
             binding.setMediaDescription(model.getMediaDescription());
             binding.setMediaThumbnail(model.getMediaThumbnail());
@@ -229,7 +227,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
 
                     Bundle bundle = new Bundle();
                     bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putInt(Constants.ARG_PARAM2, 1);
+                    bundle.putInt(Constants.ARG_PARAM2, ClickType.SELECT);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
                     recyclerViewClickListener.onRecyclerViewItemClick(bundle);
@@ -246,7 +244,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
 
                     Bundle bundle = new Bundle();
                     bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putInt(Constants.ARG_PARAM2, 2);
+                    bundle.putInt(Constants.ARG_PARAM2, ClickType.REMOVE);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
                     recyclerViewClickListener.onRecyclerViewItemClick(bundle);
@@ -254,7 +252,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             });
         }
 
-        public void setData(PlaylistMediaEntity model) {
+        public void setData(QueueMediaEntity model) {
             binding.setMediaTitle(model.getMediaTitle());
             binding.setMediaDescription(model.getMediaDescription());
             binding.setMediaThumbnail(model.getMediaThumbnail());

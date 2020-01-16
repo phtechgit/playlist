@@ -241,4 +241,5 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
 
         PendingApiExecutorService.startService(getApplication());
     }
+
 }

@@ -20,6 +20,7 @@ import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentTrendingsBinding;
+import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
@@ -105,13 +106,10 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
 
         String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity,
                 MediaEntity.class);
-        PlaylistMediaEntity playlistMediaEntity = ParserUtil.getInstance()
-                .fromJson(objectJsonString, PlaylistMediaEntity.class);
+        QueueMediaEntity queueMediaEntity = ParserUtil.getInstance()
+                .fromJson(objectJsonString, QueueMediaEntity.class);
 
-        List<PlaylistMediaEntity> mediaEntities = new ArrayList<>();
-        mediaEntities.add(playlistMediaEntity);
-
-        ((MainActivity) activity).setMedia(null, mediaEntities, RecyclerView.NO_POSITION);
+        parentViewModel.setMedia(null, queueMediaEntity);
     }
 
     @Override

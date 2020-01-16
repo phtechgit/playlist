@@ -5,6 +5,9 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RoomWarnings;
+
+import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
 
 import java.util.List;
 
@@ -36,6 +39,18 @@ public interface PlaylistMediaDao {
 
     @Query("select * from PlaylistMediaEntity where playlistID=:playlistID and mediaID=:mediaID")
     PlaylistMediaEntity getPlaylistMedia(long playlistID, long mediaID);
+
+    @Query("select * from PlaylistMediaEntity where playlistID=:playlistID")
+    List<PlaylistMediaEntity> getPlaylistMediaEntities(long playlistID);
+
+
+
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
+    @Query("select * from PlaylistMediaEntity where playlistID=:playlistID")
+    List<PlaylistMediaEntity> getPlaylistMediaMediaEntities(long playlistID);
+
+
+
 
     @Query("select * from PlaylistMediaEntity where playlistID=:playlistID and mediaTitle like:mediaTitle limit:limit offset:offset")
     List<PlaylistMediaEntity> getPlaylistMediaEntities(long playlistID, String mediaTitle, int limit, int offset);

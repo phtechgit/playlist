@@ -21,6 +21,7 @@ import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentMediaBinding;
+import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
@@ -137,15 +138,17 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
 
         String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity,
                 MediaEntity.class);
-        PlaylistMediaEntity playlistMediaEntity = ParserUtil.getInstance()
-                .fromJson(objectJsonString, PlaylistMediaEntity.class);
 
         if (type == 1){
-            List<PlaylistMediaEntity> playlistMediaEntities = new ArrayList<>();
-            playlistMediaEntities.add(playlistMediaEntity);
-            ((MainActivity) activity).setMedia(null, playlistMediaEntities, RecyclerView.NO_POSITION);
+            QueueMediaEntity queueMediaEntity = ParserUtil.getInstance()
+                    .fromJson(objectJsonString, QueueMediaEntity.class);
+
+            parentViewModel.setMedia(null, queueMediaEntity);
 
         } else {
+            PlaylistMediaEntity playlistMediaEntity = ParserUtil.getInstance()
+                    .fromJson(objectJsonString, PlaylistMediaEntity.class);
+
             parentViewModel.showSnackBar("added to " + playlistModel.getPlaylistName(),
                     Snackbar.LENGTH_SHORT);
 

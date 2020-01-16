@@ -28,12 +28,15 @@ import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentPlaylistDetailBinding;
+import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
+import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.KeyboardUtils;
+import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 
 import java.util.List;
@@ -158,12 +161,12 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         } else if (v.equals(binding.imageViewPlay)) {
             if (playlistMediaEntities.size()>0) {
-                ((MainActivity) activity).setMedia(playlist, playlistMediaEntities, RecyclerView.NO_POSITION);
+                parentViewModel.setMedia(playlist, null);
             }
 
         } else if (v.equals(binding.imageViewShuffle)) {
             if (playlistMediaEntities.size()>2) {
-                ((MainActivity) activity).toggleShuffleMode();
+                parentViewModel.toggleShuffleMode();
             }
         }
     }
@@ -172,14 +175,19 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     public void onRecyclerViewItemClick(Bundle bundle) {
         int position = bundle.getInt(ARG_PARAM1, -1);
         int type = bundle.getInt(ARG_PARAM2, -1);
-        PlaylistMediaEntity model = bundle.getParcelable(ARG_PARAM3);
+        PlaylistMediaEntity playlistMediaEntity = bundle.getParcelable(ARG_PARAM3);
 
-        assert model != null;
+        assert playlistMediaEntity != null;
         if (type == 1){
-            ((MainActivity) activity).setMedia(playlist, playlistMediaEntities, (position-1));
+            String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntity,
+                    PlaylistMediaEntity.class);
+            QueueMediaEntity queueMediaEntity = ParserUtil.getInstance()
+                    .fromJson(objectJsonString, QueueMediaEntity.class);
+
+            parentViewModel.setMedia(playlist, queueMediaEntity);
 
         } else if (type == 2){
-            showRemoveMediaFromPlaylistAlert(position, model);
+            showRemoveMediaFromPlaylistAlert(position, playlistMediaEntity);
         }
     }
 
