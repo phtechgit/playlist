@@ -26,7 +26,6 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
     private int PLAYING_MEDIA = 1;
     private int NOT_PLAYING_MEDIA = 2;
     private Context mContext;
-    private int currentMediaPosition;
     private List<QueueMediaEntity> oldList;
     private RecyclerViewClickListener recyclerViewClickListener;
 
@@ -42,7 +41,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public int getItemViewType(int position) {
-        if (position == currentMediaPosition){
+        if (oldList.get(position).getState() == QueueMediaEntity.QueueMediaState.PLAYING){
             return PLAYING_MEDIA;
         } else {
             return NOT_PLAYING_MEDIA;

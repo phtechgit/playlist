@@ -16,7 +16,7 @@ import java.util.List;
 public interface QueueMediaDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long insert(QueueMediaEntity video);
+    long insert(QueueMediaEntity queueMediaEntity);
 
     @Query("select count(*) from QueueMediaEntity")
     LiveData<Integer> getQueueMediaCount();

@@ -1,6 +1,7 @@
 package com.pheuture.playlists;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +17,7 @@ import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEnt
 import com.pheuture.playlists.base.BaseActivity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.queue.MediaQueueRecyclerAdapter;
+import com.pheuture.playlists.receiver.ConnectivityChangeReceiver;
 import com.pheuture.playlists.utils.Logger;
 
 import androidx.annotation.NonNull;
@@ -32,13 +34,15 @@ import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
 
 public class MainActivity extends BaseActivity implements RecyclerViewClickListener,
-        MediaQueueRecyclerAdapter.ClickType {
+        MediaQueueRecyclerAdapter.ClickType,
+        ConnectivityChangeReceiver.ConnectivityChangeListener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private ActivityMainBinding binding;
     private MainActivityViewModel viewModel;
     private BottomSheetBehavior bottomSheetBehavior;
     private MediaQueueRecyclerAdapter recyclerAdapter;
+    private ConnectivityChangeReceiver connectivityChangeReceiver;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -55,9 +59,20 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
         return super.onOptionsItemSelected(item);
     }
 
+    private void setupConnectivityChangeBroadcastReceiver() {
+        connectivityChangeReceiver = new ConnectivityChangeReceiver();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+
+        registerReceiver(connectivityChangeReceiver, intentFilter);
+    }
+
     @Override
     public void initializations() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        setupConnectivityChangeBroadcastReceiver();
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings)
@@ -117,6 +132,13 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
             @Override
             public void onChanged(List<QueueMediaEntity> queueMediaEntities) {
                 recyclerAdapter.setData(queueMediaEntities);
+                if (queueMediaEntities.size()>0){
+
+                    binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer.setVisibility(View.VISIBLE);
+                    if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN){
+                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    }
+                }
             }
         });
 
@@ -127,29 +149,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
                 int playBackState = bundle.getInt(ARG_PARAM2);
 
                 checkPlayBackState(playWhenReady, playBackState);
-            }
-        });
-
-        viewModel.getBottomSheetState().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer state) {
-                Logger.e(TAG, "onStateChanged: " + state);
-                switch (state) {
-                    case BottomSheetBehavior.STATE_HIDDEN:
-                        viewModel.resetAllPlayers();
-                        break;
-                    case BottomSheetBehavior.STATE_EXPANDED:
-                    case BottomSheetBehavior.STATE_HALF_EXPANDED:
-                        /*bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);*/
-                        break;
-                    case BottomSheetBehavior.STATE_COLLAPSED:
-                        break;
-                    case BottomSheetBehavior.STATE_DRAGGING:
-                        break;
-                    case BottomSheetBehavior.STATE_SETTLING:
-                        /*bottomSheetBehavior.setHideable(false);*/
-                        break;
-                }
             }
         });
 
@@ -230,7 +229,25 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
     private BottomSheetCallback  bottomSheetCallback = new BottomSheetCallback() {
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
-            viewModel.setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
+            viewModel.setBottomSheetState(newState);
+            Logger.e(TAG, "onStateChanged: " + newState);
+
+            switch (newState) {
+                case BottomSheetBehavior.STATE_HIDDEN:
+                    viewModel.resetAllPlayers();
+                    break;
+                case BottomSheetBehavior.STATE_EXPANDED:
+                case BottomSheetBehavior.STATE_HALF_EXPANDED:
+                    /*bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);*/
+                    break;
+                case BottomSheetBehavior.STATE_COLLAPSED:
+                    break;
+                case BottomSheetBehavior.STATE_DRAGGING:
+                    break;
+                case BottomSheetBehavior.STATE_SETTLING:
+                    /*bottomSheetBehavior.setHideable(false);*/
+                    break;
+            }
         }
 
         @Override
@@ -275,4 +292,15 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(connectivityChangeReceiver);
+    }
+
+    @Override
+    public void onConnectivityChange(boolean connected) {
+        Logger.e(TAG, "onConnectivityChange");
+        viewModel.setNetworkStatus(connected);
+    }
 }
