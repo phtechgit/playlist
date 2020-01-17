@@ -50,4 +50,7 @@ public interface QueueMediaDao {
 
     @Delete
     void delete(QueueMediaEntity queueMediaEntity);
+
+    @Query("select rowid from QueueMediaEntity where mediaID=:mediaID")
+    int getPositionOfQueueMedia(long mediaID);
 }

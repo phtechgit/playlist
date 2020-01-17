@@ -3,6 +3,7 @@ package com.pheuture.playlists;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,7 +12,6 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback;
-import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.databinding.ActivityMainBinding;
 import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
 import com.pheuture.playlists.base.BaseActivity;
@@ -71,8 +71,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
     @Override
     public void initializations() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
-        setupConnectivityChangeBroadcastReceiver();
+        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings)
@@ -82,12 +81,12 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
 
+        setupConnectivityChangeBroadcastReceiver();
+
         proceedWithPermissions(null, true);
 
         bottomSheetBehavior = BottomSheetBehavior.from( binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer);
         bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
-
-        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerAdapter = new MediaQueueRecyclerAdapter(this, this);
@@ -106,17 +105,28 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
             @Override
             public void onChanged(SimpleExoPlayer exoPlayer) {
                 binding.layoutBottomSheet.playerView.setPlayer(exoPlayer);
+            }
+        });
 
-                QueueMediaEntity queueMediaEntity = viewModel.getPlayingMedia();
+        viewModel.getQueueMediaEntities().observe(this, new Observer<List<QueueMediaEntity>>() {
+            @Override
+            public void onChanged(List<QueueMediaEntity> queueMediaEntities) {
+                Log.e(TAG, "queueMediaListUpdated: " + queueMediaEntities.toString());
+                recyclerAdapter.setData(queueMediaEntities);
+            }
+        });
+
+        viewModel.getCurrentlyPlayingQueueMedia().observe(this, new Observer<QueueMediaEntity>() {
+            @Override
+            public void onChanged(QueueMediaEntity currentlyPlayingQueueMediaEntity) {
                 //set media info
-                binding.layoutBottomSheet.textViewTitle.setText(queueMediaEntity.getMediaTitle());
-                binding.layoutBottomSheet.textViewCreator.setText(queueMediaEntity.getMediaDescription());
+                binding.layoutBottomSheet.textViewTitle.setText(currentlyPlayingQueueMediaEntity.getMediaTitle());
+                binding.layoutBottomSheet.textViewCreator.setText(currentlyPlayingQueueMediaEntity.getMediaDescription());
 
-                //if more media available to play
-                if (viewModel.shouldShowNextButton()) {
-                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_light);
-                } else {
-                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_grey);
+                //show bottom sheet
+                binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer.setVisibility(View.VISIBLE);
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN){
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
             }
         });
@@ -128,20 +138,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
             }
         });
 
-        viewModel.getQueueMediaEntities().observe(this, new Observer<List<QueueMediaEntity>>() {
-            @Override
-            public void onChanged(List<QueueMediaEntity> queueMediaEntities) {
-                recyclerAdapter.setData(queueMediaEntities);
-                if (queueMediaEntities.size()>0){
-
-                    binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer.setVisibility(View.VISIBLE);
-                    if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN){
-                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                    }
-                }
-            }
-        });
-
         viewModel.getPlayBackState().observe(this, new Observer<Bundle>() {
             @Override
             public void onChanged(Bundle bundle) {
@@ -149,6 +145,19 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
                 int playBackState = bundle.getInt(ARG_PARAM2);
 
                 checkPlayBackState(playWhenReady, playBackState);
+            }
+        });
+
+        viewModel.shouldShowNextButton().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean show) {
+                Logger.e(TAG, "showNext:" + show);
+                //if more media available to play
+                if (show) {
+                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_light);
+                } else {
+                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_grey);
+                }
             }
         });
 
@@ -303,4 +312,5 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
         Logger.e(TAG, "onConnectivityChange");
         viewModel.setNetworkStatus(connected);
     }
+
 }

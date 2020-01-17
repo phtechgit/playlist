@@ -12,7 +12,6 @@ import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 
 @Entity
 public class QueueMediaEntity extends MediaEntity implements Parcelable {
-
     private int state;
     private int progress;
 

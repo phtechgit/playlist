@@ -123,6 +123,9 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             if (contentsDifferent(oldModel.getMediaThumbnail(), newModel.getMediaThumbnail())){
                 return false;
             }
+            if (contentsDifferent(String.valueOf(oldModel.getState()), String.valueOf(newModel.getState()))){
+                return false;
+            }
             return true;
         }
     }

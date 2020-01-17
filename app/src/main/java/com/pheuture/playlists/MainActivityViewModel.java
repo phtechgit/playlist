@@ -2,7 +2,6 @@ package com.pheuture.playlists;
 
 import android.app.Application;
 import android.app.DownloadManager;
-import android.content.IntentFilter;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -29,7 +28,6 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaDao;
@@ -40,7 +38,6 @@ import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMedi
 import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaEntity;
 import com.pheuture.playlists.base.BaseAndroidViewModel;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.receiver.ConnectivityChangeReceiver;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
@@ -58,15 +55,20 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     private DataSource.Factory dataSourceFactory;
     private SimpleExoPlayer exoPlayer1;
     private SimpleExoPlayer exoPlayer2;
+
     private MutableLiveData<SimpleExoPlayer> exoPlayerMutableLiveData;
     private MutableLiveData<PlaylistEntity> playlistMutableLiveData;
     private LiveData<List<QueueMediaEntity>> queueMediaEntitiesLiveData;
+    private int bottomSheetState;
+    private MutableLiveData<Boolean> showNextButtonMutableLiveData;
+    private MutableLiveData<Bundle> playbackStateMutableLiveData;
+    private MutableLiveData<Integer> playingMediaProgress;
+    private MutableLiveData<QueueMediaEntity> currentlyPlayingQueueMediaMutableLiveData;
+    private MutableLiveData<Boolean> isNewMediaAddedToPlaylist;
+
     private PlaylistMediaDao playlistMediaDao;
     private QueueMediaDao queueMediaDao;
     private OfflineMediaDao offlineMediaDao;
-    private MutableLiveData<Boolean> isNewMediaAddedToPlaylist;
-    private int bottomSheetState;
-    private MutableLiveData<Bundle> playbackStateMutableLiveData;
     private int EXO_PLAYER_1 = 1;
     private int EXO_PLAYER_2 = 2;
     private int currentPlayer = RecyclerView.NO_POSITION;
@@ -83,7 +85,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     private final Object focusLock = new Object();
     private boolean connectedToNetwork = false;
     private boolean playingFromNetwork;
-    private MutableLiveData<Integer> playingMediaProgress;
+
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
@@ -120,8 +122,10 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
         playlistMutableLiveData = new MutableLiveData<>();
         queueMediaEntitiesLiveData = queueMediaDao.getQueueMediaEntitiesLive();
+        currentlyPlayingQueueMediaMutableLiveData = new MutableLiveData<>();
         playbackStateMutableLiveData = new MutableLiveData<>();
-        playingMediaProgress = new MutableLiveData<>(0);
+        showNextButtonMutableLiveData = new MutableLiveData<>();
+        playingMediaProgress = new MutableLiveData<>();
         isNewMediaAddedToPlaylist = new MutableLiveData<>();
 
         title = new MutableLiveData<>();
@@ -150,7 +154,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                     if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
                             - currentDurationOfCurrentMedia) <= crossFadeValue) {
                         exoPlayer2.setVolume(0f);
-                        loadNextVideoIn(EXO_PLAYER_2);
+                        loadMediaIn(EXO_PLAYER_2);
                     }
                 }
             } else if (currentPlayer == EXO_PLAYER_2) {
@@ -175,7 +179,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                     if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
                             - currentDurationOfCurrentMedia) <= crossFadeValue) {
                         exoPlayer1.setVolume(0f);
-                        loadNextVideoIn(EXO_PLAYER_1);
+                        loadMediaIn(EXO_PLAYER_1);
                     }
                 }
             }
@@ -227,6 +231,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     private void playbackNow() {
         exoPlayer1.setPlayWhenReady(true);
         exoPlayer2.setPlayWhenReady(true);
+
     }
 
     @Override
@@ -311,10 +316,10 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         if ((queueMediaEntitiesLiveData.getValue().size() - 1)> currentMediaPosition){
             if (currentPlayer == EXO_PLAYER_1) {
                 exoPlayer1.setVolume(1f);
-                loadNextVideoIn(EXO_PLAYER_1);
+                loadMediaIn(EXO_PLAYER_1);
             } else {
                 exoPlayer2.setVolume(1f);
-                loadNextVideoIn(EXO_PLAYER_2);
+                loadMediaIn(EXO_PLAYER_2);
             }
         }
     }
@@ -329,8 +334,8 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
         //stop exoPlayerMutableLiveData before changing the queue
         if (playlistEntity == null){
+            playlistMutableLiveData.setValue(null);
             if (queueMediaEntity!=null){
-                playlistMutableLiveData.postValue(null);
                 queueMediaDao.deleteAll();
                 queueMediaDao.insert(queueMediaEntity);
 
@@ -338,7 +343,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             }
         } else {
             if (queueMediaEntity == null){
-                playlistMutableLiveData.postValue(playlistEntity);
+                playlistMutableLiveData.setValue(playlistEntity);
                 queueMediaDao.deleteAll();
 
                 List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaDao.getPlaylistMediaMediaEntities(playlistEntity.getPlaylistID());
@@ -357,9 +362,6 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 if (playlistMutableLiveData.getValue()!=null
                         && (playlistMutableLiveData.getValue().getPlaylistID() != playlistEntity.getPlaylistID())) {
 
-                    playlistMutableLiveData.postValue(playlistEntity);
-
-
                     List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaDao.getPlaylistMediaMediaEntities(playlistEntity.getPlaylistID());
 
                     String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
@@ -372,21 +374,23 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                     currentMediaPosition = RecyclerView.NO_POSITION;
                 } else {
                     //get index of current
+                    currentMediaPosition = queueMediaDao.getPositionOfQueueMedia(queueMediaEntity.getMediaID()) - 1;
                 }
+                playlistMutableLiveData.setValue(playlistEntity);
             }
         }
 
         if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
             exoPlayer1.setVolume(1f);
-            loadNextVideoIn(EXO_PLAYER_1);
+            loadMediaIn(EXO_PLAYER_1);
 
         } else if (currentPlayer == EXO_PLAYER_2) {
             exoPlayer2.setVolume(1f);
-            loadNextVideoIn(EXO_PLAYER_2);
+            loadMediaIn(EXO_PLAYER_2);
         }
     }
 
-    private void loadNextVideoIn(int player) {
+    private void loadMediaIn(int player) {
         currentPlayer = player;
 
         SimpleExoPlayer exoPlayer;
@@ -401,6 +405,14 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         queueMediaDao.changeStateOfAllMedia(QueueMediaEntity.QueueMediaState.IN_QUEUE);
         queueMediaEntity.setState(QueueMediaEntity.QueueMediaState.PLAYING);
         queueMediaDao.insert(queueMediaEntity);
+        currentlyPlayingQueueMediaMutableLiveData.setValue(queueMediaEntity);
+
+        //if more media available to play
+        if ((queueMediaEntitiesLiveData.getValue().size()-1)> currentMediaPosition) {
+            showNextButtonMutableLiveData.postValue(true);
+        } else {
+            showNextButtonMutableLiveData.postValue(false);
+        }
 
         Uri mediaUri;
 
@@ -579,12 +591,8 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         queueMediaDao.delete(queueMediaEntity);
     }
 
-    public QueueMediaEntity getPlayingMedia() {
-        return queueMediaEntitiesLiveData.getValue().get(currentMediaPosition);
-    }
-
-    public boolean shouldShowNextButton() {
-        return (queueMediaEntitiesLiveData.getValue().size()-1)> currentMediaPosition;
+    public MutableLiveData<Boolean> shouldShowNextButton() {
+        return showNextButtonMutableLiveData;
     }
 
     public void setBottomSheetState(int newState) {
@@ -593,6 +601,14 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
     public MutableLiveData<Bundle> getPlayBackState() {
         return playbackStateMutableLiveData;
+    }
+
+    public void setNetworkStatus(boolean connected) {
+        connectedToNetwork = connected;
+    }
+
+    public MutableLiveData<QueueMediaEntity> getCurrentlyPlayingQueueMedia() {
+        return currentlyPlayingQueueMediaMutableLiveData;
     }
 
     @Override
@@ -607,7 +623,4 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         super.onCleared();
     }
 
-    public void setNetworkStatus(boolean connected) {
-        connectedToNetwork = connected;
-    }
 }
