@@ -109,7 +109,7 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
         QueueMediaEntity queueMediaEntity = ParserUtil.getInstance()
                 .fromJson(objectJsonString, QueueMediaEntity.class);
 
-        parentViewModel.setMedia(null, queueMediaEntity);
+        parentViewModel.setMedia(null, queueMediaEntity, true);
     }
 
     @Override

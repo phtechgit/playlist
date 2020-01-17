@@ -328,17 +328,18 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
     }
 
-    public void setMedia(PlaylistEntity playlistEntity, QueueMediaEntity queueMediaEntity){
+    public void setMedia(PlaylistEntity playlistEntity, QueueMediaEntity queueMediaEntity, boolean refreshData){
         //momentarily hold the playback to initiate the changes
         pausePlayback();
 
         currentMediaPosition = RecyclerView.NO_POSITION;
 
-        queueMediaDao.deleteAll();
+        if (refreshData) {
+            queueMediaDao.deleteAll();
+        }
 
         if (playlistEntity == null){
-            long rowId = queueMediaDao.insert(queueMediaEntity);
-            queueMediaEntity.setId(rowId);
+            queueMediaDao.insert(queueMediaEntity);
             ++currentMediaPosition;
 
         } else {
@@ -351,13 +352,12 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             //insert all media with In_Queue status.
             queueMediaDao.insertAll(queueMediaEntities);
 
-            if (queueMediaEntity != null){
-                queueMediaEntity = queueMediaDao.getQueueMediaFromMediaId(queueMediaEntity.getMediaID());
+            if (queueMediaEntity == null){
+                queueMediaEntity = queueMediaEntities.get(0);
+                ++currentMediaPosition;
             } else {
-                queueMediaEntity = queueMediaDao.getQueueMediaFromMediaId(queueMediaEntities.get(0).getMediaID());
-
+                currentMediaPosition = queueMediaEntities.indexOf(queueMediaEntity);
             }
-            currentMediaPosition = (int) (queueMediaEntity.getId() - 1);
         }
         playlistMutableLiveData.setValue(playlistEntity);
 

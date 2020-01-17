@@ -161,7 +161,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         } else if (v.equals(binding.imageViewPlay)) {
             if (playlistMediaEntities.size()>0) {
-                parentViewModel.setMedia(playlist, null);
+                parentViewModel.setMedia(playlist, null, true);
             }
 
         } else if (v.equals(binding.imageViewShuffle)) {
@@ -184,7 +184,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
             QueueMediaEntity queueMediaEntity = ParserUtil.getInstance()
                     .fromJson(objectJsonString, QueueMediaEntity.class);
 
-            parentViewModel.setMedia(playlist, queueMediaEntity);
+            parentViewModel.setMedia(playlist, queueMediaEntity, true);
 
         } else if (type == 2){
             showRemoveMediaFromPlaylistAlert(position, playlistMediaEntity);

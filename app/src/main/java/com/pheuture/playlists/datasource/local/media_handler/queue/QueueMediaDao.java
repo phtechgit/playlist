@@ -18,23 +18,11 @@ public interface QueueMediaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(QueueMediaEntity queueMediaEntity);
 
-    @Query("select count(*) from QueueMediaEntity")
-    LiveData<Integer> getQueueMediaCount();
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<QueueMediaEntity> queueMediaEntities);
 
-    @Query("select * from QueueMediaEntity")
-    LiveData<List<QueueMediaEntity>> getAllMediaLive();
-
     @Query("delete from QueueMediaEntity")
     void deleteAll();
-
-    @Query("select * from QueueMediaEntity order by modifiedOn desc")
-    LiveData<List<QueueMediaEntity>> getTrendingMediaEntitiesLive();
-
-    @Query("select * from QueueMediaEntity where mediaTitle like:searchQuery order by modifiedOn desc limit:limit offset:offset")
-    List<QueueMediaEntity> getTrendingMediaEntities(String searchQuery, int limit, int offset);
 
     @Query("select * from QueueMediaEntity")
     LiveData<List<QueueMediaEntity>> getQueueMediaEntitiesLive();
@@ -42,21 +30,8 @@ public interface QueueMediaDao {
     @Query("update QueueMediaEntity set state=:state")
     void changeStateOfAllMedia(int state);
 
-    @Query("update QueueMediaEntity set state=:state where mediaID=:mediaId")
-    void changeStateOfAllMedia(long mediaId, int state);
-
-    @Query("select * from QueueMediaEntity limit 1")
-    QueueMediaEntity getFirstQueueMedia();
-
     @Delete
     void delete(QueueMediaEntity queueMediaEntity);
 
-    @Query("select ROWID from QueueMediaEntity where mediaID=:mediaID")
-    int getPositionOfQueueMedia(long mediaID);
 
-    @Query("select * from QueueMediaEntity where id=:id")
-    QueueMediaEntity getQueueMediaFromId(long id);
-
-    @Query("select * from QueueMediaEntity where mediaID=:mediaId")
-    QueueMediaEntity getQueueMediaFromMediaId(long mediaId);
 }

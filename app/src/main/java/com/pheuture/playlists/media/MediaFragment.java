@@ -143,7 +143,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
             QueueMediaEntity queueMediaEntity = ParserUtil.getInstance()
                     .fromJson(objectJsonString, QueueMediaEntity.class);
 
-            parentViewModel.setMedia(null, queueMediaEntity);
+            parentViewModel.setMedia(null, queueMediaEntity, true);
 
         } else {
             PlaylistMediaEntity playlistMediaEntity = ParserUtil.getInstance()

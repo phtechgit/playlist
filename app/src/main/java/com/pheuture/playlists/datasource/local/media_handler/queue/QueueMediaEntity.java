@@ -14,17 +14,11 @@ import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 
 @Entity
 public class QueueMediaEntity extends MediaEntity implements Parcelable {
-    @NonNull
-    @PrimaryKey(autoGenerate = true)
-    private long id;
-    private long position;
     private int state;
     private int progress;
 
     protected QueueMediaEntity(Parcel in) {
         super(in);
-        id = in.readLong();
-        position = in.readLong();
         state = in.readInt();
         progress = in.readInt();
     }
@@ -32,8 +26,6 @@ public class QueueMediaEntity extends MediaEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeLong(id);
-        dest.writeLong(position);
         dest.writeInt(state);
         dest.writeInt(progress);
     }
@@ -69,22 +61,6 @@ public class QueueMediaEntity extends MediaEntity implements Parcelable {
 
     public void setProgress(int progress) {
         this.progress = progress;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public long getPosition() {
-        return position;
-    }
-
-    public void setPosition(long position) {
-        this.position = position;
     }
 
     public interface QueueMediaState{

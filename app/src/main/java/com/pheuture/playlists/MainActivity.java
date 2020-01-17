@@ -270,7 +270,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
         QueueMediaEntity queueMediaEntity = bundle.getParcelable(ARG_PARAM3);
 
         if (type == SELECT) {
-            viewModel.setMedia(viewModel.getPlaylistMutableLiveData().getValue(), queueMediaEntity);
+            viewModel.setMedia(viewModel.getPlaylistMutableLiveData().getValue(), queueMediaEntity, false);
 
         } else if (type == REMOVE){
             viewModel.removeQueueMedia(queueMediaEntity);
