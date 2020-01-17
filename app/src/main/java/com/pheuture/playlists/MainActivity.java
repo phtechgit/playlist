@@ -111,7 +111,8 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
         viewModel.getQueueMediaEntities().observe(this, new Observer<List<QueueMediaEntity>>() {
             @Override
             public void onChanged(List<QueueMediaEntity> queueMediaEntities) {
-                Log.e(TAG, "queueMediaListUpdated: " + queueMediaEntities.toString());
+                Logger.e(TAG,"QueueMediaEntities size:" + queueMediaEntities.size());
+                Logger.e(TAG,"QueueMediaEntitiesLiveData size:" + viewModel.getQueueMediaEntities().getValue().size());
                 recyclerAdapter.setData(queueMediaEntities);
             }
         });
@@ -143,7 +144,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
             public void onChanged(Bundle bundle) {
                 boolean playWhenReady = bundle.getBoolean(ARG_PARAM1);
                 int playBackState = bundle.getInt(ARG_PARAM2);
-
                 checkPlayBackState(playWhenReady, playBackState);
             }
         });
@@ -239,8 +239,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
             viewModel.setBottomSheetState(newState);
-            Logger.e(TAG, "onStateChanged: " + newState);
-
             switch (newState) {
                 case BottomSheetBehavior.STATE_HIDDEN:
                     viewModel.resetAllPlayers();

@@ -3,45 +3,28 @@ package com.pheuture.playlists.datasource.local.media_handler.queue;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 
 @Entity
 public class QueueMediaEntity extends MediaEntity implements Parcelable {
+    @NonNull
+    @PrimaryKey(autoGenerate = true)
+    private long id;
+    private long position;
     private int state;
     private int progress;
 
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
-    public int getProgress() {
-        return progress;
-    }
-
-    public void setProgress(int progress) {
-        this.progress = progress;
-    }
-
-    public interface QueueMediaState{
-        int PLAYED = 2;
-        int PLAYING = 1;
-        int IN_QUEUE = 0;
-    }
-
-    public QueueMediaEntity() {
-    }
-
     protected QueueMediaEntity(Parcel in) {
         super(in);
+        id = in.readLong();
+        position = in.readLong();
         state = in.readInt();
         progress = in.readInt();
     }
@@ -49,6 +32,8 @@ public class QueueMediaEntity extends MediaEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
+        dest.writeLong(id);
+        dest.writeLong(position);
         dest.writeInt(state);
         dest.writeInt(progress);
     }
@@ -69,4 +54,46 @@ public class QueueMediaEntity extends MediaEntity implements Parcelable {
             return new QueueMediaEntity[size];
         }
     };
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getPosition() {
+        return position;
+    }
+
+    public void setPosition(long position) {
+        this.position = position;
+    }
+
+    public interface QueueMediaState{
+        int PLAYED = 2;
+        int PLAYING = 1;
+        int IN_QUEUE = 0;
+    }
+
+    public QueueMediaEntity() {
+    }
+
 }

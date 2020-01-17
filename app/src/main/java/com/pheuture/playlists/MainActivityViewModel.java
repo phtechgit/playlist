@@ -154,7 +154,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                     if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
                             - currentDurationOfCurrentMedia) <= crossFadeValue) {
                         exoPlayer2.setVolume(0f);
-                        loadMediaIn(EXO_PLAYER_2);
+                        loadMediaIn(EXO_PLAYER_2, queueMediaEntitiesLiveData.getValue().get(++currentMediaPosition));
                     }
                 }
             } else if (currentPlayer == EXO_PLAYER_2) {
@@ -179,7 +179,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                     if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
                             - currentDurationOfCurrentMedia) <= crossFadeValue) {
                         exoPlayer1.setVolume(0f);
-                        loadMediaIn(EXO_PLAYER_1);
+                        loadMediaIn(EXO_PLAYER_1, queueMediaEntitiesLiveData.getValue().get(++currentMediaPosition));
                     }
                 }
             }
@@ -316,10 +316,10 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         if ((queueMediaEntitiesLiveData.getValue().size() - 1)> currentMediaPosition){
             if (currentPlayer == EXO_PLAYER_1) {
                 exoPlayer1.setVolume(1f);
-                loadMediaIn(EXO_PLAYER_1);
+                loadMediaIn(EXO_PLAYER_1, queueMediaEntitiesLiveData.getValue().get(++currentMediaPosition));
             } else {
                 exoPlayer2.setVolume(1f);
-                loadMediaIn(EXO_PLAYER_2);
+                loadMediaIn(EXO_PLAYER_2, queueMediaEntitiesLiveData.getValue().get(++currentMediaPosition));
             }
         }
     }
@@ -332,65 +332,46 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         //momentarily hold the playback to initiate the changes
         pausePlayback();
 
-        //stop exoPlayerMutableLiveData before changing the queue
+        currentMediaPosition = RecyclerView.NO_POSITION;
+
+        queueMediaDao.deleteAll();
+
         if (playlistEntity == null){
-            playlistMutableLiveData.setValue(null);
-            if (queueMediaEntity!=null){
-                queueMediaDao.deleteAll();
-                queueMediaDao.insert(queueMediaEntity);
+            long rowId = queueMediaDao.insert(queueMediaEntity);
+            queueMediaEntity.setId(rowId);
+            ++currentMediaPosition;
 
-                currentMediaPosition = RecyclerView.NO_POSITION;
-            }
         } else {
-            if (queueMediaEntity == null){
-                playlistMutableLiveData.setValue(playlistEntity);
-                queueMediaDao.deleteAll();
+            List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaDao.getPlaylistMediaMediaEntities(playlistEntity.getPlaylistID());
 
-                List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaDao.getPlaylistMediaMediaEntities(playlistEntity.getPlaylistID());
+            String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
+            List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
+                    .fromJson(objectJsonString, QueueMediaEntity[].class));
 
-                String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
-                List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
-                        .fromJson(objectJsonString, QueueMediaEntity[].class));
+            //insert all media with In_Queue status.
+            queueMediaDao.insertAll(queueMediaEntities);
 
-                //insert all media with In_Queue status.
-                queueMediaDao.insertAll(queueMediaEntities);
-
-                currentMediaPosition = RecyclerView.NO_POSITION;
-
+            if (queueMediaEntity != null){
+                queueMediaEntity = queueMediaDao.getQueueMediaFromMediaId(queueMediaEntity.getMediaID());
             } else {
-                //insert playlist media in queue only when new playlist/playlist media is selected
-                if (playlistMutableLiveData.getValue()!=null
-                        && (playlistMutableLiveData.getValue().getPlaylistID() != playlistEntity.getPlaylistID())) {
+                queueMediaEntity = queueMediaDao.getQueueMediaFromMediaId(queueMediaEntities.get(0).getMediaID());
 
-                    List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaDao.getPlaylistMediaMediaEntities(playlistEntity.getPlaylistID());
-
-                    String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
-                    List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
-                            .fromJson(objectJsonString, QueueMediaEntity[].class));
-
-                            //insert all media with In_Queue status.
-                    queueMediaDao.insertAll(queueMediaEntities);
-
-                    currentMediaPosition = RecyclerView.NO_POSITION;
-                } else {
-                    //get index of current
-                    currentMediaPosition = queueMediaDao.getPositionOfQueueMedia(queueMediaEntity.getMediaID()) - 1;
-                }
-                playlistMutableLiveData.setValue(playlistEntity);
             }
+            currentMediaPosition = (int) (queueMediaEntity.getId() - 1);
         }
+        playlistMutableLiveData.setValue(playlistEntity);
 
         if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
             exoPlayer1.setVolume(1f);
-            loadMediaIn(EXO_PLAYER_1);
+            loadMediaIn(EXO_PLAYER_1, queueMediaEntity);
 
         } else if (currentPlayer == EXO_PLAYER_2) {
             exoPlayer2.setVolume(1f);
-            loadMediaIn(EXO_PLAYER_2);
+            loadMediaIn(EXO_PLAYER_2, queueMediaEntity);
         }
     }
 
-    private void loadMediaIn(int player) {
+    private void loadMediaIn(int player, QueueMediaEntity queueMediaEntity) {
         currentPlayer = player;
 
         SimpleExoPlayer exoPlayer;
@@ -400,19 +381,10 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             exoPlayer = exoPlayer2;
         }
 
-        QueueMediaEntity queueMediaEntity = queueMediaEntitiesLiveData.getValue().get(++currentMediaPosition);
-
         queueMediaDao.changeStateOfAllMedia(QueueMediaEntity.QueueMediaState.IN_QUEUE);
         queueMediaEntity.setState(QueueMediaEntity.QueueMediaState.PLAYING);
         queueMediaDao.insert(queueMediaEntity);
         currentlyPlayingQueueMediaMutableLiveData.setValue(queueMediaEntity);
-
-        //if more media available to play
-        if ((queueMediaEntitiesLiveData.getValue().size()-1)> currentMediaPosition) {
-            showNextButtonMutableLiveData.postValue(true);
-        } else {
-            showNextButtonMutableLiveData.postValue(false);
-        }
 
         Uri mediaUri;
 
@@ -437,6 +409,14 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         exoPlayer.prepare(mediaSource);
         requestAudioFocus();
         exoPlayerMutableLiveData.postValue(exoPlayer);
+
+        Logger.e(TAG, "QueueMediaEntitiesLiveData size:" + queueMediaEntitiesLiveData.getValue().size());
+        //if more media available to play2
+        if ((queueMediaEntitiesLiveData.getValue().size()-1)> currentMediaPosition) {
+            showNextButtonMutableLiveData.postValue(true);
+        } else {
+            showNextButtonMutableLiveData.postValue(false);
+        }
     }
 
     private int calculatePercentage(long totalDuration, long currentDuration) {
