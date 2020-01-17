@@ -343,20 +343,32 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             ++currentMediaPosition;
 
         } else {
-            List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaDao.getPlaylistMediaMediaEntities(playlistEntity.getPlaylistID());
+            List<QueueMediaEntity> queueMediaEntities = null;
+            if (refreshData) {
+                List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaDao.getPlaylistMediaMediaEntities(playlistEntity.getPlaylistID());
 
-            String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
-            List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
-                    .fromJson(objectJsonString, QueueMediaEntity[].class));
+                String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
+                queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
+                        .fromJson(objectJsonString, QueueMediaEntity[].class));
 
-            //insert all media with In_Queue status.
-            queueMediaDao.insertAll(queueMediaEntities);
+                //insert all media with In_Queue status.
+                queueMediaDao.insertAll(queueMediaEntities);
+            }
 
             if (queueMediaEntity == null){
-                queueMediaEntity = queueMediaEntities.get(0);
+                if (queueMediaEntities != null) {
+                    queueMediaEntity = queueMediaEntities.get(0);
+                }
                 ++currentMediaPosition;
             } else {
-                currentMediaPosition = queueMediaEntities.indexOf(queueMediaEntity);
+                if (refreshData) {
+                    currentMediaPosition = queueMediaEntities.indexOf(queueMediaEntity);
+                } else {
+                    queueMediaEntities = queueMediaEntitiesLiveData.getValue();
+                    if (queueMediaEntities != null) {
+                        currentMediaPosition = queueMediaEntities.indexOf(queueMediaEntity);
+                    }
+                }
             }
         }
         playlistMutableLiveData.setValue(playlistEntity);
