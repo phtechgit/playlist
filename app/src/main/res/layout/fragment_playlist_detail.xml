@@ -36,6 +36,8 @@
                 android:text="@{model.playlistName}"
                 android:textSize="@dimen/textSizeHeadline4"
                 android:textStyle="bold"
+                android:paddingBottom="0dp"
+                android:paddingTop="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
@@ -73,8 +75,8 @@
 
             <ImageView
                 android:id="@+id/imageView_play"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -100,8 +102,8 @@
 
             <ImageView
                 android:id="@+id/imageView_shuffle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -127,8 +129,8 @@
 
             <ImageView
                 android:id="@+id/imageView_add_new_song"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"

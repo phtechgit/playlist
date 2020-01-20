@@ -68,12 +68,54 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_delete) {
-            parentViewModel.showSnackBar(playlist.getPlaylistName() + " deleted.", Snackbar.LENGTH_SHORT);
-            viewModel.deletePlaylist();
-            activity.onBackPressed();
+            showDeletePlaylistDialog();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showDeletePlaylistDialog() {
+        Dialog dialog = new Dialog(activity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.setContentView(R.layout.layout_create_playlist);
+        dialog.show();
+
+        TextView textViewTitle = dialog.findViewById(R.id.textView_title);
+        TextView textViewSubtitle = dialog.findViewById(R.id.textView_subtitle);
+        EditText editText = dialog.findViewById(R.id.ediText);
+        TextView textViewLeft = dialog.findViewById(R.id.textView_left);
+        TextView textViewRight = dialog.findViewById(R.id.textView_right);
+
+        textViewTitle.setText("Are you sure?");
+        textViewSubtitle.setText("Do you want to remove this playlist containing " + playlistMediaEntities.size() + " songs?");
+        textViewSubtitle.setVisibility(View.VISIBLE);
+        textViewRight.setText("Remove");
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                KeyboardUtils.hideKeyboard(activity, editText);
+            }
+        });
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                KeyboardUtils.hideKeyboard(activity, editText);
+            }
+        });
+
+        textViewLeft.setOnClickListener(view -> {
+            dialog.cancel();
+        });
+
+        textViewRight.setOnClickListener(view -> {
+            dialog.dismiss();
+            parentViewModel.showSnackBar(playlist.getPlaylistName() + " deleted.", Snackbar.LENGTH_SHORT);
+            viewModel.deletePlaylist();
+            activity.onBackPressed();
+        });
     }
 
     @Override

@@ -26,6 +26,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,7 +34,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
 
-public class MainActivity extends BaseActivity implements RecyclerViewClickListener,
+public class MainActivity extends BaseActivity implements NavController.OnDestinationChangedListener,
+        RecyclerViewClickListener,
         MediaQueueRecyclerAdapter.ClickType,
         ConnectivityChangeReceiver.ConnectivityChangeListener{
 
@@ -73,6 +75,16 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
+        setSupportActionBar(binding.toolbar);
+
+        setupConnectivityChangeBroadcastReceiver();
+
+        proceedWithPermissions(null, true);
+
+        bottomSheetBehavior = BottomSheetBehavior.from( binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer);
+        bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings)
                 .build();
@@ -81,12 +93,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
 
-        setupConnectivityChangeBroadcastReceiver();
-
-        proceedWithPermissions(null, true);
-
-        bottomSheetBehavior = BottomSheetBehavior.from( binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer);
-        bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
+        navController.addOnDestinationChangedListener(this);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerAdapter = new MediaQueueRecyclerAdapter(this, this);
@@ -244,6 +251,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
                     viewModel.resetAllPlayers();
                     break;
                 case BottomSheetBehavior.STATE_EXPANDED:
+                    break;
                 case BottomSheetBehavior.STATE_HALF_EXPANDED:
                     /*bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);*/
                     break;
@@ -259,7 +267,12 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
 
         @Override
         public void onSlide(@NonNull View view, float v) {
-
+            Logger.e(TAG, v + "");
+            if (v <= 0){
+                binding.bottomNavView.setVisibility(View.VISIBLE);
+            } else {
+                binding.bottomNavView.setVisibility(View.GONE);
+            }
         }
     };
 
@@ -290,13 +303,12 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
 
     @Override
     public void onBackPressed() {
-        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN
-                || bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-            super.onBackPressed();
-        } else {
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)                                                                                              ;
+        if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN
+                && bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED) {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            return;
         }
-
+        super.onBackPressed();
     }
 
     @Override
@@ -311,4 +323,10 @@ public class MainActivity extends BaseActivity implements RecyclerViewClickListe
         viewModel.setNetworkStatus(connected);
     }
 
+    @Override
+    public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
+        if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN && bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED){
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+    }
 }

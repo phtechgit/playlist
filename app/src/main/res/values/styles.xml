@@ -10,10 +10,11 @@
         <!--<item name="android:windowBackground">@drawable/splash_background</item>-->
         <item name="materialButtonStyle">@style/ButtonStyleDark</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>
-        <item name="toolbarStyle">@style/ToolbarStyle2Dark</item>
+        <item name="toolbarStyle">@style/ToolbarCustomStyle</item>
         <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:font" tools:targetApi="o">@font/poppins</item>
         <item name="android:fontFamily">@font/poppins</item>
+        <item name="snackbarStyle">@style/SnackBarCustomStyle</item>
     </style>
 
     <!-- Base application theme2. -->
@@ -26,11 +27,12 @@
         <item name="android:textSize">@dimen/textSizeBody1</item>
         <!--<item name="android:windowBackground">@drawable/splash_background</item>-->
         <item name="materialButtonStyle">@style/ButtonStyleDark</item>
-        <item name="toolbarStyle">@style/ToolbarStyle2Dark</item>
+        <item name="toolbarStyle">@style/ToolbarCustomStyle</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>
         <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:font" tools:targetApi="o">@font/poppins</item>
         <item name="android:fontFamily">@font/poppins</item>
+        <item name="snackbarStyle">@style/SnackBarCustomStyle</item>
     </style>
 
     <!--button styles-->
@@ -56,11 +58,7 @@
     </style>
 
     <!--Toolbar & ActionBar styles-->
-    <style name="ToolbarStyle1Dark" parent="Widget.AppCompat.Toolbar">
-        <item name="android:background">@color/colorPrimaryDark</item>
-        <item name="titleTextAppearance">@style/TitleTextStyle</item>
-    </style>
-    <style name="ToolbarStyle2Dark" parent="Widget.AppCompat.Toolbar">
+    <style name="ToolbarCustomStyle" parent="Widget.MaterialComponents.Toolbar">
         <item name="android:background">@color/colorPrimaryDark</item>
         <item name="titleTextAppearance">@style/TitleTextStyle</item>
     </style>
@@ -76,6 +74,10 @@
     <style name="TextInputLayoutStyleDark" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="colorControlActivated">@color/colorAccent</item>
         <item name="android:colorControlActivated">@color/colorAccent</item>
+    </style>
+
+    <!--SnackBar styles-->
+    <style name="SnackBarCustomStyle" parent="Widget.MaterialComponents.Snackbar.FullWidth">
     </style>
 
 </resources>

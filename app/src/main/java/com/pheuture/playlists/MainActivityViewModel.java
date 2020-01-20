@@ -86,7 +86,6 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     private boolean connectedToNetwork = false;
     private boolean playingFromNetwork;
 
-
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
 
@@ -129,6 +128,38 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         isNewMediaAddedToPlaylist = new MutableLiveData<>();
 
         title = new MutableLiveData<>();
+    }
+
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+                if (playbackDelayed || resumeOnFocusGain) {
+                    synchronized(focusLock) {
+                        playbackDelayed = false;
+                        resumeOnFocusGain = false;
+                    }
+                    playbackNow();
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+                synchronized(focusLock) {
+                    resumeOnFocusGain = false;
+                    playbackDelayed = false;
+                }
+                pausePlayback();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                synchronized(focusLock) {
+                    resumeOnFocusGain = true;
+                    playbackDelayed = false;
+                }
+                pausePlayback();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                // ... pausing or ducking depends on your app
+                break;
+        }
     }
 
     private Runnable timerRunnable = new Runnable() {
@@ -226,44 +257,13 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     private void pausePlayback() {
         exoPlayer1.setPlayWhenReady(false);
         exoPlayer2.setPlayWhenReady(false);
+        Logger.e(TAG, "playback paused");
     }
 
     private void playbackNow() {
         exoPlayer1.setPlayWhenReady(true);
         exoPlayer2.setPlayWhenReady(true);
 
-    }
-
-    @Override
-    public void onAudioFocusChange(int focusChange) {
-        switch (focusChange) {
-            case AudioManager.AUDIOFOCUS_GAIN:
-                if (playbackDelayed || resumeOnFocusGain) {
-                    synchronized(focusLock) {
-                        playbackDelayed = false;
-                        resumeOnFocusGain = false;
-                    }
-                    playbackNow();
-                }
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS:
-                synchronized(focusLock) {
-                    resumeOnFocusGain = false;
-                    playbackDelayed = false;
-                }
-                pausePlayback();
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                synchronized(focusLock) {
-                    resumeOnFocusGain = true;
-                    playbackDelayed = false;
-                }
-                pausePlayback();
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                // ... pausing or ducking depends on your app
-                break;
-        }
     }
 
     public MutableLiveData<PlaylistEntity> getPlaylistMutableLiveData() {
@@ -333,14 +333,18 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         pausePlayback();
 
         currentMediaPosition = RecyclerView.NO_POSITION;
+        Logger.e(TAG, "currentMediaPosition set to -1");
 
         if (refreshData) {
             queueMediaDao.deleteAll();
+            Logger.e(TAG, "queue media(s) deleted");
         }
 
         if (playlistEntity == null){
             queueMediaDao.insert(queueMediaEntity);
+            Logger.e(TAG, "queue media inserted");
             ++currentMediaPosition;
+            Logger.e(TAG, "currentMediaPosition set to:" + currentMediaPosition);
 
         } else {
             List<QueueMediaEntity> queueMediaEntities = null;
@@ -353,20 +357,23 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
                 //insert all media with In_Queue status.
                 queueMediaDao.insertAll(queueMediaEntities);
+                Logger.e(TAG, "queue media(s) inserted");
             }
 
             if (queueMediaEntity == null){
                 if (queueMediaEntities != null) {
-                    queueMediaEntity = queueMediaEntities.get(0);
+                    queueMediaEntity = queueMediaEntities.get(++currentMediaPosition);
+                    Logger.e(TAG, "currentMediaPosition set to:" + currentMediaPosition);
                 }
-                ++currentMediaPosition;
             } else {
                 if (refreshData) {
                     currentMediaPosition = queueMediaEntities.indexOf(queueMediaEntity);
+                    Logger.e(TAG, "currentMediaPosition set to:" + currentMediaPosition);
                 } else {
                     queueMediaEntities = queueMediaEntitiesLiveData.getValue();
                     if (queueMediaEntities != null) {
                         currentMediaPosition = queueMediaEntities.indexOf(queueMediaEntity);
+                        Logger.e(TAG, "currentMediaPosition set to:" + currentMediaPosition);
                     }
                 }
             }
@@ -375,6 +382,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
         if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
             exoPlayer1.setVolume(1f);
+            Logger.e(TAG, "ExoPlayer1 volume set to: 1f");
             loadMediaIn(EXO_PLAYER_1, queueMediaEntity);
 
         } else if (currentPlayer == EXO_PLAYER_2) {
@@ -425,9 +433,9 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         Logger.e(TAG, "QueueMediaEntitiesLiveData size:" + queueMediaEntitiesLiveData.getValue().size());
         //if more media available to play2
         if ((queueMediaEntitiesLiveData.getValue().size()-1)> currentMediaPosition) {
-            showNextButtonMutableLiveData.postValue(true);
+            showNextButtonMutableLiveData.setValue(true);
         } else {
-            showNextButtonMutableLiveData.postValue(false);
+            showNextButtonMutableLiveData.setValue(false);
         }
     }
 
