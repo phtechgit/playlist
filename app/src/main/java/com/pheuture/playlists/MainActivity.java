@@ -75,7 +75,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
-        setSupportActionBar(binding.toolbar);
+        setSupportActionBar(binding.layoutAppBar.toolbar);
 
         setupConnectivityChangeBroadcastReceiver();
 

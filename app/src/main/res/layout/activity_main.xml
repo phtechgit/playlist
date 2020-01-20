@@ -3,45 +3,32 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <RelativeLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarlayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <include
+            android:id="@+id/layout_app_bar"
+            layout="@layout/content_main_app_bar"/>
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+        <include
+            android:id="@+id/layout_nav_fragment"
+            layout="@layout/content_main"/>
 
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/coordinatorLayout"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent">
-
-            <include
-                android:id="layout_nav_fragment"
-                layout="@layout/content_main"/>
-
-            <include
-                android:id="@+id/layout_bottom_sheet"
-                layout="@layout/layout_bottom_sheet_player_view" />
-
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <include
+            android:id="@+id/layout_bottom_sheet"
+            layout="@layout/layout_bottom_sheet" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNav_view"
             android:layout_width="match_parent"
+            android:layout_gravity="bottom"
             android:layout_height="60dp"
-            android:layout_alignParentBottom="true"
             android:background="@color/grayF"
             app:menu="@menu/bottom_nav_menu" />
 
-    </RelativeLayout>w
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>
