@@ -64,12 +64,14 @@ public class SettingsFragment extends BaseFragment implements
                 Constants.DOWNLOAD_WHILE_ROAMING, false);
 
         int crossFadeValue = SharedPrefsUtils.getIntegerPreference(activity,
-                Constants.CROSS_FADE_VALUE, 0);
+                Constants.CROSS_FADE_VALUE, Constants.CROSS_FADE_DEFAULT_VALUE);
 
         binding.switchDownloadPlaylistVideosToOffline.setChecked(downloadPlaylistMediaStatus);
         binding.switchDownloadUsingCellular.setChecked(downloadOnCellularStatus);
         binding.switchDownloadWhileRoaming.setChecked(downloadWhileRoamingStatus);
         binding.seekBarCrossFade.setProgress(crossFadeValue);
+        binding.textViewSeekProgress.setText(crossFadeValue + " s");
+
     }
 
     @Override

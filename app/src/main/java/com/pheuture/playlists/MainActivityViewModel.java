@@ -111,7 +111,126 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 Util.getUserAgent(application, TAG));
         exoPlayer1 = ExoPlayerFactory.newSimpleInstance(application);
         exoPlayer2 = ExoPlayerFactory.newSimpleInstance(application);
+        /*Logger.e(TAG, "onTimelineChanged: " + reason);*/
+        /*Logger.e(TAG, "onTracksChanged: " + trackSelections.length);*/
+        /*Logger.e(TAG, "onLoadingChanged: " + isLoading);*/
+        /*Logger.e(TAG, "onPlaybackParametersChanged");*/
+        /*Logger.e(TAG, "onSeekProcessed");*/
+        Player.EventListener playerListener1 = new Player.EventListener() {
+            @Override
+            public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
+                /*Logger.e(TAG, "onTimelineChanged: " + reason);*/
+            }
+
+            @Override
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+                /*Logger.e(TAG, "onTracksChanged: " + trackSelections.length);*/
+            }
+
+            @Override
+            public void onLoadingChanged(boolean isLoading) {
+                /*Logger.e(TAG, "onLoadingChanged: " + isLoading);*/
+            }
+
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                if (currentPlayer == EXO_PLAYER_1) {
+                    setPlaybackState(playWhenReady, playbackState);
+                }
+            }
+
+            @Override
+            public void onRepeatModeChanged(int repeatMode) {
+
+            }
+
+            @Override
+            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+                String data = shuffleModeEnabled ? "Enabled" : "Disabled";
+                Toast.makeText(getApplication(), "Shuffle " + data, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPlayerError(ExoPlaybackException error) {
+                Logger.e(TAG, "onPlayerError: " + error.getMessage());
+            }
+
+            @Override
+            public void onPositionDiscontinuity(int reason) {
+                int latestWindowIndex = exoPlayer1.getCurrentWindowIndex();
+                Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
+            }
+
+            @Override
+            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+                /*Logger.e(TAG, "onPlaybackParametersChanged");*/
+            }
+
+            @Override
+            public void onSeekProcessed() {
+                /*Logger.e(TAG, "onSeekProcessed");*/
+            }
+        };
         exoPlayer1.addListener(playerListener1);
+        /*Logger.e(TAG, "onTimelineChanged: " + reason);*/
+        /*Logger.e(TAG, "onTracksChanged: " + trackSelections.length);*/
+        /*Logger.e(TAG, "onLoadingChanged: " + isLoading);*/
+        /*Logger.e(TAG, "onPlayerError: " + error.getMessage());*/
+        Player.EventListener playerListener2 = new Player.EventListener() {
+            @Override
+            public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
+                /*Logger.e(TAG, "onTimelineChanged: " + reason);*/
+            }
+
+            @Override
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+                /*Logger.e(TAG, "onTracksChanged: " + trackSelections.length);*/
+            }
+
+            @Override
+            public void onLoadingChanged(boolean isLoading) {
+                /*Logger.e(TAG, "onLoadingChanged: " + isLoading);*/
+            }
+
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                if (currentPlayer == EXO_PLAYER_2) {
+                    setPlaybackState(playWhenReady, playbackState);
+                }
+            }
+
+            @Override
+            public void onRepeatModeChanged(int repeatMode) {
+
+            }
+
+            @Override
+            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+                String data = shuffleModeEnabled ? "Enabled" : "Disabled";
+                Toast.makeText(getApplication(), "Shuffle " + data, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPlayerError(ExoPlaybackException error) {
+                /*Logger.e(TAG, "onPlayerError: " + error.getMessage());*/
+            }
+
+            @Override
+            public void onPositionDiscontinuity(int reason) {
+                int latestWindowIndex = exoPlayer1.getCurrentWindowIndex();
+                Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
+            }
+
+            @Override
+            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+                Logger.e(TAG, "onPlaybackParametersChanged");
+            }
+
+            @Override
+            public void onSeekProcessed() {
+                Logger.e(TAG, "onSeekProcessed");
+            }
+        };
         exoPlayer2.addListener(playerListener2);
         exoPlayerMutableLiveData = new MutableLiveData<>();
 
@@ -170,7 +289,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 currentDurationOfCurrentMedia = exoPlayer1.getCurrentPosition();
 
                 int crossFadeValue = (SharedPrefsUtils.getIntegerPreference(getApplication(),
-                        Constants.CROSS_FADE_VALUE, 0) * 1000);
+                        Constants.CROSS_FADE_VALUE, Constants.CROSS_FADE_DEFAULT_VALUE) * 1000);
 
                 //increase volume if player
                 if (queueMediaEntitiesLiveData.getValue().size()>1 && exoPlayer1.getVolume()<1f) {
@@ -193,7 +312,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 currentDurationOfCurrentMedia = exoPlayer2.getCurrentPosition();
 
                 int crossFadeValue = (SharedPrefsUtils.getIntegerPreference(getApplication(),
-                        Constants.CROSS_FADE_VALUE, 0) * 1000);
+                        Constants.CROSS_FADE_VALUE, Constants.CROSS_FADE_DEFAULT_VALUE) * 1000);
 
                 //increase volume if player
                 if (queueMediaEntitiesLiveData.getValue().size()>1 && exoPlayer2.getVolume()<1f) {
@@ -325,7 +444,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
     public void setMedia(PlaylistEntity playlistEntity, QueueMediaEntity queueMediaEntity, boolean refreshData){
         //momentarily hold the playback to initiate the changes
-        /*pausePlayback();*/
+        pausePlayback();
 
         currentMediaPosition = RecyclerView.NO_POSITION;
         Logger.e(TAG, "currentMediaPosition set to -1");
@@ -373,7 +492,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 }
             }
         }
-        playlistMutableLiveData.setValue(playlistEntity);
+        playlistMutableLiveData.postValue(playlistEntity);
 
         if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
             exoPlayer1.setVolume(1f);
@@ -399,7 +518,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         queueMediaDao.changeStateOfAllMedia(QueueMediaEntity.QueueMediaState.IN_QUEUE);
         queueMediaEntity.setState(QueueMediaEntity.QueueMediaState.PLAYING);
         queueMediaDao.insert(queueMediaEntity);
-        currentlyPlayingQueueMediaMutableLiveData.setValue(queueMediaEntity);
+        currentlyPlayingQueueMediaMutableLiveData.postValue(queueMediaEntity);
 
         Uri mediaUri;
 
@@ -423,15 +542,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 .Factory(dataSourceFactory).createMediaSource(mediaUri);
         exoPlayer.prepare(mediaSource);
         requestAudioFocus();
-        exoPlayerMutableLiveData.setValue(exoPlayer);
-
-        /*Logger.e(TAG, "QueueMediaEntitiesLiveData size:" + queueMediaEntitiesLiveData.getValue().size());
-        //if more media available to play2
-        if ((queueMediaEntitiesLiveData.getValue().size()-1)> currentMediaPosition) {
-            showNextButtonMutableLiveData.setValue(true);
-        } else {
-            showNextButtonMutableLiveData.setValue(false);
-        }*/
+        exoPlayerMutableLiveData.postValue(exoPlayer);
     }
 
     private int calculatePercentage(long totalDuration, long currentDuration) {
@@ -440,118 +551,6 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         }
         return (int)((currentDuration * 100)/totalDuration);
     }
-
-    private Player.EventListener playerListener1 = new Player.EventListener() {
-        @Override
-        public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
-            /*Logger.e(TAG, "onTimelineChanged: " + reason);*/
-        }
-
-        @Override
-        public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            /*Logger.e(TAG, "onTracksChanged: " + trackSelections.length);*/
-        }
-
-        @Override
-        public void onLoadingChanged(boolean isLoading) {
-            /*Logger.e(TAG, "onLoadingChanged: " + isLoading);*/
-        }
-
-        @Override
-        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            if (currentPlayer == EXO_PLAYER_1) {
-                setPlaybackState(playWhenReady, playbackState);
-            }
-        }
-
-        @Override
-        public void onRepeatModeChanged(int repeatMode) {
-
-        }
-
-        @Override
-        public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-            String data = shuffleModeEnabled?"Enabled":"Disabled";
-            Toast.makeText(getApplication(), "Shuffle " + data , Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onPlayerError(ExoPlaybackException error) {
-            Logger.e(TAG, "onPlayerError: " + error.getMessage());
-        }
-
-        @Override
-        public void onPositionDiscontinuity(int reason) {
-            int latestWindowIndex = exoPlayer1.getCurrentWindowIndex();
-            Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
-        }
-
-        @Override
-        public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-            /*Logger.e(TAG, "onPlaybackParametersChanged");*/
-        }
-
-        @Override
-        public void onSeekProcessed() {
-            /*Logger.e(TAG, "onSeekProcessed");*/
-        }
-    };
-
-    private Player.EventListener playerListener2 = new Player.EventListener() {
-        @Override
-        public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
-            /*Logger.e(TAG, "onTimelineChanged: " + reason);*/
-        }
-
-        @Override
-        public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            /*Logger.e(TAG, "onTracksChanged: " + trackSelections.length);*/
-        }
-
-        @Override
-        public void onLoadingChanged(boolean isLoading) {
-            /*Logger.e(TAG, "onLoadingChanged: " + isLoading);*/
-        }
-
-        @Override
-        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            if (currentPlayer == EXO_PLAYER_2) {
-                setPlaybackState(playWhenReady, playbackState);
-            }
-        }
-
-        @Override
-        public void onRepeatModeChanged(int repeatMode) {
-
-        }
-
-        @Override
-        public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-            String data = shuffleModeEnabled ? "Enabled" : "Disabled";
-            Toast.makeText(getApplication(), "Shuffle " + data , Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onPlayerError(ExoPlaybackException error) {
-            /*Logger.e(TAG, "onPlayerError: " + error.getMessage());*/
-        }
-
-        @Override
-        public void onPositionDiscontinuity(int reason) {
-            int latestWindowIndex = exoPlayer1.getCurrentWindowIndex();
-            Logger.e(TAG, "onPositionDiscontinuity: " + latestWindowIndex);
-        }
-
-        @Override
-        public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-            Logger.e(TAG, "onPlaybackParametersChanged");
-        }
-
-        @Override
-        public void onSeekProcessed() {
-            Logger.e(TAG, "onSeekProcessed");
-        }
-    };
 
     private void setPlaybackState(boolean playWhenReady, int playbackState) {
         if (playingFromNetwork && !connectedToNetwork){
@@ -563,7 +562,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         Bundle bundle = new Bundle();
         bundle.putBoolean(Constants.ARG_PARAM1, playWhenReady);
         bundle.putInt(Constants.ARG_PARAM2, playbackState);
-        playbackStateMutableLiveData.setValue(bundle);
+        playbackStateMutableLiveData.postValue(bundle);
     }
 
     public void toggleShuffleMode() {

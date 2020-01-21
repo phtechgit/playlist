@@ -272,7 +272,6 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
 
         @Override
         public void onSlide(@NonNull View view, float v) {
-            Logger.e(TAG, v + "");
             if (v <= 0){
                 binding.bottomNavView.setVisibility(View.VISIBLE);
             } else {
