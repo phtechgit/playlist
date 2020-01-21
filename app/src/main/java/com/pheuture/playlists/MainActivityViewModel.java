@@ -449,18 +449,14 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         pausePlayback();
 
         currentMediaPosition = RecyclerView.NO_POSITION;
-        Logger.e(TAG, "currentMediaPosition set to -1");
 
         if (refreshData) {
             queueMediaDao.deleteAll();
-            Logger.e(TAG, "queue media(s) deleted");
         }
 
         if (playlistEntity == null){
+            queueMediaEntity.setPosition(++currentMediaPosition);
             queueMediaDao.insert(queueMediaEntity);
-            Logger.e(TAG, "queue media inserted");
-            ++currentMediaPosition;
-            Logger.e(TAG, "currentMediaPosition set to:" + currentMediaPosition);
 
         } else {
             List<QueueMediaEntity> queueMediaEntities = null;
@@ -471,25 +467,28 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
                         .fromJson(objectJsonString, QueueMediaEntity[].class));
 
+                for (int i=0; i<queueMediaEntities.size(); i++){
+                    QueueMediaEntity queueMediaEntity1 = queueMediaEntities.get(i);
+                    queueMediaEntity1.setPosition(i);
+                    queueMediaEntities.set(i, queueMediaEntity1);
+                }
+
                 //insert all media with 'In_Queue' status.
                 queueMediaDao.insertAll(queueMediaEntities);
-                Logger.e(TAG, "queue media(s) inserted");
             }
 
             if (queueMediaEntity == null){
                 if (queueMediaEntities != null) {
                     queueMediaEntity = queueMediaEntities.get(++currentMediaPosition);
-                    Logger.e(TAG, "currentMediaPosition set to:" + currentMediaPosition);
                 }
             } else {
                 if (refreshData) {
-                    currentMediaPosition = queueMediaEntities.indexOf(queueMediaEntity);
-                    Logger.e(TAG, "currentMediaPosition set to:" + currentMediaPosition);
+                    currentMediaPosition = queueMediaEntity.getPosition();
+
                 } else {
                     queueMediaEntities = queueMediaEntitiesMutableLiveData.getValue();
                     if (queueMediaEntities != null) {
-                        currentMediaPosition = queueMediaEntities.indexOf(queueMediaEntity);
-                        Logger.e(TAG, "currentMediaPosition set to:" + currentMediaPosition);
+                        currentMediaPosition = queueMediaEntity.getPosition();
                     }
                 }
             }
@@ -518,24 +517,10 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         }
 
         queueMediaDao.changeStateOfAllMedia(QueueMediaEntity.QueueMediaState.IN_QUEUE);
+        queueMediaDao.setMediaStatusBelowPosition(QueueMediaEntity.QueueMediaState.PLAYED, queueMediaEntity.getPosition());
 
-        List<QueueMediaEntity> queueMediaEntities;
-        if (currentMediaPosition > 0) {
-            queueMediaEntities = queueMediaDao.getQueueMediaEntities();
-            queueMediaEntities = queueMediaEntities.subList(0, currentMediaPosition);
-            for (int i=0; i<queueMediaEntities.size(); i++){
-                QueueMediaEntity queueMediaEntity1 = queueMediaEntities.get(i);
-                if (queueMediaEntity1.getState() != QueueMediaEntity.QueueMediaState.PLAYED) {
-                    queueMediaEntity1.setState(QueueMediaEntity.QueueMediaState.PLAYED);
-                    queueMediaEntities.set(i, queueMediaEntity1);
-                }
-            }
-        } else {
-            queueMediaEntities = new ArrayList<>();
-        }
         queueMediaEntity.setState(QueueMediaEntity.QueueMediaState.PLAYING);
-        queueMediaEntities.add(queueMediaEntity);
-        queueMediaDao.insertAll(queueMediaEntities);
+        queueMediaDao.insert(queueMediaEntity);
 
         queueMediaEntitiesMutableLiveData.postValue(queueMediaDao.getQueueMediaEntities());
         currentlyPlayingQueueMediaMutableLiveData.postValue(queueMediaEntity);
@@ -586,18 +571,19 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public void Shuffle() {
-        List<QueueMediaEntity> queueMediaEntityList = queueMediaEntitiesMutableLiveData.getValue();
-        List<QueueMediaEntity> queueMediaEntitiesFinal = null;
-        if (queueMediaEntityList != null) {
-            queueMediaEntitiesFinal = queueMediaEntityList.subList(0, currentMediaPosition + 1);
+        List<QueueMediaEntity> queueMediaEntityList = queueMediaDao.getQueueMediaEntities(QueueMediaEntity.QueueMediaState.IN_QUEUE);
+        queueMediaDao.delete(queueMediaEntityList);
+
+        int startingPosition = queueMediaEntityList.get(0).getPosition();
+        Collections.shuffle(queueMediaEntityList);
+        for (int i=0; i<queueMediaEntityList.size(); i++){
+            QueueMediaEntity queueMediaEntity = queueMediaEntityList.get(i);
+            queueMediaEntity.setPosition(startingPosition++);
+            queueMediaEntityList.set(i, queueMediaEntity);
         }
-        if (queueMediaEntitiesFinal != null && currentMediaPosition <= (queueMediaEntityList.size() - 3)) {
-            List<QueueMediaEntity> queueMediaEntitiesToShuffle = queueMediaEntityList.subList(currentMediaPosition + 1, queueMediaEntityList.size());
-            Collections.shuffle(queueMediaEntitiesToShuffle);
-            queueMediaEntitiesFinal.addAll(queueMediaEntitiesToShuffle);
-            queueMediaEntitiesMutableLiveData.postValue(queueMediaEntitiesFinal);
-            Toast.makeText(getApplication(), "queue shuffled", Toast.LENGTH_SHORT).show();
-        }
+        queueMediaDao.insertAll(queueMediaEntityList);
+        queueMediaEntitiesMutableLiveData.postValue(queueMediaDao.getQueueMediaEntities());
+        Toast.makeText(getApplication(), "queue shuffled", Toast.LENGTH_SHORT).show();
     }
 
     public MutableLiveData<SimpleExoPlayer> getExoPlayer() {

@@ -27,10 +27,10 @@ public interface QueueMediaDao {
     @Query("select * from QueueMediaEntity")
     LiveData<List<QueueMediaEntity>> getQueueMediaEntitiesLive();
 
-    @Query("select * from QueueMediaEntity")
+    @Query("select * from QueueMediaEntity order by position asc")
     List<QueueMediaEntity> getQueueMediaEntities();
 
-    @Query("select * from QueueMediaEntity where state=:state")
+    @Query("select * from QueueMediaEntity where state=:state order by position asc")
     List<QueueMediaEntity> getQueueMediaEntities(int state);
 
     @Query("update QueueMediaEntity set state=:state")
@@ -42,5 +42,6 @@ public interface QueueMediaDao {
     @Delete
     void delete(List<QueueMediaEntity> queueMediaEntities);
 
-
+    @Query("update QueueMediaEntity set state=:state where position<:position")
+    void setMediaStatusBelowPosition(int state, int position);
 }

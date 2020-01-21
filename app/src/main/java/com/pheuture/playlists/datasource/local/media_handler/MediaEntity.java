@@ -15,6 +15,7 @@ public class MediaEntity implements Parcelable {
 
 	protected MediaEntity(Parcel in) {
 		mediaID = in.readLong();
+		status = in.readString();
 		mediaDescription = in.readString();
 		mediaUrl = in.readString();
 		mediaThumbnail = in.readString();
@@ -29,6 +30,7 @@ public class MediaEntity implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(mediaID);
+		dest.writeString(status);
 		dest.writeString(mediaDescription);
 		dest.writeString(mediaUrl);
 		dest.writeString(mediaThumbnail);
@@ -65,6 +67,14 @@ public class MediaEntity implements Parcelable {
 		this.modifiedOn = modifiedOn;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	public interface MediaColumns{
 		String MEDIA_DESCRIPTION = "mediaDescription";
 		String MEDIA_URL = "mediaUrl";
@@ -81,6 +91,9 @@ public class MediaEntity implements Parcelable {
 	@PrimaryKey
 	@SerializedName("mediaID")
 	private long mediaID;
+
+	@SerializedName("status")
+	private String status;
 
 	@SerializedName("mediaDescription")
 	private String mediaDescription;
