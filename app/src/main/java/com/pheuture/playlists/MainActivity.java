@@ -75,13 +75,13 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
-        setSupportActionBar(binding.layoutAppBar.toolbar);
+        setSupportActionBar(binding.layoutBottomSheet.layoutAppBar.toolbar);
 
         setupConnectivityChangeBroadcastReceiver();
 
         proceedWithPermissions(null, true);
 
-        bottomSheetBehavior = BottomSheetBehavior.from( binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer);
+        bottomSheetBehavior = BottomSheetBehavior.from( binding.layoutBottomSheet.constraintLayoutBottomSheet);
         bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
@@ -132,7 +132,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                 binding.layoutBottomSheet.textViewCreator.setText(currentlyPlayingQueueMediaEntity.getMediaDescription());
 
                 //show bottom sheet
-                binding.layoutBottomSheet.constraintLayoutBottomSheetPlayer.setVisibility(View.VISIBLE);
+                binding.layoutBottomSheet.constraintLayoutBottomSheet.setVisibility(View.VISIBLE);
                 if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN){
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
@@ -168,7 +168,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             }
         });
 
-        viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
+        /*viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
             @Override
             public void onChanged(Bundle bundle) {
                 if (bundle.getBoolean(SNACK_BAR_SHOW, false)){
@@ -177,7 +177,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                     hideSnack();
                 }
             }
-        });
+        });*/
     }
 
     private void checkPlayBackState(boolean playWhenReady, int playbackState) {
