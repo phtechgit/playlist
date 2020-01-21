@@ -149,58 +149,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         PlayingMediaViewHolder(@NonNull ItemQueuePlayingMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            binding.imageViewRemove.setVisibility(View.VISIBLE);
 
-            binding.getRoot().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = getAdapterPosition();
-                    if (pos == RecyclerView.NO_POSITION){
-                        return;
-                    }
-
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putInt(Constants.ARG_PARAM2, 1);
-                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
-
-                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
-                }
-            });
-
-            /*binding.imageViewThumbnail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = getAdapterPosition();
-                    if (pos == RecyclerView.NO_POSITION){
-                        return;
-                    }
-
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putInt(Constants.ARG_PARAM2, 1);
-                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
-
-                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
-                }
-            });*/
-
-            binding.imageViewRemove.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = getAdapterPosition();
-                    if (pos == RecyclerView.NO_POSITION){
-                        return;
-                    }
-
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putInt(Constants.ARG_PARAM2, 2);
-                    bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
-
-                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
-                }
-            });
         }
 
         public void setData(QueueMediaEntity model) {

@@ -27,11 +27,20 @@ public interface QueueMediaDao {
     @Query("select * from QueueMediaEntity")
     LiveData<List<QueueMediaEntity>> getQueueMediaEntitiesLive();
 
+    @Query("select * from QueueMediaEntity")
+    List<QueueMediaEntity> getQueueMediaEntities();
+
+    @Query("select * from QueueMediaEntity where state=:state")
+    List<QueueMediaEntity> getQueueMediaEntities(int state);
+
     @Query("update QueueMediaEntity set state=:state")
     void changeStateOfAllMedia(int state);
 
     @Delete
     void delete(QueueMediaEntity queueMediaEntity);
+
+    @Delete
+    void delete(List<QueueMediaEntity> queueMediaEntities);
 
 
 }

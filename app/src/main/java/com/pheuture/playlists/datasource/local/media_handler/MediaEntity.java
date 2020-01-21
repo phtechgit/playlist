@@ -22,7 +22,6 @@ public class MediaEntity implements Parcelable {
 		mediaTitle = in.readString();
 		playDuration = in.readLong();
 		postDate = in.readString();
-		status = in.readString();
 		createdOn = in.readLong();
 		modifiedOn = in.readLong();
 	}
@@ -37,7 +36,6 @@ public class MediaEntity implements Parcelable {
 		dest.writeString(mediaTitle);
 		dest.writeLong(playDuration);
 		dest.writeString(postDate);
-		dest.writeString(status);
 		dest.writeLong(createdOn);
 		dest.writeLong(modifiedOn);
 	}
@@ -65,23 +63,6 @@ public class MediaEntity implements Parcelable {
 
 	public void setModifiedOn(long modifiedOn) {
 		this.modifiedOn = modifiedOn;
-	}
-
-	@Override
-	public String toString() {
-		return "MediaEntity{" +
-				"mediaID=" + mediaID +
-				", mediaDescription='" + mediaDescription + '\'' +
-				", mediaUrl='" + mediaUrl + '\'' +
-				", mediaThumbnail='" + mediaThumbnail + '\'' +
-				", mediaName='" + mediaName + '\'' +
-				", mediaTitle='" + mediaTitle + '\'' +
-				", playDuration=" + playDuration +
-				", postDate='" + postDate + '\'' +
-				", status='" + status + '\'' +
-				", createdOn=" + createdOn +
-				", modifiedOn=" + modifiedOn +
-				'}';
 	}
 
 	public interface MediaColumns{
@@ -121,9 +102,6 @@ public class MediaEntity implements Parcelable {
 
 	@SerializedName("postDate")
 	private String postDate;
-
-	@SerializedName("status")
-	private String status;
 
 	@SerializedName("createdOn")
 	private long createdOn;
@@ -196,14 +174,6 @@ public class MediaEntity implements Parcelable {
 
 	public void setPostDate(String postDate) {
 		this.postDate = postDate;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
 	}
 
 	public String getFormattedPlayDuration() {
