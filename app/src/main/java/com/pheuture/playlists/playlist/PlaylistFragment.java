@@ -80,11 +80,13 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
                     /*((MainActivity) activity).updateActionBarStatus(false);*/
                     binding.linearLayoutCreatePlaylist.setVisibility(View.VISIBLE);
                     binding.relativeLayoutPlaylists.setVisibility(View.GONE);
+                    parentViewModel.setShowActionBar(false);
 
                 } else {
                     /*((MainActivity) activity).updateActionBarStatus(true);*/
                     binding.linearLayoutCreatePlaylist.setVisibility(View.GONE);
                     binding.relativeLayoutPlaylists.setVisibility(View.VISIBLE);
+                    parentViewModel.setShowActionBar(true);
                 }
 
                 recyclerAdapter.setData(playlistEntities);

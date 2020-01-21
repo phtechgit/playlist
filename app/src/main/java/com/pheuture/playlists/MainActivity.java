@@ -3,7 +3,6 @@ package com.pheuture.playlists;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -121,6 +120,15 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                 Logger.e(TAG,"QueueMediaEntities size:" + queueMediaEntities.size());
                 Logger.e(TAG,"QueueMediaEntitiesLiveData size:" + viewModel.getQueueMediaEntities().getValue().size());
                 recyclerAdapter.setData(queueMediaEntities);
+
+                //if more media available to play
+                if (viewModel.nextMediaAvailable()) {
+                    Logger.e(TAG, "showNext:" + true);
+                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_light);
+                } else {
+                    Logger.e(TAG, "showNext:" + true);
+                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_grey);
+                }
             }
         });
 
@@ -155,19 +163,6 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             }
         });
 
-        viewModel.shouldShowNextButton().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean show) {
-                Logger.e(TAG, "showNext:" + show);
-                //if more media available to play
-                if (show) {
-                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_light);
-                } else {
-                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_grey);
-                }
-            }
-        });
-
         /*viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
             @Override
             public void onChanged(Bundle bundle) {
@@ -178,6 +173,17 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                 }
             }
         });*/
+
+        viewModel.getShowActionBar().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean show) {
+                if (show){
+                   binding.layoutBottomSheet.layoutAppBar.toolbar.setVisibility(View.VISIBLE);
+                } else {
+                    binding.layoutBottomSheet.layoutAppBar.toolbar.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     private void checkPlayBackState(boolean playWhenReady, int playbackState) {
@@ -236,7 +242,6 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             viewModel.next();
 
         } else if (v.equals(binding.layoutBottomSheet.imageViewClose)){
-            viewModel.dismissPlayer();
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             binding.bottomNavView.setVisibility(View.VISIBLE);
         }
