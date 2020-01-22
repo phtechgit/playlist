@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
+import android.view.animation.DecelerateInterpolator;
 
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -278,12 +280,21 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         }
 
         @Override
-        public void onSlide(@NonNull View view, float v) {
-            if (v <= 0){
+        public void onSlide(@NonNull View view, float slideOffset) {
+            if (slideOffset>=0) {
+                float height_to_animate = slideOffset * binding.bottomNavView.getHeight();
+                ViewPropertyAnimator animator = binding.bottomNavView.animate();
+                animator.translationY(height_to_animate)
+                        .setInterpolator(new DecelerateInterpolator())
+                        .setDuration(0)
+                        .start();
+            }
+
+            /*if (v <= 0){
                 binding.bottomNavView.setVisibility(View.VISIBLE);
             } else {
                 binding.bottomNavView.setVisibility(View.GONE);
-            }
+            }*/
         }
     };
 

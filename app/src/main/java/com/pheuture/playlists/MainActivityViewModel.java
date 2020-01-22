@@ -635,6 +635,9 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     public void moveQueueMedia(int fromPosition, int toPosition) {
         List<QueueMediaEntity> queueMediaEntities = queueMediaEntitiesMutableLiveData.getValue();
 
+        if (queueMediaEntities == null) {
+            return;
+        }
 
         QueueMediaEntity queueMediaEntity = queueMediaEntities.get(fromPosition);
         queueMediaEntities.remove(fromPosition);
