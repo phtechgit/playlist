@@ -145,7 +145,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             @Override
             public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
                 String data = shuffleModeEnabled ? "Enabled" : "Disabled";
-                /*Toast.makeText(getApplication(), "Shuffle " + data, Toast.LENGTH_SHORT).show();*/
+                /*Toast.makeText(getApplication(), "shuffle " + data, Toast.LENGTH_SHORT).show();*/
             }
 
             @Override
@@ -202,7 +202,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             @Override
             public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
                 String data = shuffleModeEnabled ? "Enabled" : "Disabled";
-                /*Toast.makeText(getApplication(), "Shuffle " + data, Toast.LENGTH_SHORT).show();*/
+                /*Toast.makeText(getApplication(), "shuffle " + data, Toast.LENGTH_SHORT).show();*/
             }
 
             @Override
@@ -564,7 +564,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         playbackStateMutableLiveData.postValue(bundle);
     }
 
-    public void Shuffle() {
+    public void shuffle() {
         List<QueueMediaEntity> queueMediaEntityList = queueMediaDao.getQueueMediaEntities(QueueMediaEntity.QueueMediaState.IN_QUEUE);
         queueMediaDao.delete(queueMediaEntityList);
 
@@ -655,5 +655,45 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         }
         queueMediaDao.insertAll(queueMediaEntities);
         queueMediaEntitiesMutableLiveData.postValue(queueMediaEntities);
+    }
+
+    public void setShuffledMedia(PlaylistEntity playlist) {
+        //momentarily hold the playback to initiate the changes
+        pausePlayback();
+
+        currentMediaPosition = RecyclerView.NO_POSITION;
+
+        queueMediaDao.deleteAll();
+
+        List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaDao.getPlaylistMediaMediaEntities(playlist.getPlaylistID());
+
+        String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
+        List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
+                .fromJson(objectJsonString, QueueMediaEntity[].class));
+
+        //shuffle the media
+        Collections.shuffle(queueMediaEntities);
+
+        for (int i=0; i<queueMediaEntities.size(); i++){
+            QueueMediaEntity queueMediaEntity1 = queueMediaEntities.get(i);
+            queueMediaEntity1.setPosition(i);
+            queueMediaEntities.set(i, queueMediaEntity1);
+        }
+
+        //insert all media with 'In_Queue' status.
+        queueMediaDao.insertAll(queueMediaEntities);
+
+        QueueMediaEntity queueMediaEntity = queueMediaEntities.get(++currentMediaPosition);
+        playlistMutableLiveData.postValue(playlist);
+
+        if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
+            exoPlayer1.setVolume(1f);
+            Logger.e(TAG, "ExoPlayer1 volume set to: 1f");
+            loadMediaIn(EXO_PLAYER_1, queueMediaEntity);
+
+        } else if (currentPlayer == EXO_PLAYER_2) {
+            exoPlayer2.setVolume(1f);
+            loadMediaIn(EXO_PLAYER_2, queueMediaEntity);
+        }
     }
 }

@@ -206,7 +206,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         } else if (v.equals(binding.imageViewShuffle)) {
             if (playlistMediaEntities.size()>2) {
-                parentViewModel.Shuffle();
+                parentViewModel.setShuffledMedia(playlist);
             }
         }
     }

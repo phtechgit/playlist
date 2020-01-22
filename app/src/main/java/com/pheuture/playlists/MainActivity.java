@@ -1,5 +1,8 @@
 package com.pheuture.playlists;
 
+import android.animation.Animator;
+import android.animation.TimeInterpolator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -7,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
+import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 
 import com.google.android.exoplayer2.Player;
@@ -23,6 +27,7 @@ import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.RecyclerItemMoveCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -240,6 +245,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         binding.layoutBottomSheet.imageViewTogglePlay.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewNext.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewClose.setOnClickListener(this);
+        binding.layoutBottomSheet.imageViewShuffle.setOnClickListener(this);
     }
 
     @Override
@@ -253,6 +259,8 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         } else if (v.equals(binding.layoutBottomSheet.imageViewClose)){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             binding.bottomNavView.setVisibility(View.VISIBLE);
+        } else if (v.equals(binding.layoutBottomSheet.imageViewShuffle)){
+            viewModel.shuffle();
         }
     }
 
@@ -288,13 +296,24 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                         .setInterpolator(new DecelerateInterpolator())
                         .setDuration(0)
                         .start();
+
+
+                /*ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) binding.layoutBottomSheet.constraintLayoutBottomSheet.getLayoutParams();
+                ValueAnimator varl = ValueAnimator.ofFloat(layoutParams.getMarginStart(), 8 - 8 * slideOffset);
+                varl.setDuration(0);
+                varl.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        int value = (Integer) animation.getAnimatedValue();
+                        layoutParams.setMargins(value, value, value, value);
+                        binding.layoutBottomSheet.constraintLayoutBottomSheet.setLayoutParams(layoutParams);
+                    }
+                });
+                varl.start();*/
             }
 
-            /*if (v <= 0){
-                binding.bottomNavView.setVisibility(View.VISIBLE);
-            } else {
-                binding.bottomNavView.setVisibility(View.GONE);
-            }*/
+
+
         }
     };
 
