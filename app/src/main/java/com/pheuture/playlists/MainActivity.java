@@ -1,8 +1,5 @@
 package com.pheuture.playlists;
 
-import android.animation.Animator;
-import android.animation.TimeInterpolator;
-import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -10,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
-import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 
 import com.google.android.exoplayer2.Player;
@@ -27,7 +23,6 @@ import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.RecyclerItemMoveCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -38,9 +33,11 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import java.util.ArrayList;
 import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
+import static com.pheuture.playlists.utils.Constants.PlayerRepeatModes.REPEAT_MODE_ALL;
+import static com.pheuture.playlists.utils.Constants.PlayerRepeatModes.REPEAT_MODE_OFF;
+import static com.pheuture.playlists.utils.Constants.PlayerRepeatModes.REPEAT_MODE_ONE;
 
 public class MainActivity extends BaseActivity implements NavController.OnDestinationChangedListener,
         RecyclerViewClickListener, MediaQueueRecyclerAdapter.ClickType,
@@ -177,6 +174,19 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             }
         });
 
+        viewModel.getRepeatMode().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer repeatMode) {
+                if (repeatMode == REPEAT_MODE_OFF) {
+                    binding.layoutBottomSheet.imageViewRepeat.setImageDrawable(getResources().getDrawable(R.drawable.exo_controls_repeat_off));
+                } else if (repeatMode == REPEAT_MODE_ONE){
+                    binding.layoutBottomSheet.imageViewRepeat.setImageDrawable(getResources().getDrawable(R.drawable.exo_controls_repeat_one ));
+                } else if (repeatMode == REPEAT_MODE_ALL){
+                    binding.layoutBottomSheet.imageViewRepeat.setImageDrawable(getResources().getDrawable(R.drawable.exo_controls_repeat_all));
+                }
+            }
+        });
+
         viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
             @Override
             public void onChanged(Bundle bundle) {
@@ -198,6 +208,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                 }
             }
         });
+
     }
 
     private void checkPlayBackState(boolean playWhenReady, int playbackState) {
@@ -246,6 +257,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         binding.layoutBottomSheet.imageViewNext.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewClose.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewShuffle.setOnClickListener(this);
+        binding.layoutBottomSheet.imageViewRepeat.setOnClickListener(this);
     }
 
     @Override
@@ -261,6 +273,8 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             binding.bottomNavView.setVisibility(View.VISIBLE);
         } else if (v.equals(binding.layoutBottomSheet.imageViewShuffle)){
             viewModel.shuffle();
+        } else if (v.equals(binding.layoutBottomSheet.imageViewRepeat)){
+            viewModel.toggleRepeatMode();
         }
     }
 

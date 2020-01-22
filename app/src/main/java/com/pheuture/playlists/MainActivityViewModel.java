@@ -43,14 +43,13 @@ import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import static android.content.Context.AUDIO_SERVICE;
 
 public class MainActivityViewModel extends BaseAndroidViewModel implements Constants.SnackBarActions,
-        AudioManager.OnAudioFocusChangeListener {
+        AudioManager.OnAudioFocusChangeListener, Constants.PlayerRepeatModes {
 
     private static final String TAG = MainActivityViewModel.class.getSimpleName();
     private MutableLiveData<String> title;
@@ -87,6 +86,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     private boolean connectedToNetwork = false;
     private boolean playingFromNetwork;
     private MutableLiveData<List<QueueMediaEntity>> queueMediaEntitiesMutableLiveData;
+    private MutableLiveData<Integer> repeatModeMutableLiveData = new MutableLiveData<>(REPEAT_MODE_OFF);
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
@@ -282,63 +282,68 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     private Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
-            if (currentPlayer == EXO_PLAYER_1) {
-                totalDurationOfCurrentMedia = exoPlayer1.getDuration();
-                currentDurationOfCurrentMedia = exoPlayer1.getCurrentPosition();
-
-                int crossFadeValue = (SharedPrefsUtils.getIntegerPreference(getApplication(),
-                        Constants.CROSS_FADE_VALUE, Constants.CROSS_FADE_DEFAULT_VALUE) * 1000);
-
-                //increase volume if player
-                if (queueMediaEntitiesMutableLiveData.getValue().size()>1 && exoPlayer1.getVolume()<1f) {
-                    float volume = (float) currentDurationOfCurrentMedia / (float) crossFadeValue;
-                    exoPlayer1.setVolume(volume);
-                    exoPlayer2.setVolume(1f-volume);
-                    /*Logger.e(TAG, "volume: exoPlayerMutableLiveData:" + exoPlayer1.getVolume() + ", exoPlayer2:" + exoPlayer2.getVolume());*/
-                }
-
-                //if more media available to play
-                if (nextMediaAvailable()) {
-                    if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
-                            - currentDurationOfCurrentMedia) <= crossFadeValue) {
-                        exoPlayer2.setVolume(0f);
-                        loadMediaIn(EXO_PLAYER_2, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
-                    }
-                }
-            } else if (currentPlayer == EXO_PLAYER_2) {
-                totalDurationOfCurrentMedia = exoPlayer2.getDuration();
-                currentDurationOfCurrentMedia = exoPlayer2.getCurrentPosition();
-
-                int crossFadeValue = (SharedPrefsUtils.getIntegerPreference(getApplication(),
-                        Constants.CROSS_FADE_VALUE, Constants.CROSS_FADE_DEFAULT_VALUE) * 1000);
-
-                //increase volume if player
-                if (queueMediaEntitiesMutableLiveData.getValue().size()>1 && exoPlayer2.getVolume()<1f) {
-                    float volume = (float) currentDurationOfCurrentMedia / (float) crossFadeValue;
-                    exoPlayer2.setVolume(volume);
-                    exoPlayer1.setVolume(1f-volume);
-                    /*Logger.e(TAG, "volume: exoPlayer2:" + exoPlayer2.getVolume() + ", exoPlayer1:" + exoPlayer1.getVolume());*/
-                }
-
-                //if more media available to play
-                if (nextMediaAvailable()){
-                    //if remaining duration of current media <= 2sec
-                    if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
-                            - currentDurationOfCurrentMedia) <= crossFadeValue) {
-                        exoPlayer1.setVolume(0f);
-                        loadMediaIn(EXO_PLAYER_1, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
-                    }
-                }
+            if (currentPlayer != RecyclerView.NO_POSITION) {
+                proceed();
             }
-
-            //update progress
-            playingMediaProgress.postValue(calculatePercentage(totalDurationOfCurrentMedia,
-                    currentDurationOfCurrentMedia));
-
             //reset handler
             timerHandler.postDelayed(timerRunnable, defaultTimerInMilliSec);
         }
     };
+
+    private void proceed() {
+        int nextPlayer;
+        SimpleExoPlayer primaryExoPlayer;
+        SimpleExoPlayer secondaryExoPlayer;
+
+        if (currentPlayer == EXO_PLAYER_1){
+            primaryExoPlayer = exoPlayer1;
+            secondaryExoPlayer = exoPlayer2;
+            nextPlayer = EXO_PLAYER_2;
+        } else {
+            primaryExoPlayer = exoPlayer2;
+            secondaryExoPlayer = exoPlayer1;
+            nextPlayer = EXO_PLAYER_1;
+        }
+        totalDurationOfCurrentMedia = primaryExoPlayer.getDuration();
+        currentDurationOfCurrentMedia = primaryExoPlayer.getCurrentPosition();
+
+        int crossFadeValue = (SharedPrefsUtils.getIntegerPreference(getApplication(),
+                Constants.CROSS_FADE_VALUE, Constants.CROSS_FADE_DEFAULT_VALUE) * 1000);
+
+        //increase volume if player
+        if (queueMediaEntitiesMutableLiveData.getValue().size()>1 && primaryExoPlayer.getVolume()<1f) {
+            float volume = (float) currentDurationOfCurrentMedia / (float) crossFadeValue;
+            primaryExoPlayer.setVolume(volume);
+            secondaryExoPlayer.setVolume(1f-volume);
+            /*Logger.e(TAG, "volume: exoPlayerMutableLiveData:" + exoPlayer1.getVolume() + ", exoPlayer2:" + exoPlayer2.getVolume());*/
+        }
+
+        //check if it is time to change the track
+        if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
+                - currentDurationOfCurrentMedia) <= crossFadeValue) {
+
+            int repeatMode = repeatModeMutableLiveData.getValue();
+            if (repeatMode == REPEAT_MODE_ONE){
+                //If single repeat play is ON
+                secondaryExoPlayer.setVolume(0f);
+                loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(currentMediaPosition));
+
+            } else if (nextMediaAvailable()) {
+                //if more media available to play
+                secondaryExoPlayer.setVolume(0f);
+                loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
+
+            } else if (repeatMode == REPEAT_MODE_ALL){
+                currentMediaPosition = RecyclerView.NO_POSITION;
+                secondaryExoPlayer.setVolume(0f);
+                loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
+            }
+        }
+
+        //update progress
+        playingMediaProgress.postValue(calculatePercentage(totalDurationOfCurrentMedia,
+                currentDurationOfCurrentMedia));
+    }
 
     private void requestAudioFocus(){
         int res;
@@ -428,6 +433,10 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public void next() {
+        pausePlayback();
+
+        repeatModeMutableLiveData.postValue(REPEAT_MODE_OFF);
+
         //if more media available to play & no pending callbacks
         if ((queueMediaEntitiesMutableLiveData.getValue().size() - 1)> currentMediaPosition){
             if (currentPlayer == EXO_PLAYER_1) {
@@ -443,6 +452,8 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     public void setMedia(PlaylistEntity playlistEntity, QueueMediaEntity queueMediaEntity, boolean refreshData){
         //momentarily hold the playback to initiate the changes
         pausePlayback();
+
+        repeatModeMutableLiveData.postValue(REPEAT_MODE_OFF);
 
         currentMediaPosition = RecyclerView.NO_POSITION;
 
@@ -661,6 +672,8 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         //momentarily hold the playback to initiate the changes
         pausePlayback();
 
+        repeatModeMutableLiveData.postValue(REPEAT_MODE_OFF);
+
         currentMediaPosition = RecyclerView.NO_POSITION;
 
         queueMediaDao.deleteAll();
@@ -695,5 +708,20 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             exoPlayer2.setVolume(1f);
             loadMediaIn(EXO_PLAYER_2, queueMediaEntity);
         }
+    }
+
+    public void toggleRepeatMode() {
+        int repeatMode = repeatModeMutableLiveData.getValue();
+        if (repeatMode == REPEAT_MODE_OFF) {
+            repeatModeMutableLiveData.postValue(REPEAT_MODE_ONE);
+        } else if (repeatMode == REPEAT_MODE_ONE){
+            repeatModeMutableLiveData.postValue(REPEAT_MODE_ALL);
+        } else if (repeatMode == REPEAT_MODE_ALL){
+            repeatModeMutableLiveData.postValue(REPEAT_MODE_OFF);
+        }
+    }
+
+    public LiveData<Integer> getRepeatMode() {
+        return repeatModeMutableLiveData;
     }
 }

@@ -33,4 +33,10 @@ public final class Constants{
         String SNACK_BAR_LENGTH = "snack_bar_length";
     }
 
+    public interface PlayerRepeatModes{
+        int REPEAT_MODE_OFF = 0;
+        int REPEAT_MODE_ONE = 1;
+        int REPEAT_MODE_ALL = 2;
+    }
+
 }
