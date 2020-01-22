@@ -26,14 +26,15 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.pheuture.playlists.R;
+import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.interfaces.NotificationID;
 import com.pheuture.playlists.interfaces.RequestCodes;
 
 import java.util.List;
 
-public abstract class BaseActivity extends AppCompatActivity implements NotificationID, RequestCodes,
-        Constants.SnackBarActions, View.OnClickListener {
+public abstract class BaseActivity extends AppCompatActivity implements
+        NotificationID, RequestCodes, Constants.SnackBarActions, View.OnClickListener {
     public static final String ARG_PARAM1 = "param1";
     public static final String ARG_PARAM2 = "param2";
     public static final String ARG_PARAM3 = "param3";
@@ -184,7 +185,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Notifica
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.cancel();
                                     Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                    intent.setData(Uri.fromParts("package", getPackageName(), null));
+                                    intent.updateData(Uri.fromParts("package", getPackageName(), null));
                                     startActivityForResult(intent, 0);
                                 }
                             });
@@ -206,4 +207,5 @@ public abstract class BaseActivity extends AppCompatActivity implements Notifica
                 .onSameThread()
                 .check();
     }
+
 }

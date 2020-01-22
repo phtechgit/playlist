@@ -147,7 +147,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                     bundle.putInt(Constants.ARG_PARAM1, pos);
                     bundle.putParcelable(Constants.ARG_PARAM2, masterList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
                 }
             });
 
@@ -163,7 +163,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                     bundle.putInt(Constants.ARG_PARAM1, pos);
                     bundle.putParcelable(Constants.ARG_PARAM2, masterList.get(pos));
 
-                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
+                    recyclerViewInterface.onRecyclerViewHolderClick(bundle);
                 }
             });*/
         }

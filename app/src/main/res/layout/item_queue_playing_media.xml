@@ -28,7 +28,6 @@
         android:background="@color/grayF"
         android:clickable="true"
         android:focusable="true"
-        android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:paddingBottom="2dp"
         android:paddingTop="2dp"
@@ -36,14 +35,26 @@
         app:layout_constraintStart_toStartOf="@+id/textView_title">
 
         <ImageView
+            android:id="@+id/imageView_drag_handle"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_drag_handle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
             android:id="@+id/imageView_thumbnail"
             android:layout_width="140dp"
             android:layout_height="90dp"
-            android:scaleType="center"
             android:background="@color/grayE"
+            android:scaleType="center"
             app:imageUrl="@{mediaThumbnail}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView_drag_handle"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView

@@ -64,7 +64,7 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     /*public void removeItem(int position) {
         List newData = new ArrayList<>(oldList);
         newData.remove(position);
-        setData(newData);
+        updateData(newData);
     }*/
 
     class DiffCallBack extends DiffUtil.Callback{
@@ -151,7 +151,7 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                     bundle.putInt(Constants.ARG_PARAM1, 1);
                     bundle.putInt(Constants.ARG_PARAM2, pos);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
-                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
                 }
             });
 
@@ -167,7 +167,7 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                     bundle.putInt(Constants.ARG_PARAM1, 1);
                     bundle.putInt(Constants.ARG_PARAM2, pos);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
-                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
+                    recyclerViewInterface.onRecyclerViewHolderClick(bundle);
                 }
             });*/
 
@@ -184,7 +184,7 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                     bundle.putInt(Constants.ARG_PARAM2, pos);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
                 }
             });
         }

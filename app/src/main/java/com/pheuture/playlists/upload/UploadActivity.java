@@ -23,7 +23,7 @@ import com.pheuture.playlists.databinding.ActivityUploadBinding;
 import com.pheuture.playlists.base.BaseActivity;
 import com.pheuture.playlists.interfaces.RequestCodes;
 
-public class UploadActivity extends BaseActivity implements RequestCodes{
+public class UploadActivity extends BaseActivity{
     private static final String TAG = UploadActivity.class.getSimpleName();
     private UploadViewModel viewModel;
     private ActivityUploadBinding binding;

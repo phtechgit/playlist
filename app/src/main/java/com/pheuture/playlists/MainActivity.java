@@ -18,7 +18,7 @@ import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.queue.MediaQueueRecyclerAdapter;
 import com.pheuture.playlists.receiver.ConnectivityChangeReceiver;
 import com.pheuture.playlists.utils.Logger;
-
+import com.pheuture.playlists.utils.RecyclerItemMoveCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -28,14 +28,16 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
 
 public class MainActivity extends BaseActivity implements NavController.OnDestinationChangedListener,
-        RecyclerViewClickListener,
-        MediaQueueRecyclerAdapter.ClickType,
+        RecyclerViewClickListener, MediaQueueRecyclerAdapter.ClickType,
+        RecyclerItemMoveCallback.ItemTouchHelperContract,
         ConnectivityChangeReceiver.ConnectivityChangeListener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -44,6 +46,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     private BottomSheetBehavior bottomSheetBehavior;
     private MediaQueueRecyclerAdapter recyclerAdapter;
     private ConnectivityChangeReceiver connectivityChangeReceiver;
+    private ItemTouchHelper itemTouchHelper;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -100,6 +103,11 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         binding.layoutBottomSheet.recyclerViewMediaQueue.setLayoutManager(layoutManager);
         binding.layoutBottomSheet.recyclerViewMediaQueue.setAdapter(recyclerAdapter);
 
+        //enable drag listener
+        RecyclerItemMoveCallback itemMoveCallback = new RecyclerItemMoveCallback(this);
+        itemTouchHelper = new ItemTouchHelper(itemMoveCallback);
+        itemTouchHelper.attachToRecyclerView(binding.layoutBottomSheet.recyclerViewMediaQueue);
+
         viewModel.getTitle().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
@@ -118,8 +126,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             @Override
             public void onChanged(List<QueueMediaEntity> queueMediaEntities) {
                 Logger.e(TAG,"QueueMediaEntities size:" + queueMediaEntities.size());
-                Logger.e(TAG,"QueueMediaEntitiesLiveData size:" + viewModel.getQueueMediaEntities().getValue().size());
-                recyclerAdapter.setData(queueMediaEntities);
+                recyclerAdapter.updateData(queueMediaEntities);
 
                 //if more media available to play
                 if (viewModel.nextMediaAvailable()) {
@@ -163,16 +170,16 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             }
         });
 
-        /*viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
+        viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
             @Override
             public void onChanged(Bundle bundle) {
                 if (bundle.getBoolean(SNACK_BAR_SHOW, false)){
-                    showSnack(binding.coordinatorLayout, bundle);
+                    showSnack(binding.layoutBottomSheet.coordinatorLayoutSnackBar, bundle);
                 } else {
                     hideSnack();
                 }
             }
-        });*/
+        });
 
         viewModel.getShowActionBar().observe(this, new Observer<Boolean>() {
             @Override
@@ -281,21 +288,23 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     };
 
     @Override
-    public void onRecyclerViewItemClick(Bundle bundle) {
+    public void onRecyclerViewHolderClick(Bundle bundle) {
         int position = bundle.getInt(ARG_PARAM1, -1);
         int type = bundle.getInt(ARG_PARAM2, 1);
         QueueMediaEntity queueMediaEntity = bundle.getParcelable(ARG_PARAM3);
 
         if (type == SELECT) {
             viewModel.setMedia(viewModel.getPlaylistMutableLiveData().getValue(), queueMediaEntity, false);
-
         } else if (type == REMOVE){
             viewModel.removeQueueMedia(queueMediaEntity);
+        } else if (type == DRAG) {
+            Logger.e(TAG, "drag started");
+            itemTouchHelper.startDrag(binding.layoutBottomSheet.recyclerViewMediaQueue.findViewHolderForLayoutPosition(position));
         }
     }
 
     @Override
-    public void onRecyclerViewItemLongClick(Bundle bundle) {
+    public void onRecyclerViewHolderLongClick(Bundle bundle) {
 
     }
 
@@ -321,6 +330,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         unregisterReceiver(connectivityChangeReceiver);
     }
 
+
     @Override
     public void onConnectivityChange(boolean connected) {
         Logger.e(TAG, "onConnectivityChange");
@@ -332,5 +342,10 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN && bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
+    }
+
+    @Override
+    public void onRecyclerViewHolderMoved(int fromPosition, int toPosition) {
+        viewModel.moveQueueMedia(fromPosition, toPosition);
     }
 }

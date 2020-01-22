@@ -140,7 +140,7 @@ public class PlaylistMediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     bundle.putInt(Constants.ARG_PARAM2, 1);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
                 }
             });
 
@@ -157,7 +157,7 @@ public class PlaylistMediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     bundle.putInt(Constants.ARG_PARAM2, 1);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewInterface.onRecyclerViewItemClick(bundle);
+                    recyclerViewInterface.onRecyclerViewHolderClick(bundle);
                 }
             });*/
 
@@ -174,7 +174,7 @@ public class PlaylistMediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     bundle.putInt(Constants.ARG_PARAM2, 2);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
                 }
             });
         }

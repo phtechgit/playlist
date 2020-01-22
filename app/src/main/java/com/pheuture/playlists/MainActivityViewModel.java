@@ -113,11 +113,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 Util.getUserAgent(application, TAG));
         exoPlayer1 = ExoPlayerFactory.newSimpleInstance(application);
         exoPlayer2 = ExoPlayerFactory.newSimpleInstance(application);
-        /*Logger.e(TAG, "onTimelineChanged: " + reason);*/
-        /*Logger.e(TAG, "onTracksChanged: " + trackSelections.length);*/
-        /*Logger.e(TAG, "onLoadingChanged: " + isLoading);*/
-        /*Logger.e(TAG, "onPlaybackParametersChanged");*/
-        /*Logger.e(TAG, "onSeekProcessed");*/
+
         Player.EventListener playerListener1 = new Player.EventListener() {
             @Override
             public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
@@ -483,13 +479,11 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 }
             } else {
                 if (refreshData) {
+                    queueMediaEntity = queueMediaDao.getQueueMediaEntity(queueMediaEntity.getMediaID());
                     currentMediaPosition = queueMediaEntity.getPosition();
 
                 } else {
-                    queueMediaEntities = queueMediaEntitiesMutableLiveData.getValue();
-                    if (queueMediaEntities != null) {
-                        currentMediaPosition = queueMediaEntity.getPosition();
-                    }
+                    currentMediaPosition = queueMediaEntity.getPosition();
                 }
             }
         }
@@ -636,5 +630,27 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
     public LiveData<Boolean> getShowActionBar() {
         return showActionBar;
+    }
+
+    public void moveQueueMedia(int fromPosition, int toPosition) {
+        List<QueueMediaEntity> queueMediaEntities = queueMediaEntitiesMutableLiveData.getValue();
+
+
+        QueueMediaEntity queueMediaEntity = queueMediaEntities.get(fromPosition);
+        queueMediaEntities.remove(fromPosition);
+
+        if (toPosition < fromPosition) {
+            queueMediaEntities.add(toPosition, queueMediaEntity);
+        } else {
+            queueMediaEntities.add(toPosition, queueMediaEntity);
+        }
+
+        for (int i = fromPosition; i<queueMediaEntities.size(); i++){
+            QueueMediaEntity queueMediaEntity1 = queueMediaEntities.get(i);
+            queueMediaEntity1.setPosition(i);
+            queueMediaEntities.set(i, queueMediaEntity1);
+        }
+        queueMediaDao.insertAll(queueMediaEntities);
+        queueMediaEntitiesMutableLiveData.postValue(queueMediaEntities);
     }
 }

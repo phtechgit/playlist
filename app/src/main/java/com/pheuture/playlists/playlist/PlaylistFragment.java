@@ -233,7 +233,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
     }
 
     @Override
-    public void onRecyclerViewItemClick(Bundle bundle) {
+    public void onRecyclerViewHolderClick(Bundle bundle) {
         int position = bundle.getInt(ARG_PARAM1, -1);
         int type = bundle.getInt(ARG_PARAM2, -1);
         PlaylistEntity model = bundle.getParcelable(ARG_PARAM3);
@@ -257,7 +257,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
     }
 
     @Override
-    public void onRecyclerViewItemLongClick(Bundle bundle) {
+    public void onRecyclerViewHolderLongClick(Bundle bundle) {
 
     }
 

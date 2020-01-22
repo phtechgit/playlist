@@ -44,4 +44,7 @@ public interface QueueMediaDao {
 
     @Query("update QueueMediaEntity set state=:state where position<:position")
     void setMediaStatusBelowPosition(int state, int position);
+
+    @Query("select * from QueueMediaEntity where mediaID=:mediaID")
+    QueueMediaEntity getQueueMediaEntity(long mediaID);
 }

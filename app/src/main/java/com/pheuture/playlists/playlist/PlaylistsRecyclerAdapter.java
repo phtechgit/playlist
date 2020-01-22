@@ -139,7 +139,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                     bundle.putInt(Constants.ARG_PARAM1, adapterPosition);
                     bundle.putInt(Constants.ARG_PARAM2, 1);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(adapterPosition));
-                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
                 }
             });
 
@@ -155,7 +155,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                     bundle.putInt(Constants.ARG_PARAM1, adapterPosition);
                     bundle.putInt(Constants.ARG_PARAM2, 2);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(adapterPosition));
-                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
                 }
             });
 

@@ -3,6 +3,7 @@ package com.pheuture.playlists.queue;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -17,21 +18,23 @@ import com.pheuture.playlists.databinding.ItemQueuePlayingMediaBinding;
 import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.utils.RecyclerItemMoveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = MediaQueueRecyclerAdapter.class.getSimpleName();
+    private Context mContext;
     private int PLAYING_MEDIA = 1;
     private int NOT_PLAYING_MEDIA = 2;
-    private Context mContext;
     private List<QueueMediaEntity> oldList;
     private RecyclerViewClickListener recyclerViewClickListener;
 
     public interface ClickType {
         int SELECT = 1;
         int REMOVE = 2;
+        int DRAG = 3;
     }
 
     public MediaQueueRecyclerAdapter(Context context, RecyclerViewClickListener listener) {
@@ -72,14 +75,11 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         }
     }
 
-    public void setData(List<QueueMediaEntity> newList) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList), true);
+    public void updateData(List<QueueMediaEntity> newList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList),
+                true);
         oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
-    }
-
-    public List<QueueMediaEntity> getDataList() {
-        return oldList;
     }
 
     class DiffCallBack extends DiffUtil.Callback{
@@ -103,7 +103,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).getMediaID() == newList.get(newItemPosition).getMediaID();
+            return oldList.get(oldItemPosition).getPosition() == newList.get(newItemPosition).getPosition();
         }
 
         @Override
@@ -149,7 +149,9 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         PlayingMediaViewHolder(@NonNull ItemQueuePlayingMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-
+            this.binding.imageViewDragHandle.setOnTouchListener(null);
+            this.binding.imageViewDragHandle.setVisibility(View.INVISIBLE);
+            this.binding.imageViewRemove.setVisibility(View.GONE);
         }
 
         public void setData(QueueMediaEntity model) {
@@ -160,13 +162,14 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         }
     }
 
-    public class NotPlayingMediaViewHolder extends RecyclerView.ViewHolder {
+    public class NotPlayingMediaViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
         private ItemQueueNotPlayingMediaBinding binding;
 
         NotPlayingMediaViewHolder(@NonNull ItemQueueNotPlayingMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            binding.imageViewRemove.setVisibility(View.VISIBLE);
+            this.binding.imageViewDragHandle.setOnTouchListener(this);
+            this.binding.imageViewRemove.setVisibility(View.VISIBLE);
 
             binding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -181,7 +184,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
                     bundle.putInt(Constants.ARG_PARAM2, ClickType.SELECT);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
                 }
             });
 
@@ -198,7 +201,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
                     bundle.putInt(Constants.ARG_PARAM2, ClickType.REMOVE);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewItemClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
                 }
             });
         }
@@ -208,6 +211,11 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             binding.setMediaDescription(model.getMediaDescription());
             binding.setMediaThumbnail(model.getMediaThumbnail());
             binding.setMediaDuration(model.getFormattedPlayDuration());
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            return false;
         }
     }
 

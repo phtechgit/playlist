@@ -101,7 +101,7 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     }
 
     @Override
-    public void onRecyclerViewItemClick(Bundle bundle) {
+    public void onRecyclerViewHolderClick(Bundle bundle) {
         MediaEntity mediaEntity = bundle.getParcelable(ARG_PARAM2);
 
         String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity,
@@ -113,7 +113,7 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     }
 
     @Override
-    public void onRecyclerViewItemLongClick(Bundle bundle) {
+    public void onRecyclerViewHolderLongClick(Bundle bundle) {
 
     }
 

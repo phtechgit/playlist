@@ -1,8 +1,11 @@
 package com.pheuture.playlists.interfaces;
 
 import android.os.Bundle;
+import android.view.View;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public interface RecyclerViewClickListener {
-    void onRecyclerViewItemClick(Bundle bundle);
-    void onRecyclerViewItemLongClick(Bundle bundle);
+    void onRecyclerViewHolderClick(Bundle bundle);
+    void onRecyclerViewHolderLongClick(Bundle bundle);
 }

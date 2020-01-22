@@ -131,7 +131,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
     };
 
     @Override
-    public void onRecyclerViewItemClick(Bundle bundle) {
+    public void onRecyclerViewHolderClick(Bundle bundle) {
         int type = bundle.getInt(ARG_PARAM1, -1);
         int position = bundle.getInt(ARG_PARAM2, -1);
         MediaEntity mediaEntity = bundle.getParcelable(ARG_PARAM3);
@@ -158,7 +158,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
     }
 
     @Override
-    public void onRecyclerViewItemLongClick(Bundle bundle) {
+    public void onRecyclerViewHolderLongClick(Bundle bundle) {
 
     }
 }
