@@ -135,9 +135,11 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                 //if more media available to play
                 if (viewModel.nextMediaAvailable()) {
                     Logger.e(TAG, "showNext:" + true);
+                    binding.layoutBottomSheet.imageViewShuffle.setImageResource(R.drawable.exo_controls_shuffle_on);
                     binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_light);
                 } else {
                     Logger.e(TAG, "showNext:" + true);
+                    binding.layoutBottomSheet.imageViewShuffle.setImageResource(R.drawable.exo_controls_shuffle_off);
                     binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_grey);
                 }
             }
