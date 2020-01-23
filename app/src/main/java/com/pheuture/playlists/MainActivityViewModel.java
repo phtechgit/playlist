@@ -5,6 +5,7 @@ import android.app.DownloadManager;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -28,6 +30,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaDao;
@@ -318,6 +321,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             /*Logger.e(TAG, "volume: exoPlayerMutableLiveData:" + exoPlayer1.getVolume() + ", exoPlayer2:" + exoPlayer2.getVolume());*/
         }
 
+        List<QueueMediaEntity> queueMediaEntities = queueMediaEntitiesMutableLiveData.getValue();
         //check if it is time to change the track
         if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
                 - currentDurationOfCurrentMedia) <= crossFadeValue) {
@@ -326,23 +330,31 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             if (repeatMode == REPEAT_MODE_ONE){
                 //If single repeat play is ON
                 secondaryExoPlayer.setVolume(0f);
-                loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(currentMediaPosition));
+                loadMediaIn(nextPlayer, queueMediaEntities.get(currentMediaPosition));
 
             } else if (nextMediaAvailable()) {
                 //if more media available to play
                 secondaryExoPlayer.setVolume(0f);
-                loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
+                loadMediaIn(nextPlayer, queueMediaEntities.get(++currentMediaPosition));
 
             } else if (repeatMode == REPEAT_MODE_ALL){
                 currentMediaPosition = RecyclerView.NO_POSITION;
                 secondaryExoPlayer.setVolume(0f);
-                loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
+                loadMediaIn(nextPlayer, queueMediaEntities.get(++currentMediaPosition));
             }
         }
 
-        //update progress
-        playingMediaProgress.postValue(calculatePercentage(totalDurationOfCurrentMedia,
-                currentDurationOfCurrentMedia));
+        int progress = calculatePercentage(totalDurationOfCurrentMedia,
+                currentDurationOfCurrentMedia);
+
+        QueueMediaEntity queueMediaEntity = currentlyPlayingQueueMediaMutableLiveData.getValue();
+        if (queueMediaEntity != null) {
+            queueMediaEntity.setProgress(progress);
+            queueMediaEntitiesMutableLiveData.postValue(queueMediaEntities);
+            currentlyPlayingQueueMediaMutableLiveData.postValue(queueMediaEntity);
+            //update progress
+            playingMediaProgress.postValue(progress);
+        }
     }
 
     private void requestAudioFocus(){
@@ -417,7 +429,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public void togglePlay() {
-        SimpleExoPlayer exoPlayer = null;
+        SimpleExoPlayer exoPlayer;
         if (currentPlayer == EXO_PLAYER_1){
             exoPlayer = exoPlayer1;
         } else {
@@ -428,13 +440,14 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             pausePlayback();
             abandonAudioFocus();
         } else {
+            if (exoPlayer.getPlaybackState() == Player.STATE_IDLE) {
+                playMedia(exoPlayer, currentlyPlayingQueueMediaMutableLiveData.getValue());
+            }
             requestAudioFocus();
         }
     }
 
     public void next() {
-        pausePlayback();
-
         repeatModeMutableLiveData.postValue(REPEAT_MODE_OFF);
 
         //if more media available to play & no pending callbacks
@@ -509,6 +522,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             exoPlayer2.setVolume(1f);
             loadMediaIn(EXO_PLAYER_2, queueMediaEntity);
         }
+        requestAudioFocus();
     }
 
     private void loadMediaIn(int player, QueueMediaEntity queueMediaEntity) {
@@ -527,9 +541,14 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         queueMediaEntity.setState(QueueMediaEntity.QueueMediaState.PLAYING);
         queueMediaDao.insert(queueMediaEntity);
 
-        queueMediaEntitiesMutableLiveData.postValue(queueMediaDao.getQueueMediaEntities());
-        currentlyPlayingQueueMediaMutableLiveData.postValue(queueMediaEntity);
+        queueMediaEntitiesMutableLiveData.setValue(queueMediaDao.getQueueMediaEntities());
+        currentlyPlayingQueueMediaMutableLiveData.setValue(queueMediaEntity);
+        exoPlayerMutableLiveData.postValue(exoPlayer);
 
+        playMedia(exoPlayer, queueMediaEntity);
+    }
+
+    private void playMedia(SimpleExoPlayer exoPlayer, QueueMediaEntity queueMediaEntity) {
         Uri mediaUri;
 
         //check if media is available offline then load from it else stream from server
@@ -551,8 +570,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         MediaSource mediaSource = new ProgressiveMediaSource
                 .Factory(dataSourceFactory).createMediaSource(mediaUri);
         exoPlayer.prepare(mediaSource);
-        requestAudioFocus();
-        exoPlayerMutableLiveData.postValue(exoPlayer);
+        exoPlayer.seekTo(queueMediaEntity.getProgress());
     }
 
     private int calculatePercentage(long totalDuration, long currentDuration) {
@@ -563,9 +581,8 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     private void setPlaybackState(boolean playWhenReady, int playbackState) {
-        if (playingFromNetwork && !connectedToNetwork){
-            pausePlayback();
-            abandonAudioFocus();
+        if (playingFromNetwork && !connectedToNetwork && playbackState == PlaybackState.STATE_STOPPED
+                && bottomSheetState!= BottomSheetBehavior.STATE_HIDDEN){
             showSnackBar("No internet connectivity...", Snackbar.LENGTH_LONG);
         }
 
@@ -600,7 +617,20 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public void removeQueueMedia(QueueMediaEntity queueMediaEntity) {
-        queueMediaDao.delete(queueMediaEntity);
+        int position = queueMediaEntity.getPosition();
+        List<QueueMediaEntity> queueMediaEntities = queueMediaEntitiesMutableLiveData.getValue();
+        if (queueMediaEntities != null && queueMediaEntities.size()>0) {
+            queueMediaEntities.remove(position);
+            queueMediaDao.delete(queueMediaEntity);
+
+            for (int i=position; i<queueMediaEntities.size(); i++){
+                queueMediaEntity = queueMediaEntities.get(i);
+                queueMediaEntity.setPosition(i);
+                queueMediaEntities.set(i, queueMediaEntity);
+            }
+            queueMediaDao.insertAll(queueMediaEntities);
+            queueMediaEntitiesMutableLiveData.postValue(queueMediaEntities   );
+        }
     }
 
     public boolean nextMediaAvailable() {
@@ -625,12 +655,12 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
     @Override
     protected void onCleared() {
+        timerHandler.removeCallbacks(timerRunnable);
+
         exoPlayer1.release();
         exoPlayer2.release();
 
         abandonAudioFocus();
-
-        timerHandler.removeCallbacks(timerRunnable);
 
         super.onCleared();
     }

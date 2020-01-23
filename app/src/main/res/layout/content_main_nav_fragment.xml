@@ -10,6 +10,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <fragment
+            tools:showIn="@layout/content_main_app_bar"
             android:id="@+id/nav_host_fragment"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"

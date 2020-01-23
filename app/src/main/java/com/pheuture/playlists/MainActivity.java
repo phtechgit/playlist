@@ -81,7 +81,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
-        setSupportActionBar(binding.layoutBottomSheet.layoutAppBar.toolbar);
+        setSupportActionBar(binding.layoutAppBar.toolbar);
 
         setupConnectivityChangeBroadcastReceiver();
 
@@ -191,7 +191,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             @Override
             public void onChanged(Bundle bundle) {
                 if (bundle.getBoolean(SNACK_BAR_SHOW, false)){
-                    showSnack(binding.layoutBottomSheet.coordinatorLayoutSnackBar, bundle);
+                    showSnack(binding.coordinatorLayoutSnackBar, bundle);
                 } else {
                     hideSnack();
                 }
@@ -202,9 +202,9 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             @Override
             public void onChanged(Boolean show) {
                 if (show){
-                   binding.layoutBottomSheet.layoutAppBar.toolbar.setVisibility(View.VISIBLE);
+                   binding.layoutAppBar.toolbar.setVisibility(View.VISIBLE);
                 } else {
-                    binding.layoutBottomSheet.layoutAppBar.toolbar.setVisibility(View.GONE);
+                    binding.layoutAppBar.toolbar.setVisibility(View.GONE);
                 }
             }
         });
@@ -215,7 +215,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         switch (playbackState) {
             case Player.STATE_BUFFERING:
                 Logger.e(TAG, "state_buffering");
-                binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
+                /*binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));*/
                 binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
                 binding.layoutBottomSheet.progressBuffering.setVisibility(View.VISIBLE);
                 break;
@@ -310,24 +310,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                         .setInterpolator(new DecelerateInterpolator())
                         .setDuration(0)
                         .start();
-
-
-                /*ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) binding.layoutBottomSheet.constraintLayoutBottomSheet.getLayoutParams();
-                ValueAnimator varl = ValueAnimator.ofFloat(layoutParams.getMarginStart(), 8 - 8 * slideOffset);
-                varl.setDuration(0);
-                varl.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        int value = (Integer) animation.getAnimatedValue();
-                        layoutParams.setMargins(value, value, value, value);
-                        binding.layoutBottomSheet.constraintLayoutBottomSheet.setLayoutParams(layoutParams);
-                    }
-                });
-                varl.start();*/
             }
-
-
-
         }
     };
 
@@ -340,7 +323,9 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         if (type == SELECT) {
             viewModel.setMedia(viewModel.getPlaylistMutableLiveData().getValue(), queueMediaEntity, false);
         } else if (type == REMOVE){
-            viewModel.removeQueueMedia(queueMediaEntity);
+            if (queueMediaEntity != null) {
+                viewModel.removeQueueMedia(queueMediaEntity);
+            }
         } else if (type == DRAG) {
             Logger.e(TAG, "drag started");
             itemTouchHelper.startDrag(binding.layoutBottomSheet.recyclerViewMediaQueue.findViewHolderForLayoutPosition(position));
