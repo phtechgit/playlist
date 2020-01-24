@@ -36,8 +36,6 @@
                 android:text="@{model.playlistName}"
                 android:textSize="@dimen/textSizeHeadline4"
                 android:textStyle="bold"
-                android:paddingBottom="0dp"
-                android:paddingTop="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
@@ -120,7 +118,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                android:text="SHUFFLE"
+                android:text="SHUFFLE PLAY"
                 android:textColor="@color/grayB"
                 android:textSize="@dimen/textSizeCaption"
                 app:layout_constraintEnd_toEndOf="@+id/imageView_shuffle"

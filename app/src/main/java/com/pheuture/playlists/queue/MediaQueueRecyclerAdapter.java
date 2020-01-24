@@ -143,14 +143,13 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         return !oldData.equals(newData);
     }
 
-    public class PlayingMediaViewHolder extends RecyclerView.ViewHolder {
+    public class PlayingMediaViewHolder extends RecyclerView.ViewHolder implements  View.OnTouchListener {
         private ItemQueuePlayingMediaBinding binding;
 
         PlayingMediaViewHolder(@NonNull ItemQueuePlayingMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            this.binding.imageViewDragHandle.setOnTouchListener(null);
-            this.binding.imageViewDragHandle.setVisibility(View.INVISIBLE);
+            this.binding.imageViewDragHandle.setOnTouchListener(this);
             this.binding.imageViewRemove.setVisibility(View.GONE);
         }
 
@@ -159,6 +158,11 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             binding.setMediaDescription(model.getMediaDescription());
             binding.setMediaThumbnail(model.getMediaThumbnail());
             binding.setMediaDuration(model.getFormattedPlayDuration());
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            return true;
         }
     }
 
@@ -215,7 +219,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            return false;
+            return true;
         }
     }
 

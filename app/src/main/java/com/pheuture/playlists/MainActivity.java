@@ -317,6 +317,24 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     };
 
     @Override
+    public void onConnectivityChange(boolean connected) {
+        Logger.e(TAG, "onConnectivityChange");
+        viewModel.setNetworkStatus(connected);
+    }
+
+    @Override
+    public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
+        if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN && bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED){
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+    }
+
+    @Override
+    public void onRecyclerViewHolderMoved(int fromPosition, int toPosition) {
+        viewModel.moveQueueMedia(fromPosition, toPosition);
+    }
+
+    @Override
     public void onRecyclerViewHolderClick(Bundle bundle) {
         int position = bundle.getInt(ARG_PARAM1, -1);
         int type = bundle.getInt(ARG_PARAM2, 1);
@@ -359,24 +377,5 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(connectivityChangeReceiver);
-    }
-
-
-    @Override
-    public void onConnectivityChange(boolean connected) {
-        Logger.e(TAG, "onConnectivityChange");
-        viewModel.setNetworkStatus(connected);
-    }
-
-    @Override
-    public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
-        if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN && bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED){
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        }
-    }
-
-    @Override
-    public void onRecyclerViewHolderMoved(int fromPosition, int toPosition) {
-        viewModel.moveQueueMedia(fromPosition, toPosition);
     }
 }
