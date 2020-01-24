@@ -51,7 +51,7 @@
             android:layout_width="140dp"
             android:layout_height="90dp"
             android:background="@color/grayE"
-            android:scaleType="center"
+            android:scaleType="centerCrop"
             app:imageUrl="@{mediaThumbnail}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageView_drag_handle"

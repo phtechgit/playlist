@@ -9,17 +9,17 @@ import org.jetbrains.annotations.NotNull;
 
 class VerifyOtpViewModelFactory implements ViewModelProvider.Factory {
     private Application mApplication;
-    private String phone;
+    private String phoneNumber;
 
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NotNull Class<T> modelClass) {
-        return (T) new VerifyOtpViewModel(mApplication, phone);
+        return (T) new VerifyOtpViewModel(mApplication, phoneNumber);
     }
 
-    public VerifyOtpViewModelFactory(Application application, String phone) {
+    public VerifyOtpViewModelFactory(Application application, String phoneNumber) {
         this.mApplication = application;
-        this.phone = phone;
+        this.phoneNumber = phoneNumber;
     }
 }

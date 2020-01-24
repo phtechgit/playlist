@@ -38,7 +38,7 @@
             android:id="@+id/imageView_thumbnail"
             android:layout_width="140dp"
             android:layout_height="90dp"
-            android:scaleType="center"
+            android:scaleType="centerCrop"
             android:background="@color/grayE"
             app:imageUrl="@{mediaThumbnail}"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -269,7 +269,6 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         textViewRight.setOnClickListener(view -> {
             dialog.dismiss();
-            parentViewModel.showSnackBar("removed from " + playlist.getPlaylistName(), Snackbar.LENGTH_SHORT);
             viewModel.removeMediaFromPlaylist(position, model);
         });
     }

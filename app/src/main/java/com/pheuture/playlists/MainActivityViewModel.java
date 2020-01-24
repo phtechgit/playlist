@@ -114,7 +114,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         this.title.postValue(title);
     }
 
-    private int calculatePercentage(long totalDuration, long currentDuration) {
+    public int calculatePercentage(long totalDuration, long currentDuration) {
         if (totalDuration == 0){
             return 0;
         }
@@ -210,7 +210,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         queueMediaEntitiesMutableLiveData.postValue(queueMediaDao.getQueueMediaEntities());
     }
 
-    private void requestAudioFocus(){
+    public void requestAudioFocus(){
         int res;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             res = audioManager.requestAudioFocus(audioFocusRequestBuilder);
@@ -232,7 +232,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         }
     }
 
-    private void abandonAudioFocus(){
+    public void abandonAudioFocus(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             audioManager.abandonAudioFocusRequest(audioFocusRequestBuilder);
         } else {
@@ -240,19 +240,19 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         }
     }
 
-    private void pausePlayback() {
+    public void pausePlayback() {
         exoPlayer1.setPlayWhenReady(false);
         exoPlayer2.setPlayWhenReady(false);
         Logger.e(TAG, "playback paused");
     }
 
-    private void playbackNow() {
+    public void playbackNow() {
         exoPlayer1.setPlayWhenReady(true);
         exoPlayer2.setPlayWhenReady(true);
 
     }
 
-    private Player.EventListener playerListener1 = new Player.EventListener() {
+    public Player.EventListener playerListener1 = new Player.EventListener() {
         @Override
         public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
             /*Logger.e(TAG, "onTimelineChanged: " + reason);*/
@@ -312,7 +312,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         }
     };
 
-    private Player.EventListener playerListener2 = new Player.EventListener() {
+    public Player.EventListener playerListener2 = new Player.EventListener() {
         @Override
         public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
             /*Logger.e(TAG, "onTimelineChanged: " + reason);*/
@@ -404,7 +404,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         }
     }
 
-    private Runnable timerRunnable = new Runnable() {
+    public Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
             SimpleExoPlayer exoPlayer = getExoPlayer().getValue();
@@ -416,7 +416,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         }
     };
 
-    private void proceed() {
+    public void proceed() {
         int nextPlayer;
         SimpleExoPlayer primaryExoPlayer;
         SimpleExoPlayer secondaryExoPlayer;
@@ -605,7 +605,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         requestAudioFocus();
     }
 
-    private void loadMediaIn(int player, QueueMediaEntity queueMediaEntity) {
+    public void loadMediaIn(int player, QueueMediaEntity queueMediaEntity) {
         currentPlayer = player;
 
         SimpleExoPlayer exoPlayer;
@@ -630,7 +630,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         playMedia(exoPlayer, queueMediaEntity);
     }
 
-    private void playMedia(SimpleExoPlayer exoPlayer, QueueMediaEntity queueMediaEntity) {
+    public void playMedia(SimpleExoPlayer exoPlayer, QueueMediaEntity queueMediaEntity) {
         Uri mediaUri;
 
         //check if media is available offline then load from it else stream from server
@@ -655,7 +655,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         exoPlayer.seekTo(queueMediaEntity.getProgress());
     }
 
-    private void setPlaybackState(boolean playWhenReady, int playbackState) {
+    public void setPlaybackState(boolean playWhenReady, int playbackState) {
         if (playingFromNetwork && !connectedToNetwork && playbackState == PlaybackState.STATE_STOPPED
                 && bottomSheetState!= BottomSheetBehavior.STATE_HIDDEN){
             showSnackBar("No internet connectivity...", Snackbar.LENGTH_LONG);
@@ -690,6 +690,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public void removeQueueMedia(QueueMediaEntity queueMediaEntity) {
+        String title = queueMediaEntity.getMediaTitle();
         int position = queueMediaEntity.getPosition();
         List<QueueMediaEntity> queueMediaEntities = queueMediaEntitiesMutableLiveData.getValue();
         if (queueMediaEntities != null && queueMediaEntities.size()>0) {
@@ -702,7 +703,8 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 queueMediaEntities.set(i, queueMediaEntity);
             }
             queueMediaDao.insertAll(queueMediaEntities);
-            queueMediaEntitiesMutableLiveData.postValue(queueMediaEntities   );
+            queueMediaEntitiesMutableLiveData.postValue(queueMediaEntities);
+            showSnackBar(title + " removed from queue", Snackbar.LENGTH_SHORT);
         }
     }
 

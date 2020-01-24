@@ -58,8 +58,8 @@
                 android:layout_height="match_parent"
                 android:layout_below="@+id/layout_search_bar"
                 android:clipToPadding="false"
-                android:paddingBottom="50dp"
-                android:scrollbarStyle="outsideOverlay"
+                android:paddingBottom="120dp"
+                android:scrollbarStyle="insideOverlay"
                 android:scrollbars="vertical"
                 tools:listitem="@layout/item_playlist"/>
 

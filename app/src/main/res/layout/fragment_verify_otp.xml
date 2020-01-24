@@ -8,6 +8,7 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:layout_margin="32dp"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -16,9 +17,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:padding="8dp"
-                android:text="Verify phone number"
+                android:text="VERIFICATION"
                 android:textSize="@dimen/textSizeHeadline5"
                 android:textStyle="bold" />
 
@@ -28,31 +28,50 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:gravity="center"
                 android:textSize="@dimen/textSizeBody2"
                 android:textColor="@color/grayA" />
 
             <ProgressBar
-                android:id="@+id/progressBar2"
+                android:visibility="invisible"
+                android:id="@+id/progressBar_primary"
                 android:layout_marginTop="8dp"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:indeterminate="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <TextView
-                android:id="@+id/textView_otp"
+            <EditText
+                android:id="@+id/editText_otp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginEnd="32dp"
+                android:lines="1"
                 android:padding="8dp"
-                android:textSize="@dimen/textSizeHeadline5"
                 android:hint="OTP"
+                android:maxLength="6"
+                android:inputType="phone"
                 android:gravity="center"
+                android:textSize="@dimen/textSizeHeadline5"
+                android:imeOptions="actionDone"
                 android:textColor="@color/grayC"
-                android:background="@drawable/edittext_background_gray" />
+                android:background="@drawable/edittext_background_gray"/>
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/textView_resend_otp"
+                android:drawableStart="@drawable/ic_retry"
+                android:drawablePadding="4dp"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="Resend"
+                android:layout_marginTop="32dp"
+                android:layout_gravity="center"
+                android:textStyle="bold"
+                android:textSize="@dimen/textSizeBody1"
+                android:textColor="@color/grayA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
         </LinearLayout>
 

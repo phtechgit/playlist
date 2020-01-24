@@ -10,6 +10,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.pheuture.playlists.base.BaseAndroidViewModel;
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiDao;
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiEntity;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
@@ -37,7 +39,7 @@ import java.util.List;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
 
-public class PlaylistDetailViewModel extends AndroidViewModel {
+public class PlaylistDetailViewModel extends BaseAndroidViewModel {
     private static final String TAG = PlaylistDetailViewModel.class.getSimpleName();
     private long playlistID;
     private UserEntity user;
@@ -228,6 +230,8 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
 
         //start ExecutorService
         PendingApiExecutorService.startService(getApplication());
+
+        showSnackBar("removed from " + playlistEntity.getValue().getPlaylistName(), Snackbar.LENGTH_SHORT);
     }
 
     public void deletePlaylist() {

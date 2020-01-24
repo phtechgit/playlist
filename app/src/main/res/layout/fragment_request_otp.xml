@@ -2,61 +2,65 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
+        <LinearLayout
+            android:layout_margin="32dp"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="8dp"
-            android:text="Enter your phone number"
-            android:textSize="@dimen/textSizeHeadline5"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="WHAT'S YOUR \nMOBILE NUMBER?"
+                android:textSize="@dimen/textSizeHeadline5"
+                android:textStyle="bold" />
 
 
-        <TextView
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:gravity="center"
-            android:text="Playlist will send an SMS message to verify your phone number"
-            android:textSize="@dimen/textSizeBody2"
-            android:textColor="@color/grayA" />
+            <TextView
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:gravity="center"
+                android:text="Playlist will send an SMS message to verify your phone number"
+                android:textSize="@dimen/textSizeBody2"
+                android:textColor="@color/grayA" />
 
-        <EditText
-            android:id="@+id/ediText_phone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
-            android:lines="1"
-            android:padding="8dp"
-            android:hint="Phone number"
-            android:maxLength="10"
-            android:inputType="phone"
-            android:textSize="@dimen/textSizeBody1"
-            android:imeOptions="actionDone"
-            android:textColor="@color/grayC"
-            android:background="@drawable/edittext_background_gray"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_title" />
+            <EditText
+                android:id="@+id/ediText_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lines="1"
+                android:padding="8dp"
+                android:hint="Mobile number"
+                android:maxLength="10"
+                android:inputType="phone"
+                android:textSize="@dimen/textSizeBody1"
+                android:imeOptions="actionDone"
+                android:textColor="@color/grayC"
+                android:background="@drawable/edittext_background_gray"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView_title" />
 
-        <TextView
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:gravity="center"
-            android:text="Carrier SMS charges may apply"
-            android:textSize="@dimen/textSizeCaption"
-            android:textColor="@color/grayD" />
+            <TextView
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:gravity="center"
+                android:text="Carrier SMS charges may apply"
+                android:textSize="@dimen/textSizeCaption"
+                android:textColor="@color/grayD" />
 
-    </LinearLayout>
+        </LinearLayout>
 
+    </RelativeLayout>
 </layout>

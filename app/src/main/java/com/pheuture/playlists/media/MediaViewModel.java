@@ -43,7 +43,7 @@ public class MediaViewModel extends AndroidViewModel {
     private PlaylistMediaDao playlistMediaDao;
     private PlaylistDao playlistDao;
     private long lastID;
-    private long limit = 20;
+    private long limit = 30;
     private String searchQuery = "";
     private boolean reachedLast;
     private PlaylistEntity playlistEntity;
@@ -135,7 +135,7 @@ public class MediaViewModel extends AndroidViewModel {
             return;
         }
 
-        final String url = Url.BASE_URL + Url.MEDIA_TRENDING_LIST;
+        final String url = Url.BASE_URL + Url.MEDIA_LIST;
 
         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
             @Override
@@ -154,16 +154,12 @@ public class MediaViewModel extends AndroidViewModel {
                     if (newDataList.size()>0){
                         MediaEntity mediaEntity = newDataList.get(newDataList.size() - 1);
                         lastID = mediaEntity.getMediaID();
-
                         reachedLast = newDataList.size() < limit;
                     } else {
                         reachedLast = true;
                     }
 
-                    List<MediaEntity> oldList = mediaEntitiesMutableLiveData.getValue();
-                    if (oldList == null){
-                        oldList = new ArrayList<>();
-                    }
+                    List<MediaEntity> oldList = new ArrayList<>(mediaEntitiesMutableLiveData.getValue());
                     oldList.addAll(newDataList);
                     mediaEntitiesMutableLiveData.postValue(oldList);
                 } catch (Exception e) {
@@ -177,11 +173,12 @@ public class MediaViewModel extends AndroidViewModel {
             }
         }){
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
+            protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
+                params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getPlaylistID()));
                 params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
                 params.put(ApiConstant.LIMIT, String.valueOf(limit));
-                params.put(ApiConstant.SEARCH_QUERY, ((searchQuery==null)?"":searchQuery));
+                params.put(ApiConstant.SEARCH_QUERY, ((searchQuery == null) ? "" : searchQuery));
                 Logger.e(url + ApiConstant.PARAMS, params.toString());
                 return params;
             }

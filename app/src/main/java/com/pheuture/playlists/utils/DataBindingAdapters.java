@@ -6,6 +6,8 @@ import android.widget.ImageView;
 import androidx.databinding.BindingAdapter;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.Target;
+import com.google.android.gms.common.images.Size;
 
 public final class DataBindingAdapters {
 
@@ -16,6 +18,7 @@ public final class DataBindingAdapters {
         }
         Glide.with(view.getContext())
                 .load(imageUrl)
+                .override(160,90)
                 .into(view);
     }
 }

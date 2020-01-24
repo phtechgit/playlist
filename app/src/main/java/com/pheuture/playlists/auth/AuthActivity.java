@@ -2,35 +2,31 @@ package com.pheuture.playlists.auth;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import android.content.Intent;
+
 import android.view.View;
 
-import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.auth.user_detail.UserProfileActivity;
-import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.databinding.ActivityAuthBinding;
 import com.pheuture.playlists.interfaces.ButtonClickListener;
 import com.pheuture.playlists.base.BaseActivity;
-import com.pheuture.playlists.utils.Constants;
-import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
-import com.pheuture.playlists.utils.StringUtils;
 
 public class AuthActivity extends BaseActivity {
     private static final String TAG = AuthActivity.class.getSimpleName();
     private ActivityAuthBinding binding;
-    private ButtonClickListener buttonClickListener;
     private NavController navController;
+    private AuthViewModel viewModel;
 
 
     @Override
     public void initializations() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_auth);
+        viewModel = ViewModelProviders.of(this).get(AuthViewModel.class);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_request_otp, R.id.navigation_verify_otp)
@@ -39,19 +35,23 @@ public class AuthActivity extends BaseActivity {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_auth);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        UserEntity user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
-                this, Constants.USER, ""), UserEntity.class);
+        viewModel.getShowNextButton().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean show) {
+                if (show) {
+                    binding.fab.show();
+                } else {
+                    binding.fab.hide();
+                }
+            }
+        });
 
-        if (user != null && user.getUserID()!=0 && StringUtils.isEmpty(user.getUserFirstName())){
-            Intent intent = new Intent(this, UserProfileActivity.class);
-            startActivity(intent);
-            finish();
-
-        } else if(user != null && user.getUserID()!=0 && !StringUtils.isEmpty(user.getUserFirstName())){
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
+        viewModel.getMoveToOtpVerifyPage().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean move) {
+                navController.navigate(R.id.action_navigation_request_otp_to_navigation_verify_otp);
+            }
+        });
     }
 
     @Override
@@ -62,28 +62,8 @@ public class AuthActivity extends BaseActivity {
     @Override
     public void onClick(View v) {
         if (v.equals(binding.fab)) {
-            buttonClickListener.onButtonClick();
+            viewModel.setNextButtonClicked();
         }
     }
 
-    public void setOnButtonClickListener(Fragment fragment){
-        if (fragment instanceof ButtonClickListener) {
-            this.buttonClickListener = (ButtonClickListener) fragment;
-        }
-    }
-
-    public void showNextButton(boolean status) {
-        if (status) {
-            binding.fab.show();
-        } else {
-            binding.fab.hide();
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (!navController.popBackStack()) {
-            super.onBackPressed();
-        }
-    }
 }

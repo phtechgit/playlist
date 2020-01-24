@@ -12,10 +12,11 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.phone.SmsRetriever;
 import com.google.android.gms.auth.api.phone.SmsRetrieverClient;
@@ -24,56 +25,91 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.auth.AuthActivity;
+import com.pheuture.playlists.auth.AuthViewModel;
+import com.pheuture.playlists.auth.SplashActivity;
 import com.pheuture.playlists.auth.user_detail.UserProfileActivity;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.auth.request_otp.RequestOtpFragment;
 import com.pheuture.playlists.databinding.FragmentVerifyOtpBinding;
+import com.pheuture.playlists.interfaces.ButtonClickListener;
 import com.pheuture.playlists.receiver.SMSReceiver;
 import com.pheuture.playlists.base.BaseFragment;
+import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.utils.KeyboardUtils;
+import com.pheuture.playlists.utils.ParserUtil;
+import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.StringUtils;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPReceiveListener{
+public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
+        SMSReceiver.OTPReceiveListener, ButtonClickListener {
     private static final String TAG = RequestOtpFragment.class.getSimpleName();
     private FragmentActivity activity;
     private FragmentVerifyOtpBinding binding;
     private VerifyOtpViewModel viewModel;
-    private String phone;
+    private AuthViewModel parentViewModel;
     private SMSReceiver smsReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = getActivity();
-        ((AuthActivity)activity).setOnButtonClickListener(this);
     }
 
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (getArguments() == null) {
-            return null;
-        }
-        phone = getArguments().getString(ARG_PARAM1);
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_verify_otp,
                 container, false);
-        viewModel = ViewModelProviders.of(this,
-                new VerifyOtpViewModelFactory(activity.getApplication(),
-                        phone)).get(VerifyOtpViewModel.class);
+        parentViewModel = ViewModelProviders.of(activity).get(AuthViewModel.class);
+        viewModel = ViewModelProviders.of(this, new VerifyOtpViewModelFactory(activity.getApplication(), parentViewModel.getPhoneNumber())).get(VerifyOtpViewModel.class);
         return binding.getRoot();
     }
 
     @Override
     public void initializations() {
-        ((AuthActivity)activity).showNextButton(false);
-
-        binding.textViewMessage.setText("Waiting to automatically detect an SMS sent to: " + phone);
-
-        viewModel.getUserLive().observe(this, new Observer<UserEntity>() {
+        viewModel.getPrimaryProgressStatus().observe(this, new Observer<Boolean>() {
             @Override
-            public void onChanged(UserEntity user) {
+            public void onChanged(Boolean show) {
+                if (show) {
+                    binding.textViewMessage.setText("Waiting to automatically detect an SMS sent to: " + viewModel.getPhoneNumber());
+                    binding.progressBarPrimary.setVisibility(View.VISIBLE);
+                    binding.textViewResendOtp.setVisibility(View.GONE);
+                    startSMSListener();
+                } else {
+                    binding.progressBarPrimary.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        viewModel.getShowNextButton().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean show) {
+                parentViewModel.setShowNextButton(show);
+            }
+        });
+
+        viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean show) {
+                if(show){
+                    KeyboardUtils.hideKeyboard(activity, binding.editTextOtp);
+                    binding.editTextOtp.setEnabled(false);
+                    showProgress(binding.progressLayout.relativeLayoutProgress, true);
+                } else {
+                    hideProgress(binding.progressLayout.relativeLayoutProgress);
+                    binding.editTextOtp.setEnabled(true);
+                }
+            }
+        });
+
+        viewModel.getUserVerifiedStatus().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean verified) {
+                UserEntity user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
+                        activity, Constants.USER, ""), UserEntity.class);
+
                 if (StringUtils.isEmpty(user.getUserFirstName())){
                     Intent intent = new Intent(activity, UserProfileActivity.class);
                     startActivity(intent);
@@ -86,29 +122,34 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
                 }
             }
         });
-
-        viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean show) {
-                if(show){
-                    showProgress(binding.progressLayout.relativeLayoutProgress, true);
-                } else {
-                    hideProgress(binding.progressLayout.relativeLayoutProgress);
-                }
-            }
-        });
-
-        startSMSListener();
     }
 
     @Override
     public void setListeners() {
+        binding.editTextOtp.addTextChangedListener(this);
+        parentViewModel.setOnButtonClickListener(this);
+        binding.textViewResendOtp.setOnClickListener(this);
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        binding.editTextOtp.requestFocus();
+        KeyboardUtils.showKeyboard(activity, binding.editTextOtp);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        KeyboardUtils.hideKeyboard(activity, binding.editTextOtp);
     }
 
     @Override
     public void onClick(View v) {
-
+        if (v.equals(binding.textViewResendOtp)){
+            parentViewModel.requestOTP();
+            viewModel.setShowPrimaryProgress(true);
+        }
     }
 
     /**
@@ -131,7 +172,7 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
             task.addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    showToast("SMS sent to " + phone);
+                    viewModel.setShowPrimaryProgress(true);
                 }
             });
 
@@ -139,8 +180,11 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     // Fail to start API
+                    binding.textViewMessage.setText("Automatically detection of SMS Failed");
+                    viewModel.setShowPrimaryProgress(false);
                 }
             });
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -148,29 +192,37 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
 
     @Override
     public void onOTPReceived(String otp) {
-        if (smsReceiver != null) {
-            activity.unregisterReceiver(smsReceiver);
-            smsReceiver = null;
-        }
+        unregisterSmsReceiver();
 
         String[] data = otp.split(" ");
         otp = data[data.length-2];
 
-        binding.textViewOtp.setText(otp);
-        binding.progressBar2.setVisibility(View.GONE);
-        binding.textViewMessage.setText("Verifying OTP...");
+        binding.editTextOtp.setText(otp);
+        binding.editTextOtp.setSelection(binding.editTextOtp.getText().length());
 
-        viewModel.verifyOtp(otp);
+        binding.textViewMessage.setText("Verifying OTP");
+        viewModel.setShowPrimaryProgress(false);
+        viewModel.verifyOtp();
+    }
+
+    private void unregisterSmsReceiver() {
+        if (smsReceiver != null) {
+            activity.unregisterReceiver(smsReceiver);
+            smsReceiver = null;
+        }
     }
 
     @Override
     public void onOTPTimeOut() {
-        showToast("OTP Time out");
+        binding.textViewMessage.setText("Automatically detection of SMS Timed out");
+        viewModel.setShowPrimaryProgress(false);
+        binding.textViewResendOtp.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onOTPReceivedError(String error) {
-        showToast(error);
+        binding.textViewMessage.setText("Automatically detection of SMS Failed");
+        viewModel.setShowPrimaryProgress(false);
     }
 
     @Override
@@ -182,8 +234,30 @@ public class VerifyOtpFragment extends BaseFragment implements SMSReceiver.OTPRe
         super.onDestroy();
     }
 
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
 
-    private void showToast(String msg) {
-        Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        viewModel.setOtp(s.toString());
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+
+    @Override
+    public void onButtonClick() {
+        binding.textViewMessage.setText("Verifying OTP");
+        viewModel.setShowPrimaryProgress(false);
+        viewModel.verifyOtp();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unregisterSmsReceiver();
     }
 }
