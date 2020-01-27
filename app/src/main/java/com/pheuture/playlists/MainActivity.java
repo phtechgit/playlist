@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.SeekBar;
 
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -43,7 +44,7 @@ import static com.pheuture.playlists.utils.Constants.PlayerRepeatModes.REPEAT_MO
 public class MainActivity extends BaseActivity implements NavController.OnDestinationChangedListener,
         RecyclerViewClickListener, MediaQueueRecyclerAdapter.ClickType,
         RecyclerItemMoveCallback.ItemTouchHelperContract,
-        ConnectivityChangeReceiver.ConnectivityChangeListener{
+        ConnectivityChangeReceiver.ConnectivityChangeListener, SeekBar.OnSeekBarChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private ActivityMainBinding binding;
@@ -260,6 +261,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         binding.layoutBottomSheet.imageViewTogglePlay.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewNext.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewClose.setOnClickListener(this);
+        binding.layoutBottomSheet.progressBar.setOnSeekBarChangeListener(this);
         binding.layoutBottomSheet.imageViewShuffle.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewRepeat.setOnClickListener(this);
     }
@@ -379,5 +381,20 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(connectivityChangeReceiver);
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (fromUser){
+            viewModel.seekPlayer(progress);
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
     }
 }

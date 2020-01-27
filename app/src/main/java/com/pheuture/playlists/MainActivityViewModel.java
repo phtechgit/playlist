@@ -411,7 +411,8 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         @Override
         public void run() {
             SimpleExoPlayer exoPlayer = getExoPlayer().getValue();
-            if (exoPlayer != null && bottomSheetState != BottomSheetBehavior.STATE_HIDDEN && exoPlayer.getPlaybackState() == Player.STATE_READY && exoPlayer.getPlayWhenReady()) {
+            if (exoPlayer != null && bottomSheetState != BottomSheetBehavior.STATE_HIDDEN
+                    && exoPlayer.getPlaybackState() == Player.STATE_READY && exoPlayer.getPlayWhenReady()) {
                 proceed();
             }
             //reset handler
@@ -860,5 +861,17 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         abandonAudioFocus();
 
         super.onCleared();
+    }
+
+    public void seekPlayer(int progress) {
+        try {
+            SimpleExoPlayer exoPlayer = exoPlayerMutableLiveData.getValue();
+
+            long totalDurationOfCurrentMedia = exoPlayer.getDuration();
+            long currentDurationOfCurrentMedia = (progress * totalDurationOfCurrentMedia)/100;
+            exoPlayer.seekTo(currentDurationOfCurrentMedia);
+        } catch (Exception e) {
+            Logger.e(TAG, e.toString());
+        }
     }
 }

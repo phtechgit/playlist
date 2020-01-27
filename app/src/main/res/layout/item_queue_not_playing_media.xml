@@ -56,17 +56,6 @@
             app:layout_constraintStart_toEndOf="@+id/imageView_drag_handle"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/imageView_thumbnail_dummy"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:padding="24dp"
-            android:src="@drawable/ic_play_circular_grey"
-            app:layout_constraintBottom_toBottomOf="@id/imageView_thumbnail"
-            app:layout_constraintStart_toStartOf="@+id/imageView_thumbnail"
-            app:layout_constraintTop_toTopOf="@+id/imageView_thumbnail"
-            app:layout_constraintEnd_toEndOf="@id/imageView_thumbnail"/>
-
         <TextView
             android:id="@+id/textView_duration"
             android:layout_width="wrap_content"
