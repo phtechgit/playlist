@@ -24,6 +24,7 @@ import com.pheuture.playlists.databinding.FragmentRequestOtpBinding;
 import com.pheuture.playlists.interfaces.ButtonClickListener;
 import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.KeyboardUtils;
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.NetworkUtils;
 
 /**
@@ -61,6 +62,27 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
                 parentViewModel.setShowNextButton(show);
             }
         });
+
+        viewModel.getProgressStatus().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean show) {
+                if (show) {
+                    KeyboardUtils.hideKeyboard(activity, binding.ediTextPhone);
+                    binding.ediTextPhone.setEnabled(false);
+                    binding.progress.relativeLayoutProgress.setVisibility(View.VISIBLE);
+                } else {
+                    binding.ediTextPhone.setEnabled(true);
+                    binding.progress.relativeLayoutProgress.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        viewModel.getOtpSentStatus().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean sent) {
+                parentViewModel.setMoveToOtpVerifyPage(sent);
+            }
+        });
     }
 
     @Override
@@ -76,8 +98,8 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         KeyboardUtils.hideKeyboard(activity, binding.ediTextPhone);
     }
 
@@ -89,7 +111,7 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
     @Override
     public void onButtonClick() {
         KeyboardUtils.hideKeyboard(activity, binding.ediTextPhone);
-        parentViewModel.setMoveToOtpVerifyPage();
+        viewModel.requestOTP();
     }
 
     @Override

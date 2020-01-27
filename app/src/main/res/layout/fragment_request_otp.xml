@@ -62,5 +62,9 @@
 
         </LinearLayout>
 
+        <include
+            android:id="@+id/progress"
+            layout="@layout/layout_progress_bar_full_screen"/>
+
     </RelativeLayout>
 </layout>

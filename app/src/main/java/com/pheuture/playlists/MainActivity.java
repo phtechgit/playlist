@@ -134,13 +134,16 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
 
                 //if more media available to play
                 if (viewModel.nextMediaAvailable()) {
-                    Logger.e(TAG, "showNext:" + true);
-                    binding.layoutBottomSheet.imageViewShuffle.setImageResource(R.drawable.exo_controls_shuffle_on);
                     binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_light);
                 } else {
-                    Logger.e(TAG, "showNext:" + true);
-                    binding.layoutBottomSheet.imageViewShuffle.setImageResource(R.drawable.exo_controls_shuffle_off);
                     binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_grey);
+                }
+
+                //if can shuffle
+                if (viewModel.canShuffle()){
+                    binding.layoutBottomSheet.imageViewShuffle.setImageResource(R.drawable.exo_controls_shuffle_on);
+                } else {
+                    binding.layoutBottomSheet.imageViewShuffle.setImageResource(R.drawable.exo_controls_shuffle_off);
                 }
             }
         });
@@ -150,13 +153,14 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             public void onChanged(QueueMediaEntity currentlyPlayingQueueMediaEntity) {
                 //set media info
                 binding.layoutBottomSheet.textViewTitle.setText(currentlyPlayingQueueMediaEntity.getMediaTitle());
-                binding.layoutBottomSheet.textViewCreator.setText(currentlyPlayingQueueMediaEntity.getMediaDescription());
+                binding.layoutBottomSheet.textViewCreator.setText(currentlyPlayingQueueMediaEntity.getMovieName());
 
                 //show bottom sheet
                 binding.layoutBottomSheet.constraintLayoutBottomSheet.setVisibility(View.VISIBLE);
                 if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN){
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
+                layoutManager.scrollToPosition(currentlyPlayingQueueMediaEntity.getPosition());
             }
         });
 

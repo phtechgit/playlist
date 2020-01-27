@@ -13,6 +13,59 @@ import com.pheuture.playlists.utils.CalenderUtils;
 @Entity
 public class MediaEntity implements Parcelable {
 
+	@NonNull
+	@PrimaryKey
+	@SerializedName("mediaID")
+	private long mediaID;
+
+	@SerializedName("status")
+	private String status;
+
+	@SerializedName("mediaDescription")
+	private String mediaDescription;
+
+	@SerializedName("mediaUrl")
+	private String mediaUrl;
+
+	@SerializedName("mediaThumbnail")
+	private String mediaThumbnail;
+
+	@SerializedName("mediaName")
+	private String mediaName;
+
+	@SerializedName("mediaTitle")
+	private String mediaTitle;
+
+	@SerializedName("movieName")
+	private String movieName;
+
+	@SerializedName("singers")
+	private String singers;
+
+	@SerializedName("musicDirector")
+	private String musicDirector;
+
+	@SerializedName("artists")
+	private String artists;
+
+	@SerializedName("movieDirector")
+	private String movieDirector;
+
+	@SerializedName("playDuration")
+	private long playDuration;
+
+	@SerializedName("postDate")
+	private String postDate;
+
+	@SerializedName("createdOn")
+	private long createdOn;
+
+	@SerializedName("modifiedOn")
+	private long modifiedOn;
+
+	public MediaEntity() {
+	}
+
 	protected MediaEntity(Parcel in) {
 		mediaID = in.readLong();
 		status = in.readString();
@@ -21,6 +74,11 @@ public class MediaEntity implements Parcelable {
 		mediaThumbnail = in.readString();
 		mediaName = in.readString();
 		mediaTitle = in.readString();
+		movieName = in.readString();
+		singers = in.readString();
+		musicDirector = in.readString();
+		artists = in.readString();
+		movieDirector = in.readString();
 		playDuration = in.readLong();
 		postDate = in.readString();
 		createdOn = in.readLong();
@@ -36,6 +94,11 @@ public class MediaEntity implements Parcelable {
 		dest.writeString(mediaThumbnail);
 		dest.writeString(mediaName);
 		dest.writeString(mediaTitle);
+		dest.writeString(movieName);
+		dest.writeString(singers);
+		dest.writeString(musicDirector);
+		dest.writeString(artists);
+		dest.writeString(movieDirector);
 		dest.writeLong(playDuration);
 		dest.writeString(postDate);
 		dest.writeLong(createdOn);
@@ -75,6 +138,46 @@ public class MediaEntity implements Parcelable {
 		this.status = status;
 	}
 
+	public String getMovieName() {
+		return movieName;
+	}
+
+	public void setMovieName(String movieName) {
+		this.movieName = movieName;
+	}
+
+	public String getSingers() {
+		return singers;
+	}
+
+	public void setSingers(String singers) {
+		this.singers = singers;
+	}
+
+	public String getMusicDirector() {
+		return musicDirector;
+	}
+
+	public void setMusicDirector(String musicDirector) {
+		this.musicDirector = musicDirector;
+	}
+
+	public String getArtists() {
+		return artists;
+	}
+
+	public void setArtists(String artists) {
+		this.artists = artists;
+	}
+
+	public String getMovieDirector() {
+		return movieDirector;
+	}
+
+	public void setMovieDirector(String movieDirector) {
+		this.movieDirector = movieDirector;
+	}
+
 	public interface MediaColumns{
 		String MEDIA_DESCRIPTION = "mediaDescription";
 		String MEDIA_URL = "mediaUrl";
@@ -85,44 +188,6 @@ public class MediaEntity implements Parcelable {
 		String POST_DATE = "postDate";
 		String CREATED_ON = "createdOn";
 		String STATUS = "status";
-	}
-
-	@NonNull
-	@PrimaryKey
-	@SerializedName("mediaID")
-	private long mediaID;
-
-	@SerializedName("status")
-	private String status;
-
-	@SerializedName("mediaDescription")
-	private String mediaDescription;
-
-	@SerializedName("mediaUrl")
-	private String mediaUrl;
-
-	@SerializedName("mediaThumbnail")
-	private String mediaThumbnail;
-
-	@SerializedName("mediaName")
-	private String mediaName;
-
-	@SerializedName("mediaTitle")
-	private String mediaTitle;
-
-	@SerializedName("playDuration")
-	private long playDuration;
-
-	@SerializedName("postDate")
-	private String postDate;
-
-	@SerializedName("createdOn")
-	private long createdOn;
-
-	@SerializedName("modifiedOn")
-	private long modifiedOn;
-
-	public MediaEntity() {
 	}
 
 	public long getMediaID() {

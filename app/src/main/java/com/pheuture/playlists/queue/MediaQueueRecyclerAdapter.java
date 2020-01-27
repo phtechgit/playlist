@@ -155,7 +155,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
 
         public void setData(QueueMediaEntity model) {
             binding.setMediaTitle(model.getMediaTitle());
-            binding.setMediaDescription(model.getMediaDescription());
+            binding.setMediaDescription(model.getMovieName());
             binding.setMediaThumbnail(model.getMediaThumbnail());
             binding.setMediaDuration(model.getFormattedPlayDuration());
         }
@@ -212,7 +212,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
 
         public void setData(QueueMediaEntity model) {
             binding.setMediaTitle(model.getMediaTitle());
-            binding.setMediaDescription(model.getMediaDescription());
+            binding.setMediaDescription(model.getMovieName());
             binding.setMediaThumbnail(model.getMediaThumbnail());
             binding.setMediaDuration(model.getFormattedPlayDuration());
         }

@@ -45,7 +45,7 @@ public class PlaylistMediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
 
         PlaylistMediaEntity model = oldList.get(position);
         holder.binding.setMediaTitle(model.getMediaTitle());
-        holder.binding.setMediaDescription(model.getMediaDescription());
+        holder.binding.setMediaDescription(model.getMovieName());
         holder.binding.setMediaThumbnail(model.getMediaThumbnail());
         holder.binding.setMediaDuration(model.getFormattedPlayDuration());
     }

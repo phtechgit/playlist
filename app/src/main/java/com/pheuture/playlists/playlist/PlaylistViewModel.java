@@ -68,7 +68,7 @@ public class PlaylistViewModel extends AndroidViewModel {
     }
 
     private void addCreateButton(List<PlaylistEntity> playlistEntities) {
-        if (searchQuery.length() == 0 && playlistEntities.size()>0){
+        if (searchQuery.length() == 0){
             PlaylistEntity addNewPlaylistModel = new PlaylistEntity();
             addNewPlaylistModel.setPlaylistID(RecyclerView.NO_ID);
             addNewPlaylistModel.setPlaylistName("Create playlist");
@@ -152,8 +152,8 @@ public class PlaylistViewModel extends AndroidViewModel {
         }
         playlistEntities.remove(position);
 
-        //remove create button
-        removeCreateButton(playlistEntities);
+        /*//remove create button
+        removeCreateButton(playlistEntities);*/
 
         playlistEntitiesMutableLiveData.postValue(playlistEntities);
 

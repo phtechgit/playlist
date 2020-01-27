@@ -15,6 +15,7 @@ import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ActivityAuthBinding;
 import com.pheuture.playlists.interfaces.ButtonClickListener;
 import com.pheuture.playlists.base.BaseActivity;
+import com.pheuture.playlists.utils.Logger;
 
 public class AuthActivity extends BaseActivity {
     private static final String TAG = AuthActivity.class.getSimpleName();
@@ -49,7 +50,10 @@ public class AuthActivity extends BaseActivity {
         viewModel.getMoveToOtpVerifyPage().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean move) {
-                navController.navigate(R.id.action_navigation_request_otp_to_navigation_verify_otp);
+                if (move) {
+                    Logger.e(TAG, "MoveToOtpVerifyPage:" + move);
+                    navController.navigate(R.id.action_navigation_request_otp_to_navigation_verify_otp);
+                }
             }
         });
     }

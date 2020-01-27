@@ -147,7 +147,7 @@ public class PlaylistDetailViewModel extends BaseAndroidViewModel {
 
                     //add media to *download manager*
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(offlineVideoEntity.getMediaUrl()))
-                            .setTitle(offlineVideoEntity.getMediaName())// Title of the Download Notification
+                            .setTitle(offlineVideoEntity.getMediaTitle())// Title of the Download Notification
                             .setDescription(offlineVideoEntity.getMediaDescription())// Description of the Download Notification
                             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)// Visibility of the download Notification
                             .setDestinationUri(Uri.fromFile(new File(offlineVideoEntity.getDownloadedFilePath())))// Uri of the destination file

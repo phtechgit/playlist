@@ -76,18 +76,18 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
         viewModel.getPlaylistEntitiesMutableLiveData().observe(this, new Observer<List<PlaylistEntity>>() {
             @Override
             public void onChanged(List<PlaylistEntity> playlistEntities) {
-                if (StringUtils.isEmpty(viewModel.getSearchQuery()) && playlistEntities.size()==0){
-                    /*((MainActivity) activity).updateActionBarStatus(false);*/
+                /*if (StringUtils.isEmpty(viewModel.getSearchQuery()) && playlistEntities.size()==0){
+                    *//*((MainActivity) activity).updateActionBarStatus(false);*//*
                     binding.linearLayoutCreatePlaylist.setVisibility(View.VISIBLE);
                     binding.relativeLayoutPlaylists.setVisibility(View.GONE);
                     parentViewModel.setShowActionBar(false);
 
                 } else {
-                    /*((MainActivity) activity).updateActionBarStatus(true);*/
+                    *//*((MainActivity) activity).updateActionBarStatus(true);*//*
                     binding.linearLayoutCreatePlaylist.setVisibility(View.GONE);
                     binding.relativeLayoutPlaylists.setVisibility(View.VISIBLE);
                     parentViewModel.setShowActionBar(true);
-                }
+                }*/
 
                 recyclerAdapter.setData(playlistEntities);
             }

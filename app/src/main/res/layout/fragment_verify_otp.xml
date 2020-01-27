@@ -31,14 +31,14 @@
                 android:textSize="@dimen/textSizeBody2"
                 android:textColor="@color/grayA" />
 
-            <ProgressBar
+            <!--<ProgressBar
                 android:visibility="invisible"
                 android:id="@+id/progressBar_primary"
                 android:layout_marginTop="8dp"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:indeterminate="true"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content" />-->
 
             <EditText
                 android:id="@+id/editText_otp"

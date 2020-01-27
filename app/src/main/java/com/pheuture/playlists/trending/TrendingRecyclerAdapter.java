@@ -49,7 +49,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         MediaEntity model = masterList.get(position);
         holder.binding.setMediaTitle(model.getMediaTitle());
-        holder.binding.setMediaDescription(model.getMediaDescription());
+        holder.binding.setMediaDescription(model.getMovieName());
         holder.binding.setMediaThumbnail(model.getMediaThumbnail());
         holder.binding.setMediaDuration(model.getFormattedPlayDuration());
     }

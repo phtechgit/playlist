@@ -69,19 +69,7 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
 
     @Override
     public void initializations() {
-        viewModel.getPrimaryProgressStatus().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean show) {
-                if (show) {
-                    binding.textViewMessage.setText("Waiting to automatically detect an SMS sent to: " + viewModel.getPhoneNumber());
-                    binding.progressBarPrimary.setVisibility(View.VISIBLE);
-                    binding.textViewResendOtp.setVisibility(View.GONE);
-                    startSMSListener();
-                } else {
-                    binding.progressBarPrimary.setVisibility(View.INVISIBLE);
-                }
-            }
-        });
+        startSMSListener();
 
         viewModel.getShowNextButton().observe(this, new Observer<Boolean>() {
             @Override
@@ -96,9 +84,10 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
                 if(show){
                     KeyboardUtils.hideKeyboard(activity, binding.editTextOtp);
                     binding.editTextOtp.setEnabled(false);
-                    showProgress(binding.progressLayout.relativeLayoutProgress, true);
+                    binding.progressLayout.relativeLayoutProgress.setVisibility(View.VISIBLE);
+                    binding.textViewMessage.setText("Verifying OTP");
                 } else {
-                    hideProgress(binding.progressLayout.relativeLayoutProgress);
+                    binding.progressLayout.relativeLayoutProgress.setVisibility(View.GONE);
                     binding.editTextOtp.setEnabled(true);
                 }
             }
@@ -139,16 +128,15 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         KeyboardUtils.hideKeyboard(activity, binding.editTextOtp);
     }
 
     @Override
     public void onClick(View v) {
         if (v.equals(binding.textViewResendOtp)){
-            parentViewModel.requestOTP();
-            viewModel.setShowPrimaryProgress(true);
+            viewModel.verifyOtp();
         }
     }
 
@@ -172,7 +160,8 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
             task.addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    viewModel.setShowPrimaryProgress(true);
+                    binding.textViewResendOtp.setVisibility(View.GONE);
+                    binding.textViewMessage.setText("Waiting to automatically detect an SMS sent to: " + viewModel.getPhoneNumber());
                 }
             });
 
@@ -180,8 +169,8 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     // Fail to start API
+                    binding.textViewResendOtp.setVisibility(View.VISIBLE);
                     binding.textViewMessage.setText("Automatically detection of SMS Failed");
-                    viewModel.setShowPrimaryProgress(false);
                 }
             });
 
@@ -200,8 +189,6 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
         binding.editTextOtp.setText(otp);
         binding.editTextOtp.setSelection(binding.editTextOtp.getText().length());
 
-        binding.textViewMessage.setText("Verifying OTP");
-        viewModel.setShowPrimaryProgress(false);
         viewModel.verifyOtp();
     }
 
