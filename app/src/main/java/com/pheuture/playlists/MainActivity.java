@@ -32,6 +32,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
@@ -126,10 +127,24 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             }
         });
 
+        viewModel.getCurrentlyPlayingQueueMedia().observe(this, new Observer<QueueMediaEntity>() {
+            @Override
+            public void onChanged(QueueMediaEntity currentlyPlayingQueueMediaEntity) {
+                //set media info
+                binding.layoutBottomSheet.textViewTitle.setText(currentlyPlayingQueueMediaEntity.getMediaTitle());
+                binding.layoutBottomSheet.textViewCreator.setText(currentlyPlayingQueueMediaEntity.getMovieName());
+
+                //show bottom sheet
+                binding.layoutBottomSheet.constraintLayoutBottomSheet.setVisibility(View.VISIBLE);
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN){
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
+
         viewModel.getQueueMediaEntities().observe(this, new Observer<List<QueueMediaEntity>>() {
             @Override
             public void onChanged(List<QueueMediaEntity> queueMediaEntities) {
-                Logger.e(TAG,"QueueMediaEntities size:" + queueMediaEntities.size());
                 recyclerAdapter.updateData(queueMediaEntities);
 
                 //if more media available to play
@@ -145,22 +160,6 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                 } else {
                     binding.layoutBottomSheet.imageViewShuffle.setImageResource(R.drawable.exo_controls_shuffle_off);
                 }
-            }
-        });
-
-        viewModel.getCurrentlyPlayingQueueMedia().observe(this, new Observer<QueueMediaEntity>() {
-            @Override
-            public void onChanged(QueueMediaEntity currentlyPlayingQueueMediaEntity) {
-                //set media info
-                binding.layoutBottomSheet.textViewTitle.setText(currentlyPlayingQueueMediaEntity.getMediaTitle());
-                binding.layoutBottomSheet.textViewCreator.setText(currentlyPlayingQueueMediaEntity.getMovieName());
-
-                //show bottom sheet
-                binding.layoutBottomSheet.constraintLayoutBottomSheet.setVisibility(View.VISIBLE);
-                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN){
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                }
-                layoutManager.scrollToPosition(currentlyPlayingQueueMediaEntity.getPosition());
             }
         });
 
@@ -214,7 +213,6 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                 }
             }
         });
-
     }
 
     private void checkPlayBackState(boolean playWhenReady, int playbackState) {

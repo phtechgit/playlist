@@ -143,13 +143,13 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         return !oldData.equals(newData);
     }
 
-    public class PlayingMediaViewHolder extends RecyclerView.ViewHolder implements  View.OnTouchListener {
+    public class PlayingMediaViewHolder extends RecyclerView.ViewHolder {
         private ItemQueuePlayingMediaBinding binding;
 
         PlayingMediaViewHolder(@NonNull ItemQueuePlayingMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            this.binding.imageViewDragHandle.setOnTouchListener(this);
+            /*this.binding.imageViewDragHandle.setOnTouchListener(this);*/
             this.binding.imageViewRemove.setVisibility(View.GONE);
         }
 
@@ -160,19 +160,19 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             binding.setMediaDuration(model.getFormattedPlayDuration());
         }
 
-        @Override
+        /*@Override
         public boolean onTouch(View v, MotionEvent event) {
             return true;
-        }
+        }*/
     }
 
-    public class NotPlayingMediaViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
+    public class NotPlayingMediaViewHolder extends RecyclerView.ViewHolder {
         private ItemQueueNotPlayingMediaBinding binding;
 
         NotPlayingMediaViewHolder(@NonNull ItemQueueNotPlayingMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            this.binding.imageViewDragHandle.setOnTouchListener(this);
+            /*this.binding.imageViewDragHandle.setOnTouchListener(this);*/
             this.binding.imageViewRemove.setVisibility(View.VISIBLE);
 
             binding.getRoot().setOnClickListener(new View.OnClickListener() {
@@ -217,10 +217,10 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             binding.setMediaDuration(model.getFormattedPlayDuration());
         }
 
-        @Override
+        /*@Override
         public boolean onTouch(View v, MotionEvent event) {
             return true;
-        }
+        }*/
     }
 
     @Override
