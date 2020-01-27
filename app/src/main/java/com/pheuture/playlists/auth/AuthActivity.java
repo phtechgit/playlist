@@ -51,7 +51,6 @@ public class AuthActivity extends BaseActivity {
             @Override
             public void onChanged(Boolean move) {
                 if (move) {
-                    Logger.e(TAG, "MoveToOtpVerifyPage:" + move);
                     navController.navigate(R.id.action_navigation_request_otp_to_navigation_verify_otp);
                 }
             }

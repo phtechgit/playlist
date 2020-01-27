@@ -1,6 +1,9 @@
 package com.pheuture.playlists.auth.verify_otp;
 
 import android.app.Application;
+import android.util.Log;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -11,6 +14,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.pheuture.playlists.auth.AppSignatureHelper;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
@@ -42,6 +46,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
     private PlaylistMediaDao playlistMediaDao;
     private MutableLiveData<Boolean> showNextButton;
     private String otp;
+    private MutableLiveData<String> messageMutableLiveData;
 
     public VerifyOtpViewModel(@NonNull Application application, String phoneNumber) {
         super(application);
@@ -49,9 +54,11 @@ public class VerifyOtpViewModel extends AndroidViewModel {
         showNextButton = new MutableLiveData<>(false);
         playlistDao = LocalRepository.getInstance(application).playlistDao();
         playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
+        messageMutableLiveData = new MutableLiveData<>("Waiting to automatically detect an SMS sent to: " + phoneNumber);
     }
 
     public void verifyOtp() {
+        setMessageToShow("Verifying OTP");
         showProgress.postValue(true);
         showNextButton.postValue(false);
 
@@ -68,6 +75,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
                     if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         showProgress.postValue(false);
                         showNextButton.postValue(true);
+                        setMessageToShow(response.optString("status", "Invalid Otp"));
                         return;
                     }
 
@@ -76,6 +84,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
                     if (userEntity == null){
                         showProgress.postValue(false);
                         showNextButton.postValue(true);
+                        setMessageToShow("Something went wrong");
                         return;
                     }
 
@@ -97,23 +106,27 @@ public class VerifyOtpViewModel extends AndroidViewModel {
                     playlistMediaDao.deleteAll();
                     playlistMediaDao.insertAll(playlistMediaEntities);
 
+                    setMessageToShow("Verified successfully");
                     userVerifiedMutableLiveData.setValue(true);
 
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                     showProgress.postValue(false);
                     showNextButton.postValue(true);
+                    setMessageToShow("Something went wrong");
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError e) {
                 try {
+                    showProgress.postValue(false);
+                    showNextButton.postValue(true);
                     Logger.e(url, e.toString());
+                    setMessageToShow(VolleyClient.getErrorMsg(e));
                 } catch (Exception ex) {
                     Logger.e(TAG, ex.toString());
                 }
-                showNextButton.postValue(true);
             }
         }){
             @Override
@@ -160,19 +173,76 @@ public class VerifyOtpViewModel extends AndroidViewModel {
         return phoneNumber;
     }
 
-    public LiveData<Boolean> getPrimaryProgressStatus() {
-        return showPrimaryProgress;
-    }
-
-    public void setShowPrimaryProgress(boolean show) {
-        showPrimaryProgress.postValue(show);
-    }
-
     @Override
     protected void onCleared() {
         super.onCleared();
         if (stringRequest!=null) {
             stringRequest.cancel();
         }
+    }
+
+    public void requestOtp() {
+        showProgress.postValue(true);
+        showNextButton.postValue(false);
+        messageMutableLiveData.postValue("Waiting to automatically detect an SMS sent to: " + phoneNumber);
+
+        AppSignatureHelper appSignatureHashHelper = new AppSignatureHelper(getApplication());
+        String hashKey = appSignatureHashHelper.getAppSignatures().get(0);
+        Log.i(TAG, "HashKey: " + hashKey);
+
+        final String url = Url.BASE_URL + Url.REQUEST_OTP;
+
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, url,  new Response.Listener<String>() {
+            @Override
+            public void onResponse(String stringResponse) {
+                try {
+                    showProgress.postValue(false);
+                    Logger.e(url + ApiConstant.RESPONSE, stringResponse);
+
+                    JSONObject response = new JSONObject(stringResponse);
+
+                    if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
+                        showNextButton.postValue(true);
+                        Toast.makeText(getApplication(), "Failed to send OTP", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Toast.makeText(getApplication(), "OTP sent", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Logger.e(TAG, e.toString());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError e) {
+                try {
+                    showNextButton.postValue(true);
+                    showProgress.postValue(false);
+                    Logger.e(url, e.toString());
+                    Toast.makeText(getApplication(),VolleyClient.getErrorMsg(e) , Toast.LENGTH_SHORT).show();
+                } catch (Exception ex) {
+                    Logger.e(TAG, ex.toString());
+                }
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put(ApiConstant.USER_MOBILE, phoneNumber);
+                params.put(ApiConstant.HASH_KEY, hashKey);
+                Logger.e(url + ApiConstant.PARAMS, params.toString());
+                return params;
+            }
+        };
+        jsonObjectRequest.setTag(TAG);
+        VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
+        VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
+    }
+
+    public LiveData<String> getMessageToShow() {
+        return messageMutableLiveData;
+    }
+
+    public void setMessageToShow(String message) {
+        messageMutableLiveData.postValue(message);
     }
 }

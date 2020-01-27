@@ -8,29 +8,24 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.Navigation;
 
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.auth.AuthActivity;
 import com.pheuture.playlists.auth.AuthViewModel;
 import com.pheuture.playlists.databinding.FragmentRequestOtpBinding;
 import com.pheuture.playlists.interfaces.ButtonClickListener;
 import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.KeyboardUtils;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.NetworkUtils;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RequestOtpFragment extends BaseFragment implements TextWatcher, ButtonClickListener{
+public class RequestOtpFragment extends BaseFragment implements TextWatcher, ButtonClickListener, OtpListener{
     private static final String TAG = RequestOtpFragment.class.getSimpleName();
     private FragmentActivity activity;
     private FragmentRequestOtpBinding binding;
@@ -76,18 +71,12 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
                 }
             }
         });
-
-        viewModel.getOtpSentStatus().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean sent) {
-                parentViewModel.setMoveToOtpVerifyPage(sent);
-            }
-        });
     }
 
     @Override
     public void setListeners() {
         binding.ediTextPhone.addTextChangedListener(this);
+        viewModel.setOtpSentListener(this);
         parentViewModel.setOnButtonClickListener(this);
     }
 
@@ -128,5 +117,10 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
     @Override
     public void afterTextChanged(Editable s) {
 
+    }
+
+    @Override
+    public void onOtpSent() {
+        parentViewModel.setMoveToOtpVerifyPage(true);
     }
 }

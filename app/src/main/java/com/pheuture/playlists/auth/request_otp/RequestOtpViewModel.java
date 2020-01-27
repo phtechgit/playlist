@@ -15,8 +15,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.auth.AppSignatureHelper;
+import com.pheuture.playlists.base.BaseAndroidViewModel;
 import com.pheuture.playlists.interfaces.ApiConstant;
 import com.pheuture.playlists.utils.Logger;
+import com.pheuture.playlists.utils.NetworkUtils;
 import com.pheuture.playlists.utils.Url;
 import com.pheuture.playlists.utils.VolleyClient;
 
@@ -25,18 +27,17 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestOtpViewModel extends AndroidViewModel {
+public class RequestOtpViewModel extends BaseAndroidViewModel {
     private static final String TAG = RequestOtpViewModel.class.getSimpleName();
     private MutableLiveData<Boolean> showNextButton;
     private MutableLiveData<Boolean> showProgress;
+    private OtpListener otpListener;
     private String phoneNumber;
-    private MutableLiveData<Boolean> otpSentMutableLiveData;
 
     public RequestOtpViewModel(@NonNull Application application) {
         super(application);
         showNextButton = new MutableLiveData<>(false);
         showProgress = new MutableLiveData<>(false);
-        otpSentMutableLiveData = new MutableLiveData<>(false);
     }
 
     public LiveData<Boolean> getShowNextButton() {
@@ -84,7 +85,7 @@ public class RequestOtpViewModel extends AndroidViewModel {
                         return;
                     }
                     Toast.makeText(getApplication(), "OTP sent", Toast.LENGTH_SHORT).show();
-                    otpSentMutableLiveData.postValue(true);
+                    otpListener.onOtpSent();
                 } catch (Exception e) {
                     setShowNext(true);
                     Logger.e(TAG, e.toString());
@@ -97,6 +98,7 @@ public class RequestOtpViewModel extends AndroidViewModel {
                     setShowNext(true);
                     showProgress.postValue(false);
                     Logger.e(url, e.toString());
+                    Toast.makeText(getApplication(),VolleyClient.getErrorMsg(e) , Toast.LENGTH_SHORT).show();
                 } catch (Exception ex) {
                     Logger.e(TAG, ex.toString());
                 }
@@ -116,7 +118,7 @@ public class RequestOtpViewModel extends AndroidViewModel {
         VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
     }
 
-    public LiveData<Boolean> getOtpSentStatus() {
-        return otpSentMutableLiveData;
+    public void setOtpSentListener(OtpListener otpListener) {
+        this.otpListener = otpListener;
     }
 }

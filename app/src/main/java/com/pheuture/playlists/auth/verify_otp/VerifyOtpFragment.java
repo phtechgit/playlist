@@ -36,6 +36,7 @@ import com.pheuture.playlists.receiver.SMSReceiver;
 import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.Constants;
 import com.pheuture.playlists.utils.KeyboardUtils;
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.StringUtils;
@@ -63,13 +64,22 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_verify_otp,
                 container, false);
         parentViewModel = ViewModelProviders.of(activity).get(AuthViewModel.class);
-        viewModel = ViewModelProviders.of(this, new VerifyOtpViewModelFactory(activity.getApplication(), parentViewModel.getPhoneNumber())).get(VerifyOtpViewModel.class);
+        viewModel = ViewModelProviders.of(this,
+                new VerifyOtpViewModelFactory(activity.getApplication(),
+                        parentViewModel.getPhoneNumber())).get(VerifyOtpViewModel.class);
         return binding.getRoot();
     }
 
     @Override
     public void initializations() {
         startSMSListener();
+
+        viewModel.getMessageToShow().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String message) {
+                binding.textViewMessage.setText(message);
+            }
+        });
 
         viewModel.getShowNextButton().observe(this, new Observer<Boolean>() {
             @Override
@@ -85,7 +95,6 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
                     KeyboardUtils.hideKeyboard(activity, binding.editTextOtp);
                     binding.editTextOtp.setEnabled(false);
                     binding.progressLayout.relativeLayoutProgress.setVisibility(View.VISIBLE);
-                    binding.textViewMessage.setText("Verifying OTP");
                 } else {
                     binding.progressLayout.relativeLayoutProgress.setVisibility(View.GONE);
                     binding.editTextOtp.setEnabled(true);
@@ -124,7 +133,6 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
     public void onResume() {
         super.onResume();
         binding.editTextOtp.requestFocus();
-        KeyboardUtils.showKeyboard(activity, binding.editTextOtp);
     }
 
     @Override
@@ -136,7 +144,8 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
     @Override
     public void onClick(View v) {
         if (v.equals(binding.textViewResendOtp)){
-            viewModel.verifyOtp();
+            binding.textViewResendOtp.setVisibility(View.GONE);
+            viewModel.requestOtp();
         }
     }
 
@@ -160,8 +169,7 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
             task.addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    binding.textViewResendOtp.setVisibility(View.GONE);
-                    binding.textViewMessage.setText("Waiting to automatically detect an SMS sent to: " + viewModel.getPhoneNumber());
+
                 }
             });
 
@@ -169,8 +177,7 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     // Fail to start API
-                    binding.textViewResendOtp.setVisibility(View.VISIBLE);
-                    binding.textViewMessage.setText("Automatically detection of SMS Failed");
+                    viewModel.setMessageToShow("Automatically detection of SMS Failed");
                 }
             });
 
@@ -186,10 +193,12 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
         String[] data = otp.split(" ");
         otp = data[data.length-2];
 
+        viewModel.setMessageToShow("OTP received successfully");
         binding.editTextOtp.setText(otp);
         binding.editTextOtp.setSelection(binding.editTextOtp.getText().length());
 
         viewModel.verifyOtp();
+        Logger.e(TAG, "onOTPReceived");
     }
 
     private void unregisterSmsReceiver() {
@@ -201,15 +210,15 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
 
     @Override
     public void onOTPTimeOut() {
-        binding.textViewMessage.setText("Automatically detection of SMS Timed out");
-        viewModel.setShowPrimaryProgress(false);
+        viewModel.setMessageToShow("Automatically detection of SMS Timed out");
         binding.textViewResendOtp.setVisibility(View.VISIBLE);
+        Logger.e(TAG, "onOTPTimeOut");
     }
 
     @Override
     public void onOTPReceivedError(String error) {
-        binding.textViewMessage.setText("Automatically detection of SMS Failed");
-        viewModel.setShowPrimaryProgress(false);
+        viewModel.setMessageToShow("Automatically detection of SMS Failed");
+        Logger.e(TAG, "onOTPReceivedError");
     }
 
     @Override
@@ -237,8 +246,6 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
 
     @Override
     public void onButtonClick() {
-        binding.textViewMessage.setText("Verifying OTP");
-        viewModel.setShowPrimaryProgress(false);
         viewModel.verifyOtp();
     }
 
