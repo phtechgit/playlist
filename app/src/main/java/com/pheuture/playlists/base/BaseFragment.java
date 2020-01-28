@@ -22,6 +22,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.pheuture.playlists.R;
 import com.pheuture.playlists.interfaces.NotificationID;
 import com.pheuture.playlists.interfaces.RequestCodes;
 
@@ -112,10 +113,10 @@ public abstract class BaseFragment extends Fragment implements NotificationID, R
 
                         } else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                            builder.setTitle("Need Permissions");
-                            builder.setMessage("This app needs permission to use this feature. You can grant them in Setting.");
+                            builder.setTitle(getResources().getString(R.string.goto_settings));
+                            builder.setMessage(getResources().getString(R.string.this_app_need_permissions_to_use_this_feature));
                             builder.setCancelable(false);
-                            builder.setPositiveButton("GOTO SETTINGS", new DialogInterface.OnClickListener() {
+                            builder.setPositiveButton(getResources().getString(R.string.this_app_need_permissions_to_use_this_feature), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.cancel();
@@ -126,7 +127,7 @@ public abstract class BaseFragment extends Fragment implements NotificationID, R
                             });
                             builder.setNegativeButton("No", (dialog, which) -> {
                                 dialog.cancel();
-                                Toast.makeText(activity, "Required permissions are rejected. You cannot proceed.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity, getResources().getString(R.string.required_permissions_are_rejected), Toast.LENGTH_SHORT).show();
                                 if (finishActivityOnReject) {
                                     activity.onBackPressed();
                                 }

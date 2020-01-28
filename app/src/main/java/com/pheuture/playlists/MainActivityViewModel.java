@@ -681,7 +681,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
     public void shuffle() {
         List<QueueMediaEntity> queueMediaEntityList = queueMediaDao.getQueueMediaEntities(QueueMediaEntity.QueueMediaState.IN_QUEUE);
-        if (queueMediaEntityList.size()>0) {
+        if (queueMediaEntityList.size()>1) {
             queueMediaDao.delete(queueMediaEntityList);
 
             int startingPosition = queueMediaEntityList.get(0).getPosition();

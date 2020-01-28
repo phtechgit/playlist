@@ -55,8 +55,8 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
 
     @Override
     public void initializations() {
-        parentViewModel.setTitle("Trendings");
-        binding.layoutSearchBar.editTextSearch.setHint("Find in trending");
+        parentViewModel.setTitle(activity.getResources().getString(R.string.trending_title));
+        binding.layoutSearchBar.editTextSearch.setHint(activity.getResources().getString(R.string.trending_search_hint));
 
         recyclerAdapter = new TrendingRecyclerAdapter(this);
         layoutManager = new LinearLayoutManager(activity);

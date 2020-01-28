@@ -30,14 +30,14 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Upload"
+                    android:text="@string/upload"
                     android:textSize="@dimen/textSizeBody1"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="upload your own video"
+                    android:text="@string/upload_your_own_video"
                     android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2" />
 
@@ -60,7 +60,7 @@
                     android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Download Playlist"
+                    android:text="@string/download_playlist"
                     android:textSize="@dimen/textSizeBody1"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toStartOf="@+id/switch_download_playlist_videos_to_offline"
@@ -70,7 +70,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="listen to your playlist while offline"
+                    android:text="@string/listen_to_your_playlist_while_offline"
                     android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2"
                     app:layout_constraintStart_toStartOf="parent"
@@ -82,6 +82,7 @@
                 android:id="@+id/switch_download_playlist_videos_to_offline"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
                 android:checked="false"
                 app:layout_constraintBottom_toBottomOf="@+id/linearLayout_download_playlist_videos_to_offline"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -103,14 +104,14 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Download Using Cellular"
+                    android:text="@string/download_using_cellular"
                     android:textSize="@dimen/textSizeBody1"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Recommended Setting: Off"
+                    android:text="@string/recommended_setting_off"
                     android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2" />
 
@@ -120,6 +121,7 @@
                 android:id="@+id/switch_download_using_cellular"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
                 android:checked="false"
                 app:layout_constraintBottom_toBottomOf="@+id/linearLayout_download_using_cellular"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -141,14 +143,14 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Download While Roaming"
+                    android:text="@string/download_while_roaming"
                     android:textSize="@dimen/textSizeBody1"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Recommended Setting: Off"
+                    android:text="@string/recommended_setting_off"
                     android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2" />
 
@@ -158,6 +160,7 @@
                 android:id="@+id/switch_download_while_roaming"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
                 android:checked="false"
                 app:layout_constraintBottom_toBottomOf="@+id/linearLayout_download_while_roaming"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -182,14 +185,14 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Delete"
+                    android:text="@string/delete"
                     android:textSize="@dimen/textSizeBody1"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="delete all offline videos"
+                    android:text="@string/delete_all_offline_videos"
                     android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2" />
 
@@ -211,14 +214,14 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Crossfade"
+                    android:text="@string/crossfade"
                     android:textSize="@dimen/textSizeBody1"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="allow you to crossfade between songs"
+                    android:text="@string/allows_you_to_crossfade_between_songs"
                     android:textColor="@color/grayB"
                     android:textSize="@dimen/textSizeBody2" />
 

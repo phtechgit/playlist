@@ -20,11 +20,10 @@ public class UserProfileActivity extends BaseActivity implements TextWatcher {
     private static final String TAG = UserProfileActivity.class.getSimpleName();
     private ActivityUserProfileBinding binding;
     private UserProfileViewModel viewModel;
-    private UserEntity user;
 
     @Override
     public void initializations() {
-        user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
+        UserEntity user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 this, Constants.USER, ""), UserEntity.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_user_profile);
         viewModel = ViewModelProviders.of(this, new UserProfileViewModelFactory( getApplication(), user)).get(UserProfileViewModel.class);

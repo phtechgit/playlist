@@ -53,7 +53,7 @@ public class SettingsFragment extends BaseFragment implements
 
     @Override
     public void initializations() {
-        parentViewModel.setTitle("Settings");
+        parentViewModel.setTitle(activity.getResources().getString(R.string.settings));
 
         boolean downloadPlaylistMediaStatus = SharedPrefsUtils.getBooleanPreference(activity,
                 Constants.DOWNLOAD_PLAYLIST_MEDIA, false);
@@ -108,10 +108,10 @@ public class SettingsFragment extends BaseFragment implements
         TextView textViewLeft = dialog.findViewById(R.id.textView_left);
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
-        textViewTitle.setText("Are you sure?");
-        textViewSubtitle.setText("Do you want to remove all the offline songs?");
+        textViewTitle.setText(activity.getResources().getString(R.string.are_you_sure));
+        textViewSubtitle.setText(activity.getResources().getString(R.string.do_you_want_remove_all_the_offline_songs));
         textViewSubtitle.setVisibility(View.VISIBLE);
-        textViewRight.setText("Remove");
+        textViewRight.setText(activity.getResources().getString(R.string.remove));
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -133,7 +133,7 @@ public class SettingsFragment extends BaseFragment implements
         textViewRight.setOnClickListener(view -> {
             dialog.dismiss();
             viewModel.deleteOfflineMedia();
-            parentViewModel.showSnackBar("Offline songs removed.", Snackbar.LENGTH_SHORT);
+            parentViewModel.showSnackBar(activity.getResources().getString(R.string.offline_songs_removed), Snackbar.LENGTH_SHORT);
         });
     }
 

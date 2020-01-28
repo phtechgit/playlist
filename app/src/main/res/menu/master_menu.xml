@@ -6,7 +6,7 @@
         android:id="@+id/menu_delete"
         android:visible="false"
         android:icon="@android:drawable/ic_menu_delete"
-        android:title="delete playlist"
+        android:title="Delete playlist"
         app:showAsAction="never"/>
 
 </menu>

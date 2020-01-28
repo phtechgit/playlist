@@ -65,7 +65,8 @@ public class TrendingViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    List<MediaEntity> list = Arrays.asList(ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), MediaEntity[].class));
+                    List<MediaEntity> list = Arrays.asList(ParserUtil.getInstance()
+                            .fromJson(response.optString(ApiConstant.DATA), MediaEntity[].class));
                     mediaDao.deleteAll();
                     mediaDao.insertAll(list);
                 } catch (Exception e) {

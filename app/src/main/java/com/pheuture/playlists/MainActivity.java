@@ -293,11 +293,13 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                     viewModel.resetAllPlayers();
                     break;
                 case BottomSheetBehavior.STATE_EXPANDED:
+                    binding.layoutBottomSheet.progressBar.getThumb().setVisible(true, true);
                     break;
                 case BottomSheetBehavior.STATE_HALF_EXPANDED:
                     /*bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);*/
                     break;
                 case BottomSheetBehavior.STATE_COLLAPSED:
+                    binding.layoutBottomSheet.progressBar.getThumb().setVisible(false, true);
                     break;
                 case BottomSheetBehavior.STATE_DRAGGING:
                     break;

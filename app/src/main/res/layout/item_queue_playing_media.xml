@@ -70,7 +70,6 @@
             android:paddingTop="1dp"
             android:paddingBottom="1dp"
             android:background="@drawable/edittext_background_gray"
-            android:textStyle="bold"
             android:text="@{mediaDuration}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/imageView_thumbnail" />

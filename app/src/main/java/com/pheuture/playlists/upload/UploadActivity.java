@@ -44,9 +44,6 @@ public class UploadActivity extends BaseActivity{
     public void initializations() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_upload);
 
-        /*getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);*/
-
         viewModel = ViewModelProviders.of(this,
                 new UploadActivityViewModelFactory(getApplication(),
                         getIntent().getParcelableExtra(ARG_PARAM1))).get(UploadViewModel.class);
@@ -102,19 +99,19 @@ public class UploadActivity extends BaseActivity{
 
         } else if (v.equals(binding.buttonSubmit)){
             if (TextUtils.getTrimmedLength(binding.ediTextTitle.getText().toString()) == 0){
-                Toast.makeText(this, "Please provide video title", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.please_provide_video_title), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (TextUtils.getTrimmedLength(binding.ediTextDescription.getText().toString()) == 0){
-                Toast.makeText(this, "Please provide video description", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.please_provide_video_description), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             Runnable runnable = new Runnable() {
                 public void run() {
                     viewModel.uploadMedia(binding.ediTextTitle.getText().toString(), binding.ediTextDescription.getText().toString());
-                    Toast.makeText(UploadActivity.this, "file added to upload queue", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UploadActivity.this, getResources().getString(R.string.file_added_to_upload_queue), Toast.LENGTH_SHORT).show();
                     onBackPressed();
                 }
             };

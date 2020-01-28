@@ -3,27 +3,22 @@ package com.pheuture.playlists.auth.request_otp;
 import android.app.Application;
 import android.util.Log;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AppSignatureHelper;
 import com.pheuture.playlists.base.BaseAndroidViewModel;
 import com.pheuture.playlists.interfaces.ApiConstant;
 import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.NetworkUtils;
 import com.pheuture.playlists.utils.Url;
 import com.pheuture.playlists.utils.VolleyClient;
-
 import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,10 +76,10 @@ public class RequestOtpViewModel extends BaseAndroidViewModel {
 
                     if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         setShowNext(true);
-                        Toast.makeText(getApplication(), "Failed to send OTP", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplication(), getApplication().getString(R.string.failed_to_send_otp), Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    Toast.makeText(getApplication(), "OTP sent", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplication(), getApplication().getResources().getString(R.string.otp_sent), Toast.LENGTH_SHORT).show();
                     otpListener.onOtpSent();
                 } catch (Exception e) {
                     setShowNext(true);

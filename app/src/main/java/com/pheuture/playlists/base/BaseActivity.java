@@ -145,15 +145,15 @@ public abstract class BaseActivity extends AppCompatActivity implements
                             TextView textViewLeft = dialog.findViewById(R.id.textView_left);
                             TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
-                            textViewTitle.setText("Need Permissions");
-                            textViewSubtitle.setText("This app needs permission to use this feature. You can grant them in Setting.");
+                            textViewTitle.setText(getResources().getString(R.string.need_permissions));
+                            textViewSubtitle.setText(getResources().getString(R.string.this_app_need_permissions_to_use_this_feature));
                             textViewSubtitle.setVisibility(View.VISIBLE);
-                            textViewRight.setText("Goto Settings");
+                            textViewRight.setText(getResources().getString(R.string.goto_settings));
 
                             dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                                 @Override
                                 public void onCancel(DialogInterface dialog) {
-                                    Toast.makeText(BaseActivity.this, "Required permissions are rejected. You cannot proceed.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(BaseActivity.this, getResources().getString(R.string.required_permissions_are_rejected), Toast.LENGTH_SHORT).show();
                                     if (finishActivityOnReject) {
                                         onBackPressed();
                                     }

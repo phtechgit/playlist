@@ -56,11 +56,6 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     void setData(List<MediaEntity> newList) {
         masterList = new ArrayList<>(newList);
-        /*filteredList = new ArrayList<>(masterList);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(filteredList, newList),
-                false);
-        masterList = new ArrayList<>(newList);
-        diffResult.dispatchUpdatesTo(this);*/
     }
 
     class DiffCallBack extends DiffUtil.Callback{
@@ -150,22 +145,6 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                     recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
                 }
             });
-
-            /*binding.imageViewThumbnail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = getAdapterPosition();
-                    if (pos == RecyclerView.NO_POSITION){
-                        return;
-                    }
-
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putParcelable(Constants.ARG_PARAM2, masterList.get(pos));
-
-                    recyclerViewInterface.onRecyclerViewHolderClick(bundle);
-                }
-            });*/
         }
     }
 

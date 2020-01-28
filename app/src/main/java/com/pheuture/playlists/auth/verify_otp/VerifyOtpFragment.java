@@ -26,7 +26,6 @@ import com.google.android.gms.tasks.Task;
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AuthViewModel;
-import com.pheuture.playlists.auth.SplashActivity;
 import com.pheuture.playlists.auth.user_detail.UserProfileActivity;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.auth.request_otp.RequestOtpFragment;
@@ -177,7 +176,7 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     // Fail to start API
-                    viewModel.setMessageToShow("Automatically detection of SMS Failed");
+                    viewModel.setMessageToShow(activity.getString(R.string.automatic_detection_of_otp_failed));
                 }
             });
 
@@ -193,7 +192,7 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
         String[] data = otp.split(" ");
         otp = data[data.length-2];
 
-        viewModel.setMessageToShow("OTP received successfully");
+        viewModel.setMessageToShow(activity.getString(R.string.otp_received_successfully));
         binding.editTextOtp.setText(otp);
         binding.editTextOtp.setSelection(binding.editTextOtp.getText().length());
 
@@ -210,14 +209,14 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
 
     @Override
     public void onOTPTimeOut() {
-        viewModel.setMessageToShow("Automatically detection of SMS Timed out");
+        viewModel.setMessageToShow(activity.getString(R.string.automatic_detection_otp_timed_out));
         binding.textViewResendOtp.setVisibility(View.VISIBLE);
         Logger.e(TAG, "onOTPTimeOut");
     }
 
     @Override
     public void onOTPReceivedError(String error) {
-        viewModel.setMessageToShow("Automatically detection of SMS Failed");
+        viewModel.setMessageToShow(activity.getString(R.string.automatic_detection_of_otp_failed));
         Logger.e(TAG, "onOTPReceivedError");
     }
 

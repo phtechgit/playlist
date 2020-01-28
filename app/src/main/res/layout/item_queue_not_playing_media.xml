@@ -69,7 +69,6 @@
             android:paddingTop="1dp"
             android:paddingBottom="1dp"
             android:background="@drawable/edittext_background_gray"
-            android:textStyle="bold"
             android:text="@{mediaDuration}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/imageView_thumbnail" />
@@ -118,12 +117,11 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/linearLayout_2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:orientation="vertical"
+            android:layout_height="0dp"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -131,24 +129,26 @@
             <ImageView
                 android:visibility="gone"
                 android:id="@+id/imageView_add"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="match_parent"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_add_light" />
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_add_light"
+                android:padding="12dp"/>
 
             <ImageView
                 android:visibility="gone"
                 android:id="@+id/imageView_remove"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="match_parent"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_remove_circle" />
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_remove_circle"
+                android:padding="12dp"/>
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

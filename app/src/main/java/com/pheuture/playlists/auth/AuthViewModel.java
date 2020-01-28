@@ -51,4 +51,5 @@ public class AuthViewModel extends BaseAndroidViewModel {
     public LiveData<Boolean> getMoveToOtpVerifyPage() {
         return moveToOtpVerifyPage;
     }
+
 }

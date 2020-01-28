@@ -1,28 +1,22 @@
 package com.pheuture.playlists.auth;
 
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
 import android.view.View;
-
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ActivityAuthBinding;
-import com.pheuture.playlists.interfaces.ButtonClickListener;
 import com.pheuture.playlists.base.BaseActivity;
-import com.pheuture.playlists.utils.Logger;
 
 public class AuthActivity extends BaseActivity {
     private static final String TAG = AuthActivity.class.getSimpleName();
     private ActivityAuthBinding binding;
     private NavController navController;
     private AuthViewModel viewModel;
-
 
     @Override
     public void initializations() {

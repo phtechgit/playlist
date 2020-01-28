@@ -9,22 +9,18 @@
         <EditText
             android:id="@+id/editText_search"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_margin="10dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_search"
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp"
+            android:drawablePadding="8dp"
+            android:layout_margin="8dp"
             android:background="@drawable/edittext_background_gray"
-            android:hint="Search"
+            android:hint="@string/search"
             android:imeOptions="actionDone"
             android:inputType="text"
             android:lines="1"
             android:maxLength="10"
-            android:paddingStart="36dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="10dp"
             android:textColor="@color/grayB"
             android:textColorHint="@color/grayB"
             android:textSize="@dimen/textSizeBody2"
@@ -34,29 +30,29 @@
             app:layout_constraintStart_toEndOf="@+id/imageView_cancel"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
+       <!-- <ImageView
             android:id="@+id/imageView_search_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="8dp"
-            android:src="@android:drawable/ic_menu_search"
+            android:src="@drawable/ic_search"
             app:layout_constraintBottom_toBottomOf="@+id/editText_search"
             app:layout_constraintStart_toStartOf="@+id/editText_search"
-            app:layout_constraintTop_toTopOf="@+id/editText_search" />
+            app:layout_constraintTop_toTopOf="@+id/editText_search" />-->
 
         <ImageView
             android:visibility="gone"
             android:id="@+id/imageView_cancel"
             android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:padding="16dp"
+            android:layout_height="0dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="8dp"
+            android:padding="8dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/editText_search"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/editText_search" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

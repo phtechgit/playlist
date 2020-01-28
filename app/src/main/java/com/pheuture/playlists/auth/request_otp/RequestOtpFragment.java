@@ -1,20 +1,16 @@
 package com.pheuture.playlists.auth.request_otp;
 
-
 import android.os.Bundle;
-
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AuthViewModel;
 import com.pheuture.playlists.databinding.FragmentRequestOtpBinding;

@@ -45,7 +45,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
     private FragmentPlaylistBinding binding;
     private PlaylistsRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
-
+    private List<PlaylistEntity> playlistEntities;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,20 +75,8 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
 
         viewModel.getPlaylistEntitiesMutableLiveData().observe(this, new Observer<List<PlaylistEntity>>() {
             @Override
-            public void onChanged(List<PlaylistEntity> playlistEntities) {
-                /*if (StringUtils.isEmpty(viewModel.getSearchQuery()) && playlistEntities.size()==0){
-                    *//*((MainActivity) activity).updateActionBarStatus(false);*//*
-                    binding.linearLayoutCreatePlaylist.setVisibility(View.VISIBLE);
-                    binding.relativeLayoutPlaylists.setVisibility(View.GONE);
-                    parentViewModel.setShowActionBar(false);
-
-                } else {
-                    *//*((MainActivity) activity).updateActionBarStatus(true);*//*
-                    binding.linearLayoutCreatePlaylist.setVisibility(View.GONE);
-                    binding.relativeLayoutPlaylists.setVisibility(View.VISIBLE);
-                    parentViewModel.setShowActionBar(true);
-                }*/
-
+            public void onChanged(List<PlaylistEntity> newPlaylistEntities) {
+                playlistEntities = newPlaylistEntities;
                 recyclerAdapter.setData(playlistEntities);
             }
         });
@@ -123,11 +111,12 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
         TextView textViewLeft = dialog.findViewById(R.id.textView_left);
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
-        textViewTitle.setText("Give your playlist a name");
+        textViewTitle.setText(activity.getResources().getString(R.string.give_your_playlist_a_name));
 
+        editText.setHint("My playlist #" + (playlistEntities.size() + 1));
         editText.setFilters(new InputFilter[]{new EditTextInputFilter()});
         editText.setVisibility(View.VISIBLE);
-        textViewRight.setText("Create");
+        textViewRight.setText(activity.getResources().getString(R.string.create));
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -147,27 +136,25 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
         });
 
         textViewRight.setOnClickListener(view -> {
-            if (TextUtils.getTrimmedLength(editText.getText().toString()) == 0) {
-                editText.setError("This field is mandatory");
-                editText.requestFocus();
+            String playlistName;
+            if (TextUtils.getTrimmedLength(editText.getText()) == 0) {
+                playlistName = editText.getHint().toString();
 
             } else {
                 if (viewModel.isExistingPlaylist(editText.getText().toString())) {
                     Toast.makeText(activity, "Playlist already present with same name!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                dialog.dismiss();
-
-                long playlistID = viewModel.createPlaylist(editText.getText().toString());
-
-                //go to playlist detail page
-                Bundle bundle = new Bundle();
-                bundle.putLong(ARG_PARAM1, playlistID);
-
-                Navigation.findNavController(binding.getRoot())
-                        .navigate(R.id.action_navigation_playlist_to_navigation_playlist_detail, bundle);
-
+                playlistName = editText.getText().toString();
             }
+            dialog.dismiss();
+
+            long playlistID = viewModel.createPlaylist(playlistName);
+            //go to playlist detail page
+            Bundle bundle = new Bundle();
+            bundle.putLong(ARG_PARAM1, playlistID);
+            Navigation.findNavController(binding.getRoot())
+                    .navigate(R.id.action_navigation_playlist_to_navigation_playlist_detail, bundle);
         });
 
         editText.requestFocus();
