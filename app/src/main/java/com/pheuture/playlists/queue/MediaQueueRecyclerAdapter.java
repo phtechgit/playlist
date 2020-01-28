@@ -8,17 +8,22 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.common.internal.StringResourceValueReader;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemQueueNotPlayingMediaBinding;
 import com.pheuture.playlists.databinding.ItemQueuePlayingMediaBinding;
+import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.RecyclerItemMoveCallback;
+import com.pheuture.playlists.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,78 +74,29 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             return;
         }
         if (getItemViewType(position) == PLAYING_MEDIA){
-            ((PlayingMediaViewHolder) recyclerHolder).setData(oldList.get(position));
+            ((PlayingMediaViewHolder) recyclerHolder).setData(oldList.get(position), null);
         } else {
-            ((NotPlayingMediaViewHolder) recyclerHolder).setData(oldList.get(position));
+            ((NotPlayingMediaViewHolder) recyclerHolder).setData(oldList.get(position), null);
         }
     }
 
-    public void updateData(List<QueueMediaEntity> newList) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList),
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder recyclerHolder, int position, List<Object> payloads) {
+        if (position == RecyclerView.NO_POSITION){
+            return;
+        }
+        if (getItemViewType(position) == PLAYING_MEDIA){
+            ((PlayingMediaViewHolder) recyclerHolder).setData(oldList.get(position), payloads);
+        } else {
+            ((NotPlayingMediaViewHolder) recyclerHolder).setData(oldList.get(position), payloads);
+        }
+    }
+
+    public void updateData(final List<QueueMediaEntity> newList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MediaQueueDiffUtil(oldList, newList),
                 true);
         oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
-    }
-
-    class DiffCallBack extends DiffUtil.Callback{
-        private List<QueueMediaEntity> oldList;
-        private List<QueueMediaEntity> newList;
-
-        public DiffCallBack(List<QueueMediaEntity> oldList, List<QueueMediaEntity> newList) {
-            this.oldList = oldList;
-            this.newList = newList;
-        }
-
-        @Override
-        public int getOldListSize() {
-            return oldList == null ? 0 : oldList.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-            return newList == null ? 0 : newList.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).getPosition() == newList.get(newItemPosition).getPosition();
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            QueueMediaEntity oldModel = oldList.get(oldItemPosition);
-            QueueMediaEntity newModel = newList.get(newItemPosition);
-
-            if (contentsDifferent(oldModel.getMediaUrl(), newModel.getMediaUrl())){
-                return false;
-            }
-            if (contentsDifferent(oldModel.getMediaName(), newModel.getMediaName())){
-                return false;
-            }
-            if (contentsDifferent(oldModel.getMediaDescription(), newModel.getMediaDescription())){
-                return false;
-            }
-            if (contentsDifferent(oldModel.getMediaThumbnail(), newModel.getMediaThumbnail())){
-                return false;
-            }
-            if (contentsDifferent(String.valueOf(oldModel.getState()), String.valueOf(newModel.getState()))){
-                return false;
-            }
-            return true;
-        }
-    }
-
-    private boolean contentsDifferent(String oldData, String newData) {
-        if (oldData == null && newData != null){
-            return false;
-        }
-        if (oldData != null && newData == null){
-            return false;
-        }
-        if (oldData == null){
-            return false;
-        }
-        return !oldData.equals(newData);
     }
 
     public class PlayingMediaViewHolder extends RecyclerView.ViewHolder {
@@ -149,21 +105,42 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         PlayingMediaViewHolder(@NonNull ItemQueuePlayingMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            /*this.binding.imageViewDragHandle.setOnTouchListener(this);*/
             this.binding.imageViewRemove.setVisibility(View.GONE);
         }
 
-        public void setData(QueueMediaEntity model) {
-            binding.setMediaTitle(model.getMediaTitle());
-            binding.setMediaDescription(model.getMovieName());
-            binding.setMediaThumbnail(model.getMediaThumbnail());
-            binding.setMediaDuration(model.getFormattedPlayDuration());
-        }
+        public void setData(QueueMediaEntity model, List<Object> payloads) {
+            if (payloads == null || payloads.isEmpty()) {
+                binding.setMediaTitle(model.getMediaTitle());
+                binding.setMediaDescription(model.getMovieName());
+                binding.setMediaThumbnail(model.getMediaThumbnail());
+                binding.setMediaDuration(model.getFormattedPlayDuration());
+            } else {
+                try {
+                    Bundle bundle = (Bundle) payloads.get(0);
+                    String mediaTitle = bundle.getString(QueueMediaEntity.MediaColumns.MEDIA_TITLE);
+                    String mediaMovieName = bundle.getString(QueueMediaEntity.MediaColumns.MEDIA_MOVIE_NAME);
+                    String mediaThumbnail = bundle.getString(QueueMediaEntity.MediaColumns.MEDIA_THUMBNAIL);
+                    String mediaPlayDuration = bundle.getString(QueueMediaEntity.MediaColumns.PLAY_DURATION);
+                    int mediaState = bundle.getInt(QueueMediaEntity.QueueMediaColumns.STATE);
+                    int mediaProgress = bundle.getInt(QueueMediaEntity.QueueMediaColumns.PROGRESS);
 
-        /*@Override
-        public boolean onTouch(View v, MotionEvent event) {
-            return true;
-        }*/
+                    if (!StringUtils.isEmpty(mediaTitle)) {
+                        binding.setMediaTitle(model.getMediaTitle());
+                    }
+                    if (!StringUtils.isEmpty(mediaMovieName)) {
+                        binding.setMediaDescription(model.getMovieName());
+                    }
+                    if (!StringUtils.isEmpty(mediaThumbnail)) {
+                        binding.setMediaThumbnail(model.getMediaThumbnail());
+                    }
+                    if (!StringUtils.isEmpty(mediaPlayDuration)) {
+                        binding.setMediaDuration(model.getFormattedPlayDuration());
+                    }
+                } catch (Exception e) {
+                    Logger.e(TAG, e.toString());
+                }
+            }
+        }
     }
 
     public class NotPlayingMediaViewHolder extends RecyclerView.ViewHolder {
@@ -172,7 +149,6 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         NotPlayingMediaViewHolder(@NonNull ItemQueueNotPlayingMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            /*this.binding.imageViewDragHandle.setOnTouchListener(this);*/
             this.binding.imageViewRemove.setVisibility(View.VISIBLE);
 
             binding.getRoot().setOnClickListener(new View.OnClickListener() {
@@ -210,17 +186,40 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             });
         }
 
-        public void setData(QueueMediaEntity model) {
-            binding.setMediaTitle(model.getMediaTitle());
-            binding.setMediaDescription(model.getMovieName());
-            binding.setMediaThumbnail(model.getMediaThumbnail());
-            binding.setMediaDuration(model.getFormattedPlayDuration());
-        }
+        public void setData(QueueMediaEntity model, List<Object> payloads) {
+            if (payloads == null || payloads.isEmpty()) {
+                binding.setMediaTitle(model.getMediaTitle());
+                binding.setMediaDescription(model.getMovieName());
+                binding.setMediaThumbnail(model.getMediaThumbnail());
+                binding.setMediaDuration(model.getFormattedPlayDuration());
 
-        /*@Override
-        public boolean onTouch(View v, MotionEvent event) {
-            return true;
-        }*/
+            } else {
+                try {
+                    Bundle bundle = (Bundle) payloads.get(0);
+                    String mediaTitle = bundle.getString(QueueMediaEntity.MediaColumns.MEDIA_TITLE);
+                    String mediaMovieName = bundle.getString(QueueMediaEntity.MediaColumns.MEDIA_MOVIE_NAME);
+                    String mediaThumbnail = bundle.getString(QueueMediaEntity.MediaColumns.MEDIA_THUMBNAIL);
+                    String mediaPlayDuration = bundle.getString(QueueMediaEntity.MediaColumns.PLAY_DURATION);
+                    int mediaState = bundle.getInt(QueueMediaEntity.QueueMediaColumns.STATE);
+                    int mediaProgress = bundle.getInt(QueueMediaEntity.QueueMediaColumns.PROGRESS);
+
+                    if (!StringUtils.isEmpty(mediaTitle)) {
+                        binding.setMediaTitle(model.getMediaTitle());
+                    }
+                    if (!StringUtils.isEmpty(mediaMovieName)) {
+                        binding.setMediaDescription(model.getMovieName());
+                    }
+                    if (!StringUtils.isEmpty(mediaThumbnail)) {
+                        binding.setMediaThumbnail(model.getMediaThumbnail());
+                    }
+                    if (!StringUtils.isEmpty(mediaPlayDuration)) {
+                        binding.setMediaDuration(model.getFormattedPlayDuration());
+                    }
+                } catch (Exception e) {
+                    Logger.e(TAG, e.toString());
+                }
+            }
+        }
     }
 
     @Override

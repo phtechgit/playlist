@@ -180,6 +180,7 @@ public class MediaEntity implements Parcelable {
 
 	public interface MediaColumns{
 		String MEDIA_DESCRIPTION = "mediaDescription";
+		String MEDIA_MOVIE_NAME = "mediaMovieName";
 		String MEDIA_URL = "mediaUrl";
 		String MEDIA_THUMBNAIL = "mediaThumbnail";
 		String MEDIA_NAME = "mediaName";

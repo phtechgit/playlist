@@ -30,7 +30,8 @@ import com.pheuture.playlists.utils.KeyboardUtils;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 
 public class SettingsFragment extends BaseFragment implements
-        CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
+        CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener, Constants.DefaultValues {
+
     private static final String TAG = SettingsFragment.class.getSimpleName();
     private MainActivityViewModel parentViewModel;
     private SettingsViewModel viewModel;
@@ -56,15 +57,15 @@ public class SettingsFragment extends BaseFragment implements
         parentViewModel.setTitle(activity.getResources().getString(R.string.setting_title));
 
         boolean downloadPlaylistMediaStatus = SharedPrefsUtils.getBooleanPreference(activity,
-                Constants.DOWNLOAD_PLAYLIST_MEDIA, false);
+                Constants.DOWNLOAD_PLAYLIST_MEDIA, DOWNLOAD_PLAYLIST_MEDIA_DEFAULT);
 
         boolean downloadOnCellularStatus = SharedPrefsUtils.getBooleanPreference(activity,
-                Constants.DOWNLOAD_USING_CELLULAR, false);
+                Constants.DOWNLOAD_USING_CELLULAR, DOWNLOAD_USING_CELLULAR_DEFAULT);
         boolean downloadWhileRoamingStatus = SharedPrefsUtils.getBooleanPreference(activity,
-                Constants.DOWNLOAD_WHILE_ROAMING, false);
+                Constants.DOWNLOAD_WHILE_ROAMING, DOWNLOAD_WHILE_ROAMING_DEFAULT);
 
         int crossFadeValue = SharedPrefsUtils.getIntegerPreference(activity,
-                Constants.CROSS_FADE_VALUE, Constants.CROSS_FADE_DEFAULT_VALUE);
+                Constants.CROSS_FADE_VALUE, CROSS_FADE_DURATION_DEFAULT);
 
         binding.switchDownloadPlaylistVideosToOffline.setChecked(downloadPlaylistMediaStatus);
         binding.switchDownloadUsingCellular.setChecked(downloadOnCellularStatus);

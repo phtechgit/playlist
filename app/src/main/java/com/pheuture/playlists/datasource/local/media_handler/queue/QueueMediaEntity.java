@@ -18,6 +18,12 @@ public class QueueMediaEntity extends MediaEntity implements Parcelable {
     private int state;
     private int progress;
 
+    public interface QueueMediaColumns {
+        String POSITION = "position";
+        String STATE = "state";
+        String PROGRESS = "progress";
+    }
+
     protected QueueMediaEntity(Parcel in) {
         super(in);
         position = in.readInt();

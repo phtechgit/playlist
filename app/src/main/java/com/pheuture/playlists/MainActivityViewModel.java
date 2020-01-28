@@ -51,7 +51,7 @@ import java.util.List;
 import static android.content.Context.AUDIO_SERVICE;
 
 public class MainActivityViewModel extends BaseAndroidViewModel implements Constants.SnackBarActions,
-        AudioManager.OnAudioFocusChangeListener, Constants.PlayerRepeatModes {
+        AudioManager.OnAudioFocusChangeListener, Constants.PlayerRepeatModes, Constants.DefaultValues {
 
     private static final String TAG = MainActivityViewModel.class.getSimpleName();
     private MutableLiveData<String> title;
@@ -439,7 +439,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             currentDurationOfCurrentMedia = primaryExoPlayer.getCurrentPosition();
 
             int crossFadeValue = (SharedPrefsUtils.getIntegerPreference(getApplication(),
-                    Constants.CROSS_FADE_VALUE, Constants.CROSS_FADE_DEFAULT_VALUE) * 1000);
+                    Constants.CROSS_FADE_VALUE, CROSS_FADE_DURATION_DEFAULT) * 1000);
 
             //increase volume if player
             if (queueMediaEntitiesMutableLiveData.getValue().size()>1 && primaryExoPlayer.getVolume()<1f) {

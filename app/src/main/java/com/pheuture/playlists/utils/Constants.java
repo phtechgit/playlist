@@ -25,7 +25,13 @@ public final class Constants{
     public static final String DOWNLOAD_USING_CELLULAR = "download_using_cellular";
     public static final String DOWNLOAD_WHILE_ROAMING = "download_while_roaming";
     public static final String CROSS_FADE_VALUE = "cross_fade_value";
-    public static int CROSS_FADE_DEFAULT_VALUE = 1;
+
+    public interface DefaultValues{
+        int CROSS_FADE_DURATION_DEFAULT = 1;
+        boolean DOWNLOAD_PLAYLIST_MEDIA_DEFAULT = true;
+        boolean DOWNLOAD_USING_CELLULAR_DEFAULT = false;
+        boolean DOWNLOAD_WHILE_ROAMING_DEFAULT = false;
+    }
 
     public interface SnackBarActions {
         String SNACK_BAR_SHOW = "snack_bar_show";
