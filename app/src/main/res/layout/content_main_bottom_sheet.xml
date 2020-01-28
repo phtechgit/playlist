@@ -50,7 +50,7 @@
                     android:id="@+id/linearLayout"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="4dp"
                     android:layout_marginStart="8dp"
                     android:orientation="vertical"
                     app:layout_constraintTop_toTopOf="parent"
@@ -91,7 +91,7 @@
                     android:id="@+id/relativeLayout_play"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="@+id/playerView"
-                    app:layout_constraintEnd_toStartOf="@+id/imageView_next"
+                    app:layout_constraintEnd_toStartOf="@+id/imageView_close"
                     android:layout_width="?actionBarSize"
                     android:layout_height="0dp">
 
@@ -100,36 +100,23 @@
                         android:id="@+id/imageView_togglePlay"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="16dp"
+                        android:src="@android:drawable/ic_media_pause"
                         android:clickable="true"
                         android:focusable="true"
-                        android:padding="16dp"
-                        android:src="@android:drawable/ic_media_pause" />
+                        android:background="?attr/selectableItemBackgroundBorderless"/>
 
                 </RelativeLayout>
-
-                <ImageView
-                    android:id="@+id/imageView_next"
-                    android:layout_width="?actionBarSize"
-                    android:layout_height="0dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:padding="16dp"
-                    android:src="@drawable/ic_next_grey"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@+id/playerView"
-                    app:layout_constraintEnd_toStartOf="@+id/imageView_close" />
 
                 <ImageView
                     android:id="@+id/imageView_close"
                     android:layout_width="?actionBarSize"
                     android:layout_height="0dp"
                     android:padding="16dp"
+                    android:src="@drawable/ic_close_black"
                     android:clickable="true"
                     android:focusable="true"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_close_black"
                     app:layout_constraintBottom_toBottomOf="@+id/playerView"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -141,8 +128,6 @@
                     android:layout_height="wrap_content"
                     android:max="100"
                     android:min="0"
-                    android:progress="0"
-                    android:thumbOffset="2dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/playerView"
                     app:layout_constraintTop_toBottomOf="@+id/playerView"
@@ -162,11 +147,44 @@
                         android:layout_height="?attr/actionBarSize"
                         android:foregroundTint="@color/colorAccent"
                         android:padding="16dp"
-                        android:src="@drawable/exo_controls_shuffle_on"
+                        android:src="@drawable/exo_controls_shuffle_off"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/imageView_previous"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/imageView_previous"
+                        android:layout_width="?actionBarSize"
+                        android:layout_height="?attr/actionBarSize"
+                        android:foregroundTint="@color/colorAccent"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_previous_dark"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/imageView_next"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/imageView_shuffle" />
+
+                    <ImageView
+                        android:id="@+id/imageView_next"
+                        android:layout_width="?actionBarSize"
+                        android:layout_height="0dp"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_next_grey"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/imageView_repeat"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintStart_toEndOf="@+id/imageView_previous" />
+
 
                     <ImageView
                         android:id="@+id/imageView_repeat"
@@ -174,10 +192,13 @@
                         android:layout_height="?attr/actionBarSize"
                         android:padding="16dp"
                         android:src="@drawable/exo_controls_repeat_off"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/imageView_shuffle"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintStart_toEndOf="@+id/imageView_next" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

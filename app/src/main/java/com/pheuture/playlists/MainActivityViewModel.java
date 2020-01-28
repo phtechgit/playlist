@@ -874,4 +874,23 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             Logger.e(TAG, e.toString());
         }
     }
+
+    public void previous() {
+        repeatModeMutableLiveData.postValue(REPEAT_MODE_OFF);
+
+        //if more media available to play & no pending callbacks
+        if (queueMediaEntitiesMutableLiveData.getValue().size()>0 && currentMediaPosition != 0){
+            if (currentPlayer == EXO_PLAYER_1) {
+                exoPlayer1.setVolume(1f);
+                loadMediaIn(EXO_PLAYER_1, queueMediaEntitiesMutableLiveData.getValue().get(--currentMediaPosition));
+            } else {
+                exoPlayer2.setVolume(1f);
+                loadMediaIn(EXO_PLAYER_2, queueMediaEntitiesMutableLiveData.getValue().get(--currentMediaPosition));
+            }
+        }
+    }
+
+    public boolean previousMediaAvailable() {
+        return (queueMediaEntitiesMutableLiveData.getValue().size()>0 && currentMediaPosition!=0);
+    }
 }

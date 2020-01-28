@@ -161,6 +161,12 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                 } else {
                     binding.layoutBottomSheet.imageViewShuffle.setImageResource(R.drawable.exo_controls_shuffle_off);
                 }
+
+                if (viewModel.previousMediaAvailable()) {
+                    binding.layoutBottomSheet.imageViewPrevious.setImageResource(R.drawable.ic_previous_light);
+                } else {
+                    binding.layoutBottomSheet.imageViewPrevious.setImageResource(R.drawable.ic_previous_dark);
+                }
             }
         });
 
@@ -263,6 +269,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         binding.layoutBottomSheet.imageViewClose.setOnClickListener(this);
         binding.layoutBottomSheet.progressBar.setOnSeekBarChangeListener(this);
         binding.layoutBottomSheet.imageViewShuffle.setOnClickListener(this);
+        binding.layoutBottomSheet.imageViewPrevious.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewRepeat.setOnClickListener(this);
     }
 
@@ -277,8 +284,13 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         } else if (v.equals(binding.layoutBottomSheet.imageViewClose)){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             binding.bottomNavView.setVisibility(View.VISIBLE);
+
         } else if (v.equals(binding.layoutBottomSheet.imageViewShuffle)){
             viewModel.shuffle();
+
+        } else if (v.equals(binding.layoutBottomSheet.imageViewPrevious)){
+            viewModel.previous();
+
         } else if (v.equals(binding.layoutBottomSheet.imageViewRepeat)){
             viewModel.toggleRepeatMode();
         }
