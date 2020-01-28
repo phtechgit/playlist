@@ -175,7 +175,6 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
             task.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    // Fail to start API
                     viewModel.setMessageToShow(activity.getString(R.string.automatic_detection_of_otp_failed));
                 }
             });
