@@ -53,7 +53,7 @@ public class SettingsFragment extends BaseFragment implements
 
     @Override
     public void initializations() {
-        parentViewModel.setTitle(activity.getResources().getString(R.string.settings));
+        parentViewModel.setTitle(activity.getResources().getString(R.string.setting_title));
 
         boolean downloadPlaylistMediaStatus = SharedPrefsUtils.getBooleanPreference(activity,
                 Constants.DOWNLOAD_PLAYLIST_MEDIA, false);

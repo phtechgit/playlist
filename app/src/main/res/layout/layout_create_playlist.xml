@@ -43,32 +43,26 @@
             app:layout_constraintTop_toBottomOf="@+id/textView_title" />
 
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout_editText"
+        <EditText
+            android:visibility="gone"
+            android:id="@+id/ediText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="Playlist name"
+            android:textColorHint="@color/grayC"
+            android:textColor="@color/grayF"
+            android:imeOptions="actionDone"
+            android:gravity="center_vertical"
+            android:inputType="text|textCapSentences"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/edittext_background_white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_subtitle" >
-
-            <EditText
-                android:id="@+id/ediText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Playlist name"
-                android:background="@android:drawable/screen_background_light_transparent"
-                android:textColorHint="@color/grayC"
-                android:textColor="@color/grayF"
-                android:imeOptions="actionDone"
-                android:textSize="18sp"
-                android:gravity="center_vertical"
-                android:inputType="text|textCapSentences" />
-
-        </RelativeLayout>
+            app:layout_constraintTop_toBottomOf="@+id/textView_subtitle" />
 
         <View
             android:id="@+id/divider"
@@ -78,7 +72,7 @@
             android:background="@color/grayC"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/relativeLayout_editText" />
+            app:layout_constraintTop_toBottomOf="@+id/ediText" />
 
         <View
             android:id="@+id/divider2"

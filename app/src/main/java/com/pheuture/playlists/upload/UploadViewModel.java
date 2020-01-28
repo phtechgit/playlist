@@ -4,6 +4,7 @@ import android.app.Application;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Size;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -30,9 +31,10 @@ import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.utils.Url;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.provider.MediaStore.Video.Thumbnails.FULL_SCREEN_KIND;
 
 public class UploadViewModel extends AndroidViewModel implements MediaEntity.MediaColumns,
         PendingFileUploadParamEntity.MediaType {
@@ -107,22 +109,28 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
 
     public void createAndSetThumbnail() {
         Runnable runnable = () -> {
-            File videoFile = null;
-            try {
-                videoFile = new File(RealPathUtil.getRealPath(getApplication(), mediaUriLiveData.getValue()));
-            } catch (Exception e) {
-                Logger.e(TAG, e.toString());
-            }
-
-            if (videoFile == null){
-                return;
-            }
-
             Bitmap bitmap = null;
             try {
-                bitmap = ThumbnailUtils.createVideoThumbnail(videoFile,
-                        new Size(640, 360), null);
-            } catch (IOException e) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    File videoFile = null;
+                    try {
+                        videoFile = new File(RealPathUtil.getRealPath(getApplication(), mediaUriLiveData.getValue()));
+                    } catch (Exception e) {
+                        Logger.e(TAG, e.toString());
+                    }
+
+                    if (videoFile == null){
+                        return;
+                    }
+
+                    bitmap = ThumbnailUtils.createVideoThumbnail(videoFile,
+                            new Size(640, 360), null);
+                } else {
+                    bitmap = ThumbnailUtils.createVideoThumbnail(
+                            RealPathUtil.getRealPath(getApplication(), mediaUriLiveData.getValue()),
+                            FULL_SCREEN_KIND);
+                }
+            } catch (Exception e) {
                 Logger.e(TAG, e.toString());
             }
 

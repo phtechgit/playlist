@@ -1,25 +1,11 @@
 <resources>
     <string name="app_name">Playlists</string>
-    <string name="title_my_playlist">Playlists</string>
-    <string name="title_trending">Trending</string>
-    <string name="title_settings">Settings</string>
 
     <string name="today">TODAY</string>
     <string name="yesterday">YESTERDAY</string>
     <string name="formated_today">• Today</string>
     <string name="formated_yesterday">• Yesterday</string>
-    <string name="title_activity_login">Sign in</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome !"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="no_internet_error">No Internet connection available</string>
     <string name="what_s_your_mobile_number">WHAT\'S YOUR  \nMOBILE NUMBER?</string>
     <string name="mobile_number">Mobile number</string>
@@ -42,7 +28,7 @@
     <string name="search">Search</string>
     <string name="give_your_playlist_a_name">Give your playlist a name</string>
     <string name="create">Create</string>
-    <string name="settings">Settings</string>
+    <string name="setting_title">Settings</string>
     <string name="are_you_sure">Are you sure?</string>
     <string name="do_you_want_remove_all_the_offline_songs">Do you want to remove all the offline songs?</string>
     <string name="remove">Remove</string>
@@ -54,7 +40,6 @@
     <string name="download_using_cellular">Download Using Cellular</string>
     <string name="recommended_setting_off">Recommended Setting: Off</string>
     <string name="download_while_roaming">Download While Roaming</string>
-    <string name="recommended_setting_off">Recommended Setting: Off</string>
     <string name="delete">Delete</string>
     <string name="delete_all_offline_videos">delete all offline videos</string>
     <string name="crossfade">Crossfade</string>
@@ -64,5 +49,14 @@
     <string name="please_provide_video_title">Please provide video title</string>
     <string name="please_provide_video_description">Please provide video description</string>
     <string name="file_added_to_upload_queue">file added to upload queue</string>
+    <string name="checking_pending_uploads">checking pending uploads</string>
+    <string name="uploaded_successfully">uploaded successfully</string>
+    <string name="network_error">Network Error</string>
+    <string name="api_not_connected">Api not connected</string>
+    <string name="playlist_title">Playlists</string>
+    <string name="playlist_search_hint">Find in playlist</string>
+    <string name="playlist_already_present_with_same_name">Playlist already present with same name!</string>
+    <string name="do_you_want_to_remove_this_playlist_containing">Do you want to remove this playlist containing </string>
+    <string name="create_playlist">Create playlist</string>
 
 </resources>

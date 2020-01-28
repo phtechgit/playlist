@@ -19,7 +19,6 @@
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
-        android:padding="12dp"
         app:layout_constraintEnd_toStartOf="@+id/textView_title"
         app:layout_constraintStart_toStartOf="@+id/textView_title">
 
@@ -27,9 +26,9 @@
             android:id="@+id/imageView_thumbnail"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:background="@color/grayF"
             android:padding="16dp"
             android:src="@drawable/ic_music"
@@ -41,18 +40,19 @@
         <TextView
             android:id="@+id/textView_title"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="24dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:maxLines="1"
+            android:padding="-4dp"
             android:tag="decorator_ending_view"
             android:text="@{model.playlistName}"
             android:textSize="@dimen/textSizeBody1"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/textView_creator"
-            app:layout_constraintEnd_toStartOf="@+id/imageView_remove"
+            app:layout_constraintEnd_toStartOf="@+id/relativeLayout_remove"
             app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed" />
@@ -60,31 +60,51 @@
         <TextView
             android:id="@+id/textView_creator"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="24dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textSize="@dimen/textSizeBody1"
-            android:textColor="@color/grayC"
             android:text="@{model.createdByFormatted}"
+            android:textColor="@color/grayC"
+            android:textSize="@dimen/textSizeBody1"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/imageView_remove"
+            app:layout_constraintEnd_toStartOf="@+id/relativeLayout_remove"
             app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail"
             app:layout_constraintTop_toBottomOf="@+id/textView_title"
             app:showOrHide="@{position}" />
 
-        <ImageView
-            android:id="@+id/imageView_remove"
+        <RelativeLayout
+            android:id="@+id/relativeLayout_remove"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_remove_circle"
+            android:layout_height="0dp"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/imageView_add"
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="12dp"
+                android:src="@drawable/ic_add_light"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/imageView_remove"
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="12dp"
+                android:src="@drawable/ic_remove_circle" />
+
+        </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

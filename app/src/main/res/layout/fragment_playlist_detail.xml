@@ -31,7 +31,7 @@
             <TextView
                 android:id="@+id/textView_title"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:gravity="center"
                 android:text="@{model.playlistName}"
                 android:textSize="@dimen/textSizeHeadline4"
@@ -43,7 +43,7 @@
             <TextView
                 android:id="@+id/textView_creator"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="24dp"
                 android:textColorHint="@color/grayB"
                 android:textColor="@color/grayC"
                 android:text="@{model.createdByFormatted}"
@@ -57,7 +57,7 @@
                 android:id="@+id/textView_songs_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:background="@drawable/edittext_bg_gray"
                 android:drawableTint="@color/grayE"
                 android:paddingStart="8dp"
@@ -89,7 +89,7 @@
             <TextView
                 android:id="@+id/textView_playDummy"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="24dp"
                 android:layout_margin="4dp"
                 android:text="PLAY"
                 android:textColor="@color/grayB"
@@ -116,7 +116,7 @@
             <TextView
                 android:id="@+id/textView_shuffleDummy"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="24dp"
                 android:layout_margin="4dp"
                 android:text="SHUFFLE PLAY"
                 android:textColor="@color/grayB"
@@ -143,7 +143,7 @@
             <TextView
                 android:id="@+id/textView_add_new_media_dummy"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="24dp"
                 android:layout_margin="4dp"
                 android:text="ADD"
                 android:textColor="@color/grayB"

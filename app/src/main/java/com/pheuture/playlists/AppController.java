@@ -8,8 +8,6 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.pheuture.playlists.receiver.ConnectivityChangeReceiver;
 import com.pheuture.playlists.service.PendingApiExecutorService;
 import com.pheuture.playlists.service.PendingFileUploadService;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.NetworkUtils;
 
 public class AppController extends Application implements ConnectivityChangeReceiver.ConnectivityChangeListener{
     private static final String TAG = AppController.class.getSimpleName();

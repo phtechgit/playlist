@@ -4,16 +4,16 @@
     <item
         android:id="@+id/navigation_playlists"
         android:icon="@drawable/ic_playlist_light"
-        android:title="@string/title_my_playlist" />
+        android:title="@string/playlist_title" />
 
     <item
         android:id="@+id/navigation_trending"
         android:icon="@drawable/ic_trending_light"
-        android:title="@string/title_trending" />
+        android:title="@string/trending_title" />
 
     <item
         android:id="@+id/navigation_settings"
         android:icon="@drawable/ic_settings_black"
-        android:title="@string/title_settings" />
+        android:title="@string/setting_title" />
 
 </menu>

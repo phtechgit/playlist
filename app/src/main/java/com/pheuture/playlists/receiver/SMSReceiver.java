@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.google.android.gms.auth.api.phone.SmsRetriever;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.Status;
+import com.pheuture.playlists.R;
 
 public class SMSReceiver extends BroadcastReceiver {
 
@@ -56,7 +57,7 @@ public class SMSReceiver extends BroadcastReceiver {
                 case CommonStatusCodes.API_NOT_CONNECTED:
 
                     if (otpListener != null) {
-                        otpListener.onOTPReceivedError("API NOT CONNECTED");
+                        otpListener.onOTPReceivedError(context.getResources().getString(R.string.api_not_connected));
                     }
 
                     break;
@@ -64,7 +65,7 @@ public class SMSReceiver extends BroadcastReceiver {
                 case CommonStatusCodes.NETWORK_ERROR:
 
                     if (otpListener != null) {
-                        otpListener.onOTPReceivedError("NETWORK ERROR");
+                        otpListener.onOTPReceivedError(context.getResources().getString(R.string.network_error));
                     }
 
                     break;
@@ -72,7 +73,7 @@ public class SMSReceiver extends BroadcastReceiver {
                 case CommonStatusCodes.ERROR:
 
                     if (otpListener != null) {
-                        otpListener.onOTPReceivedError("SOME THING WENT WRONG");
+                        otpListener.onOTPReceivedError(context.getResources().getString(R.string.something_went_wrong));
                     }
 
                     break;

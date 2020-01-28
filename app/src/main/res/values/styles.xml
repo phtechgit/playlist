@@ -8,7 +8,7 @@
         <item name="android:colorBackground">@color/BlackF</item>
 
         <item name="android:textSize">@dimen/textSizeBody1</item>
-        <!--<item name="android:windowBackground">@drawable/splash_background</item>-->
+        <item name="android:textCursorDrawable">@drawable/cursor</item>
         <item name="materialButtonStyle">@style/ButtonStyleDark</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>
         <item name="toolbarStyle">@style/ToolbarCustomStyle</item>
@@ -26,7 +26,7 @@
         <item name="android:colorBackground">@color/BlackF</item>
 
         <item name="android:textSize">@dimen/textSizeBody1</item>
-        <!--<item name="android:windowBackground">@drawable/splash_background</item>-->
+        <item name="android:textCursorDrawable">@drawable/cursor</item>
         <item name="materialButtonStyle">@style/ButtonStyleDark</item>
         <item name="toolbarStyle">@style/ToolbarCustomStyle</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>

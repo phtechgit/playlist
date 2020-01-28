@@ -84,7 +84,8 @@ public class MediaViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    List<MediaEntity> newDataList = Arrays.asList(ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), MediaEntity[].class));
+                    List<MediaEntity> newDataList = Arrays.asList(ParserUtil.getInstance()
+                            .fromJson(response.optString(ApiConstant.DATA), MediaEntity[].class));
 
                     if (newDataList.size()>0){
                         MediaEntity mediaEntity = newDataList.get(newDataList.size() - 1);
@@ -149,7 +150,8 @@ public class MediaViewModel extends AndroidViewModel {
                         return;
                     }
 
-                    List<MediaEntity> newDataList = Arrays.asList(ParserUtil.getInstance().fromJson(response.optString(ApiConstant.DATA), MediaEntity[].class));
+                    List<MediaEntity> newDataList = Arrays.asList(ParserUtil.getInstance()
+                            .fromJson(response.optString(ApiConstant.DATA), MediaEntity[].class));
 
                     if (newDataList.size()>0){
                         MediaEntity mediaEntity = newDataList.get(newDataList.size() - 1);

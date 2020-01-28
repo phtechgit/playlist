@@ -86,10 +86,10 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         TextView textViewLeft = dialog.findViewById(R.id.textView_left);
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
-        textViewTitle.setText("Are you sure?");
-        textViewSubtitle.setText("Do you want to remove this playlist containing " + playlistMediaEntities.size() + " songs?");
+        textViewTitle.setText(getResources().getString(R.string.are_you_sure));
+        textViewSubtitle.setText(getResources().getString(R.string.do_you_want_to_remove_this_playlist_containing) + playlistMediaEntities.size() + " songs?");
         textViewSubtitle.setVisibility(View.VISIBLE);
-        textViewRight.setText("Remove");
+        textViewRight.setText(getResources().getString(R.string.remove));
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -245,10 +245,10 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         TextView textViewLeft = dialog.findViewById(R.id.textView_left);
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
-        textViewTitle.setText("Are you sure?");
+        textViewTitle.setText(getResources().getString(R.string.are_you_sure));
         textViewSubtitle.setText("Do you want to remove " + model.getMediaTitle() + " from the playlist?");
         textViewSubtitle.setVisibility(View.VISIBLE);
-        textViewRight.setText("Remove");
+        textViewRight.setText(getResources().getString(R.string.remove));
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override

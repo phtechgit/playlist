@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.pheuture.playlists.R;
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiDao;
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiEntity;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
@@ -71,7 +72,7 @@ public class PlaylistViewModel extends AndroidViewModel {
         if (searchQuery.length() == 0){
             PlaylistEntity addNewPlaylistModel = new PlaylistEntity();
             addNewPlaylistModel.setPlaylistID(RecyclerView.NO_ID);
-            addNewPlaylistModel.setPlaylistName("Create playlist");
+            addNewPlaylistModel.setPlaylistName(getApplication().getResources().getString(R.string.create_playlist));
             playlistEntities.add(0, addNewPlaylistModel);
         }
     }

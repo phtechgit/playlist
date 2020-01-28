@@ -63,9 +63,9 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
 
     @Override
     public void initializations() {
-        parentViewModel.setTitle("Playlists");
+        parentViewModel.setTitle(getResources().getString(R.string.playlist_title));
 
-        binding.layoutSearchBar.editTextSearch.setHint("Find in playlist");
+        binding.layoutSearchBar.editTextSearch.setHint(getResources().getString(R.string.playlist_search_hint));
 
         recyclerAdapter = new PlaylistsRecyclerAdapter(this);
         layoutManager = new LinearLayoutManager(activity);
@@ -142,7 +142,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
 
             } else {
                 if (viewModel.isExistingPlaylist(editText.getText().toString())) {
-                    Toast.makeText(activity, "Playlist already present with same name!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, getResources().getString(R.string.playlist_already_present_with_same_name), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 playlistName = editText.getText().toString();
@@ -190,10 +190,10 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
         TextView textViewLeft = dialog.findViewById(R.id.textView_left);
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
-        textViewTitle.setText("Are you sure?");
-        textViewSubtitle.setText("Do you want to remove this playlist containing " + model.getSongsCount() + " songs?");
+        textViewTitle.setText(getResources().getString(R.string.are_you_sure));
+        textViewSubtitle.setText(getResources().getString(R.string.do_you_want_to_remove_this_playlist_containing) + " " + model.getSongsCount() + " songs?");
         textViewSubtitle.setVisibility(View.VISIBLE);
-        textViewRight.setText("Remove");
+        textViewRight.setText(getResources().getString(R.string.remove));
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override

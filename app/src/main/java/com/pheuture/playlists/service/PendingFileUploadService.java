@@ -115,7 +115,7 @@ public class PendingFileUploadService extends Service implements NotificationCha
 
         progressNotification = new NotificationCompat.Builder(this,
                 NOTIFICATION_CHANNEL_ID_01)
-                .setContentTitle("checking pending uploads")
+                .setContentTitle(getResources().getString(R.string.checking_pending_uploads))
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setOnlyAlertOnce(true)
                 .addAction(R.drawable.ic_close_black, CANCEL, btPendingIntent)
@@ -156,7 +156,8 @@ public class PendingFileUploadService extends Service implements NotificationCha
         mUploadedInBytes = 0;
         lastProgress = 0;
 
-        List<PendingFileUploadParamEntity> params = Arrays.asList(ParserUtil.getInstance().fromJson(pendingFileUploadEntity.getParams(), PendingFileUploadParamEntity[].class));
+        List<PendingFileUploadParamEntity> params = Arrays.asList(ParserUtil.getInstance()
+                .fromJson(pendingFileUploadEntity.getParams(), PendingFileUploadParamEntity[].class));
 
         final String url = pendingFileUploadEntity.getUrl();
         HashMap<String, RequestBody> partMap = new HashMap<>();
@@ -170,15 +171,18 @@ public class PendingFileUploadService extends Service implements NotificationCha
 
             } else if (paramEntity.getMediaType() == FILE) {
                 File mediaFile = new File(paramEntity.getValue());
-                partFiles.add(MultipartBody.Part.createFormData(paramEntity.getKey(), paramEntity.getValue().substring(paramEntity.getValue().lastIndexOf("/")),
-                        new ProgressRequestBody(mediaFile, MediaType.parse(paramEntity.getExtra()), this)));
+                partFiles.add(MultipartBody.Part.createFormData(paramEntity.getKey(),
+                        paramEntity.getValue().substring(paramEntity.getValue().lastIndexOf("/")),
+                        new ProgressRequestBody(mediaFile,
+                                MediaType.parse(paramEntity.getExtra()), this)));
             }
         }
 
         fileUploadClient = fileUploadDao.multipartApiCall(url, partMap, partFiles);
         fileUploadClient.enqueue(new Callback<ResponseModel>() {
             @Override
-            public void onResponse(@NotNull Call<ResponseModel> fileUploadClient, @NotNull retrofit2.Response<ResponseModel> response) {
+            public void onResponse(@NotNull Call<ResponseModel> fileUploadClient,
+                                   @NotNull retrofit2.Response<ResponseModel> response) {
                 try {
                     if (response.body()==null){
                         Logger.e(url + ApiConstant.RESPONSE, response.message());
@@ -218,7 +222,7 @@ public class PendingFileUploadService extends Service implements NotificationCha
         Notification successNotification = new NotificationCompat.Builder(this,
                 NOTIFICATION_CHANNEL_ID_01)
                 .setContentTitle(pendingFileUploadEntity.getTitle())
-                .setSubText("uploaded successfully")
+                .setSubText(getResources().getString(R.string.uploaded_successfully))
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .build();
 
@@ -294,6 +298,7 @@ public class PendingFileUploadService extends Service implements NotificationCha
 
     private void scheduleRestart() {
         //implement workManager
+        // TODO: 28-01-2020 implement work manager for restarting the file upload service.
     }
 
 }
