@@ -102,7 +102,7 @@
                         android:padding="16dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:src="@drawable/exo_icon_pause"
+                        android:src="@drawable/exo_icon_play"
                         android:background="?attr/selectableItemBackgroundBorderless"/>
 
                 </RelativeLayout>

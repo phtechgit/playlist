@@ -4,11 +4,9 @@ import androidx.annotation.Nullable;
 import  androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -20,6 +18,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ActivityUploadBinding;
 import com.pheuture.playlists.base.BaseActivity;
@@ -70,6 +69,17 @@ public class UploadActivity extends BaseActivity{
                 showThumbnail();
             }
         });
+
+        viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
+            @Override
+            public void onChanged(Bundle bundle) {
+                if (bundle.getBoolean(SNACK_BAR_SHOW, false)){
+                    showSnack(binding.getRoot(), bundle);
+                } else {
+                    hideSnack();
+                }
+            }
+        });
     }
 
     private void setMediaInPlayer() {
@@ -102,19 +112,20 @@ public class UploadActivity extends BaseActivity{
 
         } else if (v.equals(binding.buttonSubmit)){
             if (TextUtils.getTrimmedLength(binding.ediTextTitle.getText().toString()) == 0){
-                Toast.makeText(this, getResources().getString(R.string.please_provide_video_title), Toast.LENGTH_SHORT).show();
+                viewModel.showSnackBar(getResources().getString(R.string.please_provide_video_title), Snackbar.LENGTH_SHORT);
                 return;
             }
 
             if (TextUtils.getTrimmedLength(binding.ediTextDescription.getText().toString()) == 0){
-                Toast.makeText(this, getResources().getString(R.string.please_provide_video_description), Toast.LENGTH_SHORT).show();
+                viewModel.showSnackBar(getResources().getString(R.string.please_provide_video_description), Snackbar.LENGTH_SHORT);
                 return;
             }
 
             Runnable runnable = new Runnable() {
                 public void run() {
                     viewModel.uploadMedia(binding.ediTextTitle.getText().toString(), binding.ediTextDescription.getText().toString());
-                    Toast.makeText(UploadActivity.this, getResources().getString(R.string.file_added_to_upload_queue), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UploadActivity.this, getResources().getString(R.string.thanks_msg_upon_uploading_own_video),
+                            Toast.LENGTH_SHORT).show();
                     onBackPressed();
                 }
             };

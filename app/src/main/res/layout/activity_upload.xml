@@ -116,7 +116,7 @@
                     android:gravity="center"
                     android:layout_marginTop="16dp"
                     android:padding="16dp"
-                    android:text="By submitting your videos, you acknowledge that you agree to our Terms of Service and Comunity Guidlines"
+                    android:text="@string/community_guidelines"
                     android:textColor="@color/grayD"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -129,7 +129,7 @@
                     android:layout_marginTop="16dp"
                     android:gravity="center"
                     android:padding="16dp"
-                    android:text="Please be sure not to violate others' Copyright or privacy rights."
+                    android:text="@string/copyright_policy"
                     android:textColor="@color/grayD"
                     app:layout_constraintTop_toBottomOf="@+id/textView_guidline1" />
 

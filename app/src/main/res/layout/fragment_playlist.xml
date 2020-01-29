@@ -71,7 +71,7 @@
                 android:drawablePadding="8dp"
                 android:paddingStart="32dp"
                 android:paddingEnd="32dp"
-                android:text="No playlist matched the search criteria..."
+                android:text="No playlist matched with the search criteria."
                 android:gravity="center"
                 android:layout_marginTop="48dp"
                 android:layout_centerHorizontal="true"

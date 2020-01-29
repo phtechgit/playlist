@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
@@ -88,6 +87,7 @@ public class SettingsFragment extends BaseFragment implements
     @Override
     public void onClick(View v) {
         if (v.equals(binding.linearLayoutUpload)){
+            parentViewModel.pausePlayback();
             openFileSelector();
 
         } else if (v.equals(binding.linearLayoutDeleteOfflineVideos)){
@@ -100,30 +100,29 @@ public class SettingsFragment extends BaseFragment implements
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialog.setContentView(R.layout.layout_create_playlist);
+        dialog.setContentView(R.layout.layout_alert);
         dialog.show();
 
         TextView textViewTitle = dialog.findViewById(R.id.textView_title);
         TextView textViewSubtitle = dialog.findViewById(R.id.textView_subtitle);
-        EditText editText = dialog.findViewById(R.id.ediText);
         TextView textViewLeft = dialog.findViewById(R.id.textView_left);
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
         textViewTitle.setText(activity.getResources().getString(R.string.are_you_sure));
         textViewSubtitle.setText(activity.getResources().getString(R.string.do_you_want_remove_all_the_offline_songs));
         textViewSubtitle.setVisibility(View.VISIBLE);
-        textViewRight.setText(activity.getResources().getString(R.string.remove));
+        textViewRight.setText(activity.getResources().getString(R.string.delete));
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                KeyboardUtils.hideKeyboard(activity, editText);
+                KeyboardUtils.hideKeyboard(activity, binding.getRoot());
             }
         });
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                KeyboardUtils.hideKeyboard(activity, editText);
+                KeyboardUtils.hideKeyboard(activity, binding.getRoot());
             }
         });
 
@@ -134,7 +133,7 @@ public class SettingsFragment extends BaseFragment implements
         textViewRight.setOnClickListener(view -> {
             dialog.dismiss();
             viewModel.deleteOfflineMedia();
-            parentViewModel.showSnackBar(activity.getResources().getString(R.string.offline_songs_removed), Snackbar.LENGTH_SHORT);
+            parentViewModel.showSnackBar(activity.getResources().getString(R.string.offline_songs_deleted), Snackbar.LENGTH_SHORT);
         });
     }
 

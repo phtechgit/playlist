@@ -38,13 +38,7 @@ public class PlaylistDiffCallBack extends DiffUtil.Callback{
         if (contentsDifferent(oldModel.getPlaylistName(), newModel.getPlaylistName())){
             return false;
         }
-        if (contentsDifferent(String.valueOf(oldModel.getSongsCount()), String.valueOf(newModel.getSongsCount()))){
-            return false;
-        }
-        if (contentsDifferent(String.valueOf(oldModel.getPlayDuration()), String.valueOf(newModel.getPlayDuration()))){
-            return false;
-        }
-        if (contentsDifferent(String.valueOf(oldModel.getCreatedOn()), String.valueOf(newModel.getCreatedOn()))){
+        if (contentsDifferent(oldModel.getCreatedByFormatted(), newModel.getCreatedByFormatted())){
             return false;
         }
         return true;

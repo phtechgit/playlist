@@ -30,9 +30,9 @@
     <string name="create">Create</string>
     <string name="setting_title">Settings</string>
     <string name="are_you_sure">Are you sure?</string>
-    <string name="do_you_want_remove_all_the_offline_songs">Do you want to remove all the offline songs?</string>
+    <string name="do_you_want_remove_all_the_offline_songs">This action will delete all the offline songs.</string>
     <string name="remove">Remove</string>
-    <string name="offline_songs_removed">Offline songs removed.</string>
+    <string name="offline_songs_deleted">Offline songs deleted.</string>
     <string name="upload">Upload</string>
     <string name="upload_your_own_video">upload your own video</string>
     <string name="download_playlist">Download Playlist</string>
@@ -44,10 +44,10 @@
     <string name="delete_all_offline_videos">delete all offline videos</string>
     <string name="crossfade">Crossfade</string>
     <string name="allows_you_to_crossfade_between_songs">allows you to crossfade between songs</string>
-    <string name="trending_title">Trendings</string>
-    <string name="trending_search_hint">Find in trending</string>
-    <string name="please_provide_video_title">Please provide video title</string>
-    <string name="please_provide_video_description">Please provide video description</string>
+    <string name="trending_title">Trending</string>
+    <string name="trending_search_hint">Search</string>
+    <string name="please_provide_video_title">Please enter the title</string>
+    <string name="please_provide_video_description">Please enter the description</string>
     <string name="file_added_to_upload_queue">file added to upload queue</string>
     <string name="checking_pending_uploads">checking pending uploads</string>
     <string name="uploaded_successfully">uploaded successfully</string>
@@ -56,8 +56,11 @@
     <string name="playlist_title">Playlists</string>
     <string name="playlist_search_hint">Find in playlist</string>
     <string name="playlist_already_present_with_same_name">Playlist already present with same name!</string>
-    <string name="do_you_want_to_remove_this_playlist_containing">Do you want to remove this playlist containing </string>
+    <string name="do_you_want_to_remove_this_playlist_containing">This action will delete this playlist containing</string>
     <string name="create_playlist">Create playlist</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
+    <string name="community_guidelines">By submitting your videos, you acknowledge that you agree to our Terms of Service and Community Guidelines</string>
+    <string name="copyright_policy">Please be sure not to violate other\'s Copyright or Privacy Rights.</string>
+    <string name="thanks_msg_upon_uploading_own_video">Thank you for uploading. The video will be LIVE post admin review.</string>
 
 </resources>

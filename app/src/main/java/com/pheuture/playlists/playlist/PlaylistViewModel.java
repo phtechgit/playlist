@@ -7,7 +7,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.R;
+import com.pheuture.playlists.base.BaseAndroidViewModel;
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiDao;
 import com.pheuture.playlists.datasource.local.pending_api.PendingApiEntity;
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
@@ -25,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class PlaylistViewModel extends AndroidViewModel {
+public class PlaylistViewModel extends BaseAndroidViewModel {
     private static final String TAG = PlaylistViewModel.class.getSimpleName();
     private int offset;
     private int limit = 20;
@@ -167,6 +169,8 @@ public class PlaylistViewModel extends AndroidViewModel {
         pendingApiDao.insert(pendingApiEntity);
 
         PendingApiExecutorService.startService(getApplication());
+
+        showSnackBar(playlistEntity.getPlaylistName() + " deleted.", Snackbar.LENGTH_SHORT);
     }
 
     private void removeCreateButton(List<PlaylistEntity> playlistEntities) {

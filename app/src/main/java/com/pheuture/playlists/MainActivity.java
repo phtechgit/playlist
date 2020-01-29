@@ -344,9 +344,11 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
 
     @Override
     public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
-        if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN && bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED){
+        if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN
+                && bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED){
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
+        KeyboardUtils.hideKeyboard(this, binding.getRoot());
     }
 
     @Override

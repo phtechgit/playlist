@@ -14,6 +14,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.pheuture.playlists.base.BaseAndroidViewModel;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler.PendingFileUploadDao;
 import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler.PendingFileUploadEntity;
@@ -35,7 +36,7 @@ import java.util.List;
 
 import static android.provider.MediaStore.Video.Thumbnails.FULL_SCREEN_KIND;
 
-public class UploadViewModel extends AndroidViewModel implements MediaEntity.MediaColumns,
+public class UploadViewModel extends BaseAndroidViewModel implements MediaEntity.MediaColumns,
         PendingFileUploadParamEntity.MediaType {
 
     private static final String TAG = UploadViewModel.class.getSimpleName();

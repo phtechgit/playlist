@@ -25,6 +25,7 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.base.BaseFragment;
+import com.pheuture.playlists.utils.KeyboardUtils;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
 
@@ -57,7 +58,6 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     @Override
     public void initializations() {
         parentViewModel.setTitle(activity.getResources().getString(R.string.trending_title));
-        binding.layoutSearchBar.editTextSearch.setHint(activity.getResources().getString(R.string.trending_search_hint));
 
         recyclerAdapter = new TrendingRecyclerAdapter(this);
         layoutManager = new LinearLayoutManager(activity);
@@ -125,6 +125,7 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
                 .fromJson(objectJsonString, QueueMediaEntity.class);
 
         parentViewModel.setMedia(null, queueMediaEntity, true);
+        KeyboardUtils.hideKeyboard(activity, binding.getRoot());
     }
 
     @Override

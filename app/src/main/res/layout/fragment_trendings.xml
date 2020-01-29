@@ -37,7 +37,7 @@
             android:drawablePadding="8dp"
             android:paddingStart="32dp"
             android:paddingEnd="32dp"
-            android:text="No trending media matched the search criteria..."
+            android:text="No trending media matched with the search criteria."
             android:gravity="center"
             android:layout_marginTop="48dp"
             android:textColor="@color/grayC"

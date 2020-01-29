@@ -65,8 +65,6 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
     public void initializations() {
         parentViewModel.setTitle(getResources().getString(R.string.playlist_title));
 
-        binding.layoutSearchBar.editTextSearch.setHint(getResources().getString(R.string.playlist_search_hint));
-
         recyclerAdapter = new PlaylistsRecyclerAdapter(this);
         layoutManager = new LinearLayoutManager(activity);
 
@@ -188,30 +186,30 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().getAttributes().width = ViewGroup.LayoutParams.MATCH_PARENT;
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialog.setContentView(R.layout.layout_create_playlist);
+        dialog.setContentView(R.layout.layout_alert);
         dialog.show();
 
         TextView textViewTitle = dialog.findViewById(R.id.textView_title);
         TextView textViewSubtitle = dialog.findViewById(R.id.textView_subtitle);
-        EditText editText = dialog.findViewById(R.id.ediText);
         TextView textViewLeft = dialog.findViewById(R.id.textView_left);
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
         textViewTitle.setText(getResources().getString(R.string.are_you_sure));
-        textViewSubtitle.setText(getResources().getString(R.string.do_you_want_to_remove_this_playlist_containing) + " " + model.getSongsCount() + " songs?");
+        textViewSubtitle.setText(getResources().getString(R.string.do_you_want_to_remove_this_playlist_containing) + " " + model.getSongsCount() + " songs.");
         textViewSubtitle.setVisibility(View.VISIBLE);
-        textViewRight.setText(getResources().getString(R.string.remove));
+        textViewRight.setText(getResources().getString(R.string.delete));
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                KeyboardUtils.hideKeyboard(activity, editText);
+                KeyboardUtils.hideKeyboard(activity, binding.getRoot());
             }
         });
+
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                KeyboardUtils.hideKeyboard(activity, editText);
+                KeyboardUtils.hideKeyboard(activity, binding.getRoot());
             }
         });
 
@@ -223,7 +221,6 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
             dialog.dismiss();
             viewModel.deletePlaylist(position, model);
         });
-        /*KeyboardUtils.showKeyboard(activity, editTextPlaylistName);*/
     }
 
     @Override
@@ -247,7 +244,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
         } else {
             showDeletePlaylistDialog(position, model);
         }
-
+        KeyboardUtils.hideKeyboard(activity, binding.getRoot());
     }
 
     @Override

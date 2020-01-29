@@ -28,8 +28,6 @@ import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.ParserUtil;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class MediaFragment extends BaseFragment implements TextWatcher, RecyclerViewClickListener {
@@ -61,8 +59,6 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
     @Override
     public void initializations() {
         parentViewModel.setTitle(playlistModel.getPlaylistName());
-
-        binding.layoutSearchBar.editTextSearch.setHint("Search new Videos");
 
         recyclerAdapter = new MediaRecyclerAdapter(this);
         recyclerAdapter.setHasStableIds(true);

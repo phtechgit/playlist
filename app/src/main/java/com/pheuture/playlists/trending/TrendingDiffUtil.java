@@ -33,16 +33,16 @@ public class TrendingDiffUtil extends DiffUtil.Callback{
         MediaEntity oldModel = oldList.get(oldItemPosition);
         MediaEntity newModel = newList.get(newItemPosition);
 
-        if (contentsDifferent(oldModel.getMediaName(), newModel.getMediaName())){
+        if (contentsDifferent(oldModel.getMediaTitle(), newModel.getMediaTitle())) {
             return false;
         }
-        if (contentsDifferent(oldModel.getMovieName(), newModel.getMediaDescription())){
+        if (contentsDifferent(oldModel.getMovieName(), newModel.getMovieName())) {
             return false;
         }
-        if (contentsDifferent(oldModel.getMediaThumbnail(), newModel.getMediaThumbnail())){
+        if (contentsDifferent(oldModel.getMediaThumbnail(), newModel.getMediaThumbnail())) {
             return false;
         }
-        if (contentsDifferent(String.valueOf(oldModel.getPlayDuration()), String.valueOf(newModel.getPlayDuration()))){
+        if (contentsDifferent(String.valueOf(oldModel.getPlayDuration()), String.valueOf(newModel.getPlayDuration()))) {
             return false;
         }
         return true;
