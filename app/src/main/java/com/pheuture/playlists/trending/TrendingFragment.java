@@ -25,6 +25,7 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.base.BaseFragment;
+import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
 
 import java.util.ArrayList;
@@ -68,7 +69,21 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
             @Override
             public void onChanged(List<MediaEntity> videoEntities) {
                 recyclerAdapter.setData(videoEntities);
-                recyclerAdapter.getFilter().filter(viewModel.getSearchQuery());
+            }
+        });
+
+        recyclerAdapter.getDataCount().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer count) {
+                if (count>0){
+                    binding.textViewEmptySearchResult.setVisibility(View.GONE);
+                    binding.recyclerView.setVisibility(View.VISIBLE);
+                } else {
+                    binding.recyclerView.setVisibility(View.GONE);
+                    if (viewModel.getSearchQuery().length()>0) {
+                        binding.textViewEmptySearchResult.setVisibility(View.VISIBLE);
+                    }
+                }
             }
         });
     }

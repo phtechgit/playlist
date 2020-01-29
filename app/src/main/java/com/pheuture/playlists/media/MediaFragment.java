@@ -76,6 +76,17 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
             @Override
             public void onChanged(List<MediaEntity> videoEntities) {
                 recyclerAdapter.setData(videoEntities);
+
+                if (videoEntities.size()>0){
+                    binding.textViewEmptySearchResult.setVisibility(View.GONE);
+                    binding.recyclerView.setVisibility(View.VISIBLE);
+                } else {
+                    binding.recyclerView.setVisibility(View.GONE);
+                    if (viewModel.getSearchQuery().length()>0) {
+                        binding.textViewEmptySearchResult.setVisibility(View.VISIBLE);
+                    }
+                }
+
             }
         });
     }

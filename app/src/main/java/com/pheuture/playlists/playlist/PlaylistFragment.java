@@ -78,6 +78,13 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
             public void onChanged(List<PlaylistEntity> newPlaylistEntities) {
                 playlistEntities = newPlaylistEntities;
                 recyclerAdapter.setData(playlistEntities);
+                if (newPlaylistEntities.size()>0){
+                    binding.textViewEmptySearchResult.setVisibility(View.GONE);
+                    binding.recyclerView.setVisibility(View.VISIBLE);
+                } else {
+                    binding.recyclerView.setVisibility(View.GONE);
+                    binding.textViewEmptySearchResult.setVisibility(View.VISIBLE);
+                }
             }
         });
     }

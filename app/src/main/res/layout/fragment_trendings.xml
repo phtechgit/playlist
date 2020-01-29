@@ -30,6 +30,23 @@
             app:layout_constraintTop_toBottomOf="@+id/layout_search_bar"
             tools:listitem="@layout/item_playlist" />
 
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/textView_empty_search_result"
+            android:drawableTop="@drawable/ic_video_library_dark"
+            android:drawablePadding="8dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="No trending media matched the search criteria..."
+            android:gravity="center"
+            android:layout_marginTop="48dp"
+            android:textColor="@color/grayC"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_search_bar"/>
+
         <include
             android:id="@+id/progress_layout"
             layout="@layout/layout_progress_bar_full_screen"

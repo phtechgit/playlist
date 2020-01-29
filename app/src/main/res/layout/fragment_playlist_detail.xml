@@ -100,7 +100,7 @@
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:src="@drawable/ic_shuffle_grey"
+                android:src="@drawable/ic_shuffle_dark"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintEnd_toStartOf="@+id/imageView_add_new_song"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -162,34 +162,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
-        <LinearLayout
+        <TextView
             android:visibility="gone"
-            android:id="@+id/linearLayout_empty"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="vertical"
+            android:id="@+id/textView_empty_search_result"
+            android:drawableTop="@drawable/ic_video_library_dark"
+            android:drawablePadding="8dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="Looks like you haven't added any video to this playlist yet"
             android:gravity="center"
-            app:layout_constraintTop_toTopOf="@+id/recyclerView"
-            app:layout_constraintStart_toStartOf="@+id/recyclerView"
-            app:layout_constraintEnd_toEndOf="@+id/recyclerView"
-            app:layout_constraintBottom_toBottomOf="@+id/recyclerView">
-
-            <ImageView
-                android:src="@drawable/ic_video_library_dark"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:paddingStart="32dp"
-                android:paddingEnd="32dp"
-                android:gravity="center"
-                android:textColor="@color/grayC"
-                android:textSize="@dimen/textSizeCaption"
-                android:text="looks like you haven't added any song to this playlist."
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-        </LinearLayout>
+            android:textSize="@dimen/textSizeBody2"
+            android:layout_marginTop="48dp"
+            android:textColor="@color/grayC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

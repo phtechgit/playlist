@@ -20,6 +20,7 @@ import com.pheuture.playlists.base.BaseActivity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.queue.MediaQueueRecyclerAdapter;
 import com.pheuture.playlists.receiver.ConnectivityChangeReceiver;
+import com.pheuture.playlists.utils.KeyboardUtils;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.RecyclerItemMoveCallback;
 import androidx.annotation.NonNull;
@@ -390,6 +391,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             return;
         }
+        KeyboardUtils.hideKeyboard(this, binding.getRoot());
         super.onBackPressed();
     }
 

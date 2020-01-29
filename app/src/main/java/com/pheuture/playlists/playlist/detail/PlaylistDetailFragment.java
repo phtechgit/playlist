@@ -87,7 +87,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         TextView textViewRight = dialog.findViewById(R.id.textView_right);
 
         textViewTitle.setText(getResources().getString(R.string.are_you_sure));
-        textViewSubtitle.setText(getResources().getString(R.string.do_you_want_to_remove_this_playlist_containing) + playlistMediaEntities.size() + " songs?");
+        textViewSubtitle.setText(getResources().getString(R.string.do_you_want_to_remove_this_playlist_containing) + " " + playlistMediaEntities.size() + " songs?");
         textViewSubtitle.setVisibility(View.VISIBLE);
         textViewRight.setText(getResources().getString(R.string.remove));
 
@@ -155,14 +155,16 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
                     if (newPlaylistMediaEntities.size()>2) {
                         binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_light);
                     } else {
-                        binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_grey);
+                        binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_dark);
                     }
 
-                    binding.linearLayoutEmpty.setVisibility(View.GONE);
+                    binding.textViewEmptySearchResult.setVisibility(View.GONE);
+                    binding.recyclerView.setVisibility(View.VISIBLE);
                 } else {
                     binding.imageViewPlay.setImageResource(R.drawable.ic_play_circular_grey);
-                    binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_grey);
-                    binding.linearLayoutEmpty.setVisibility(View.VISIBLE);
+                    binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_dark);
+                    binding.recyclerView.setVisibility(View.GONE);
+                    binding.textViewEmptySearchResult.setVisibility(View.VISIBLE);
                 }
 
                 boolean downloadPlaylistMedia = SharedPrefsUtils.getBooleanPreference(activity,

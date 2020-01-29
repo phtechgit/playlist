@@ -63,6 +63,22 @@
                 android:scrollbars="vertical"
                 tools:listitem="@layout/item_playlist"/>
 
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/textView_empty_search_result"
+                android:layout_below="@+id/layout_search_bar"
+                android:drawableTop="@drawable/ic_video_library_dark"
+                android:drawablePadding="8dp"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
+                android:text="No playlist matched the search criteria..."
+                android:gravity="center"
+                android:layout_marginTop="48dp"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/grayC"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
         </RelativeLayout>
 
         <include

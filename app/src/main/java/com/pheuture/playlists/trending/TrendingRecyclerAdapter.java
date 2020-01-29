@@ -10,6 +10,8 @@ import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,10 +31,12 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     private List<MediaEntity> masterList;
     private List<MediaEntity> filteredList;
     private RecyclerViewClickListener recyclerViewClickListener;
+    private MutableLiveData<Integer> dataCount;
 
     TrendingRecyclerAdapter(TrendingFragment context) {
         this.mContext = context.getContext();
         this.recyclerViewClickListener = context;
+        dataCount = new MutableLiveData<>();
     }
 
     @NonNull
@@ -58,6 +62,11 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         masterList = new ArrayList<>(newList);
         filteredList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
+        dataCount.postValue(filteredList.size());
+    }
+
+    public LiveData<Integer> getDataCount() {
+        return dataCount;
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -126,6 +135,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                 DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TrendingDiffUtil(filteredList, newList), true);
                 filteredList = new ArrayList<>(newList);
                 diffResult.dispatchUpdatesTo(TrendingRecyclerAdapter.this);
+                dataCount.postValue(filteredList.size());
             }
         };
     }
