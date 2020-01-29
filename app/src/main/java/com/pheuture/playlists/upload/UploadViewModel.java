@@ -21,14 +21,13 @@ import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_h
 import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.service.PendingFileUploadService;
-import com.pheuture.playlists.interfaces.ApiConstant;
-import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.constants.ApiConstant;
+import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.utils.FileUtils;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.RealPathUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
-import com.pheuture.playlists.utils.Url;
+import com.pheuture.playlists.constants.Url;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -75,17 +74,19 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
         pendingFileUploadEntity.setTitle(title);
         pendingFileUploadEntity.setUrl(Url.MEDIA_UPLOAD);
 
-        File thumbnailFile = new File(FileUtils.getPath(getApplication(), thumbnailUriLiveData.getValue()));
-        long totalFileSize = FileUtils.getSize(getApplication(), mediaUriLiveData.getValue()) + thumbnailFile.length();
+        File thumbnailFile = new File(FileUtils.getRealPathFromURI(getApplication(),
+                thumbnailUriLiveData.getValue()));
+        long totalFileSize = new File(FileUtils.getRealPathFromURI(getApplication(),
+                mediaUriLiveData.getValue())).length() + thumbnailFile.length();
 
         pendingFileUploadEntity.setSize(totalFileSize);
         Logger.e(TAG, "totalFileSize: " + totalFileSize);
 
         List<PendingFileUploadParamEntity> paramEntities = new ArrayList<>();
         paramEntities.add(new PendingFileUploadParamEntity(FILE, "videofile",
-                RealPathUtil.getRealPath(getApplication(), mediaUriLiveData.getValue()), "video/*"));
+                FileUtils.getRealPathFromURI(getApplication(), mediaUriLiveData.getValue()), "video/*"));
         paramEntities.add(new PendingFileUploadParamEntity(FILE, "videoThumbnail",
-                RealPathUtil.getRealPath(getApplication(), thumbnailUriLiveData.getValue()), "image/*"));
+                FileUtils.getRealPathFromURI(getApplication(), thumbnailUriLiveData.getValue()), "image/*"));
         paramEntities.add(new PendingFileUploadParamEntity(OTHER, MEDIA_TITLE, title, null));
         paramEntities.add(new PendingFileUploadParamEntity(OTHER, MEDIA_DESCRIPTION, description, null));
         paramEntities.add(new PendingFileUploadParamEntity(OTHER, PLAY_DURATION, String.valueOf(getExoPlayer().getDuration()), null));
@@ -114,7 +115,8 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     File videoFile = null;
                     try {
-                        videoFile = new File(RealPathUtil.getRealPath(getApplication(), mediaUriLiveData.getValue()));
+                        videoFile = new File(FileUtils.getRealPathFromURI(getApplication(),
+                                mediaUriLiveData.getValue()));
                     } catch (Exception e) {
                         Logger.e(TAG, e.toString());
                     }
@@ -127,8 +129,8 @@ public class UploadViewModel extends AndroidViewModel implements MediaEntity.Med
                             new Size(640, 360), null);
                 } else {
                     bitmap = ThumbnailUtils.createVideoThumbnail(
-                            RealPathUtil.getRealPath(getApplication(), mediaUriLiveData.getValue()),
-                            FULL_SCREEN_KIND);
+                            FileUtils.getRealPathFromURI(getApplication(),
+                                    mediaUriLiveData.getValue()), FULL_SCREEN_KIND);
                 }
             } catch (Exception e) {
                 Logger.e(TAG, e.toString());

@@ -7,7 +7,7 @@ import android.provider.Settings;
 
 import com.pheuture.playlists.service.PendingApiExecutorService;
 
-public class NetworkUtils {
+public final class NetworkUtils {
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
     public static boolean online(Context context) {

@@ -17,7 +17,7 @@ import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemMediaBinding;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
-import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -29,7 +29,6 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     private List<MediaEntity> masterList;
     private List<MediaEntity> filteredList;
     private RecyclerViewClickListener recyclerViewClickListener;
-    private int playerPosition = RecyclerView.NO_POSITION;
 
     TrendingRecyclerAdapter(TrendingFragment context) {
         this.mContext = context.getContext();
@@ -47,7 +46,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder recyclerHOlder, int position) {
         MyViewHolder holder = (MyViewHolder) recyclerHOlder;
 
-        MediaEntity model = masterList.get(position);
+        MediaEntity model = filteredList.get(position);
         holder.binding.setMediaTitle(model.getMediaTitle());
         holder.binding.setMediaDescription(model.getMovieName());
         holder.binding.setMediaThumbnail(model.getMediaThumbnail());
@@ -55,71 +54,10 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     void setData(List<MediaEntity> newList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TrendingDiffUtil(filteredList, newList), true);
         masterList = new ArrayList<>(newList);
-    }
-
-    class DiffCallBack extends DiffUtil.Callback{
-        private List<MediaEntity> oldList;
-        private List<MediaEntity> newList;
-
-        public DiffCallBack(List<MediaEntity> oldList, List<MediaEntity> newList) {
-            this.oldList = oldList;
-            this.newList = newList;
-        }
-
-        @Override
-        public int getOldListSize() {
-            return oldList == null ? 0 : oldList.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-            return newList == null ? 0 : newList.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).getMediaID() == newList.get(newItemPosition).getMediaID();
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            MediaEntity oldModel = oldList.get(oldItemPosition);
-            MediaEntity newModel = newList.get(newItemPosition);
-
-            if (contentsDifferent(oldModel.getMediaName(), newModel.getMediaName())){
-                return false;
-            }
-            if (contentsDifferent(oldModel.getMediaDescription(), newModel.getMediaDescription())){
-                return false;
-            }
-            if (contentsDifferent(oldModel.getMediaThumbnail(), newModel.getMediaThumbnail())){
-                return false;
-            }
-            if (contentsDifferent(oldModel.getMediaUrl(), newModel.getMediaUrl())){
-                return false;
-            }
-            if (contentsDifferent(String.valueOf(oldModel.getPostDate()), String.valueOf(newModel.getPostDate()))){
-                return false;
-            }
-            if (contentsDifferent(String.valueOf(oldModel.getStatus()), String.valueOf(newModel.getStatus()))){
-                return false;
-            }
-            return true;
-        }
-    }
-
-    private boolean contentsDifferent(String oldData, String newData) {
-        if (oldData == null && newData != null){
-            return false;
-        }
-        if (oldData != null && newData == null){
-            return false;
-        }
-        if (oldData == null){
-            return false;
-        }
-        return !oldData.equals(newData);
+        filteredList = new ArrayList<>(newList);
+        diffResult.dispatchUpdatesTo(this);
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -158,20 +96,20 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
-                String charString = charSequence.toString();
+                String searchString = charSequence.toString().toLowerCase();
 
                 List<MediaEntity> newFilteredList = new ArrayList<>();
 
-                if (charString.isEmpty()) {
+                if (searchString.isEmpty()) {
                     newFilteredList.addAll(masterList);
 
                 } else {
                     for (int i = 0; i < masterList.size(); i++) {
                         MediaEntity row = masterList.get(i);
 
-                        if (!StringUtils.isEmpty(row.getMediaTitle()) && row.getMediaTitle().toLowerCase().contains(charString.toLowerCase())) {
+                        if (!StringUtils.isEmpty(row.getMediaTitle()) && row.getMediaTitle().toLowerCase().contains(searchString)) {
                             newFilteredList.add(row);
-                        } else if (!StringUtils.isEmpty(row.getMediaDescription()) && row.getMediaDescription().toLowerCase().contains(charString.toLowerCase())) {
+                        } else if (!StringUtils.isEmpty(row.getMovieName()) && row.getMovieName().toLowerCase().contains(searchString)) {
                             newFilteredList.add(row);
                         }
                     }
@@ -185,9 +123,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 List<MediaEntity> newList = (ArrayList<MediaEntity>) filterResults.values;
-
-                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(filteredList, newList),
-                        false);
+                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new TrendingDiffUtil(filteredList, newList), true);
                 filteredList = new ArrayList<>(newList);
                 diffResult.dispatchUpdatesTo(TrendingRecyclerAdapter.this);
             }

@@ -32,7 +32,7 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.base.BaseFragment;
-import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.utils.KeyboardUtils;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
@@ -145,25 +145,28 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         viewModel.getPlaylistMediaEntitiesMutableLiveData().observe(this, new Observer<List<PlaylistMediaEntity>>() {
             @Override
-            public void onChanged(List<PlaylistMediaEntity> newPalylistMediaEntities) {
-                playlistMediaEntities = newPalylistMediaEntities;
+            public void onChanged(List<PlaylistMediaEntity> newPlaylistMediaEntities) {
+                playlistMediaEntities = newPlaylistMediaEntities;
                 recyclerAdapter.setData(playlistMediaEntities);
 
                 //show/hide play pause button
-                if (newPalylistMediaEntities.size()>0){
+                if (newPlaylistMediaEntities.size()>0){
                     binding.imageViewPlay.setImageResource(R.drawable.ic_play_circular_white);
-                    if (newPalylistMediaEntities.size()>2) {
+                    if (newPlaylistMediaEntities.size()>2) {
                         binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_light);
                     } else {
                         binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_grey);
                     }
+
+                    binding.linearLayoutEmpty.setVisibility(View.GONE);
                 } else {
                     binding.imageViewPlay.setImageResource(R.drawable.ic_play_circular_grey);
                     binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_grey);
+                    binding.linearLayoutEmpty.setVisibility(View.VISIBLE);
                 }
 
                 boolean downloadPlaylistMedia = SharedPrefsUtils.getBooleanPreference(activity,
-                        Constants.DOWNLOAD_PLAYLIST_MEDIA, false);
+                        Constants.DOWNLOAD_PLAYLIST_MEDIA, DOWNLOAD_PLAYLIST_MEDIA_DEFAULT);
 
                 if (downloadPlaylistMedia) {
                     viewModel.addToOfflineMedia(playlistMediaEntities);

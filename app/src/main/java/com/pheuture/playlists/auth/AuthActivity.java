@@ -1,5 +1,6 @@
 package com.pheuture.playlists.auth;
 
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -7,6 +8,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
+import android.os.Bundle;
 import android.view.View;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ActivityAuthBinding;
@@ -19,7 +22,9 @@ public class AuthActivity extends BaseActivity {
     private AuthViewModel viewModel;
 
     @Override
-    public void initializations() {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_auth);
         viewModel = ViewModelProviders.of(this).get(AuthViewModel.class);
 
@@ -52,7 +57,8 @@ public class AuthActivity extends BaseActivity {
     }
 
     @Override
-    public void setListeners() {
+    protected void onStart() {
+        super.onStart();
         binding.fab.setOnClickListener(this);
     }
 

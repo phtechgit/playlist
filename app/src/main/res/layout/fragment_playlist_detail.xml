@@ -25,17 +25,16 @@
             android:paddingBottom="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:context=".playlist.detail.PlaylistDetailFragment">
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/textView_title"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:gravity="center"
-                android:text="@{model.playlistName}"
                 android:textSize="@dimen/textSizeHeadline4"
                 android:textStyle="bold"
+                android:text="@{model.playlistName}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
@@ -44,11 +43,10 @@
                 android:id="@+id/textView_creator"
                 android:layout_width="0dp"
                 android:layout_height="24dp"
-                android:textColorHint="@color/grayB"
-                android:textColor="@color/grayC"
-                android:text="@{model.createdByFormatted}"
                 android:gravity="center"
                 android:textSize="@dimen/textSizeBody2"
+                android:textColor="@color/grayC"
+                android:text="@{model.createdByFormatted}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView_title" />
@@ -58,15 +56,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/edittext_bg_gray"
-                android:drawableTint="@color/grayE"
                 android:paddingStart="8dp"
                 android:paddingTop="2dp"
                 android:paddingEnd="8dp"
                 android:paddingBottom="2dp"
-                android:text="@{model.songsCountWithFormattedTotalPlaybackTime}"
                 android:textColor="@color/grayB"
-                android:textColorHint="@color/grayB"
+                android:text="@{model.songsCountWithFormattedTotalPlaybackTime}"
+                android:background="@drawable/edittext_bg_gray"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView_creator" />
@@ -78,9 +74,8 @@
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:background="@color/grayF"
                 android:src="@drawable/ic_play_circular_grey"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintEnd_toStartOf="@+id/imageView_shuffle"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
@@ -105,9 +100,8 @@
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:background="@color/grayF"
                 android:src="@drawable/ic_shuffle_grey"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintEnd_toStartOf="@+id/imageView_add_new_song"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/imageView_play"
@@ -118,9 +112,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:layout_margin="4dp"
-                android:text="SHUFFLE PLAY"
                 android:textColor="@color/grayB"
                 android:textSize="@dimen/textSizeCaption"
+                android:text="SHUFFLE PLAY"
                 app:layout_constraintEnd_toEndOf="@+id/imageView_shuffle"
                 app:layout_constraintStart_toStartOf="@+id/imageView_shuffle"
                 app:layout_constraintTop_toBottomOf="@+id/imageView_shuffle" />
@@ -132,9 +126,8 @@
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:background="@color/grayF"
                 android:src="@drawable/ic_add_light"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/imageView_shuffle"
@@ -145,9 +138,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:layout_margin="4dp"
-                android:text="ADD"
                 android:textColor="@color/grayB"
                 android:textSize="@dimen/textSizeCaption"
+                android:text="ADD"
                 app:layout_constraintEnd_toEndOf="@+id/imageView_add_new_song"
                 app:layout_constraintStart_toStartOf="@+id/imageView_add_new_song"
                 app:layout_constraintTop_toBottomOf="@+id/imageView_add_new_song" />
@@ -163,10 +156,40 @@
             android:paddingBottom="120dp"
             android:scrollbarStyle="insideOverlay"
             android:scrollbars="vertical"
+            tools:listitem="@layout/item_media"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/linearLayout_empty"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="@+id/recyclerView"
+            app:layout_constraintStart_toStartOf="@+id/recyclerView"
+            app:layout_constraintEnd_toEndOf="@+id/recyclerView"
+            app:layout_constraintBottom_toBottomOf="@+id/recyclerView">
+
+            <ImageView
+                android:src="@drawable/ic_video_library_dark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
+                android:gravity="center"
+                android:textColor="@color/grayC"
+                android:textSize="@dimen/textSizeCaption"
+                android:text="looks like you haven't added any song to this playlist."
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

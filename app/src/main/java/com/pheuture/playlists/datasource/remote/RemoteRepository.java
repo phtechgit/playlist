@@ -2,7 +2,7 @@ package com.pheuture.playlists.datasource.remote;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.pheuture.playlists.utils.Url;
+import com.pheuture.playlists.constants.Url;
 
 import java.util.concurrent.TimeUnit;
 

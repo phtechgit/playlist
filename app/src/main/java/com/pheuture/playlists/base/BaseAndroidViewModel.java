@@ -9,10 +9,11 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.pheuture.playlists.utils.Constants;
-import com.pheuture.playlists.interfaces.NotificationID;
+import com.pheuture.playlists.constants.Constants;
+import com.pheuture.playlists.constants.DefaultValues;
+import com.pheuture.playlists.constants.NotificationID;
 
-public class BaseAndroidViewModel extends AndroidViewModel implements NotificationID,
+public class BaseAndroidViewModel extends AndroidViewModel implements DefaultValues, NotificationID,
         Constants.SnackBarActions {
 
     private MutableLiveData<Bundle> snackBarBundleMutableLiveData;

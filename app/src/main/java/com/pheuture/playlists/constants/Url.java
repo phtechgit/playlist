@@ -1,4 +1,4 @@
-package com.pheuture.playlists.utils;
+package com.pheuture.playlists.constants;
 
 public final class Url {
     private Url() {

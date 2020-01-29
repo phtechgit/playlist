@@ -16,10 +16,10 @@ import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
 import com.pheuture.playlists.service.PendingApiExecutorService;
-import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
-import com.pheuture.playlists.utils.Url;
+import com.pheuture.playlists.constants.Url;
 
 import java.util.ArrayList;
 import java.util.Calendar;

@@ -10,7 +10,7 @@ public class MediaQueueDiffUtil extends DiffUtil.Callback {
     private List<QueueMediaEntity> oldList;
     private List<QueueMediaEntity> newList;
 
-    public MediaQueueDiffUtil(List<QueueMediaEntity> oldList, List<QueueMediaEntity> newList) {
+    MediaQueueDiffUtil(List<QueueMediaEntity> oldList, List<QueueMediaEntity> newList) {
         this.oldList = oldList;
         this.newList = newList;
     }

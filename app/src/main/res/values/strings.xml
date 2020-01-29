@@ -58,5 +58,6 @@
     <string name="playlist_already_present_with_same_name">Playlist already present with same name!</string>
     <string name="do_you_want_to_remove_this_playlist_containing">Do you want to remove this playlist containing </string>
     <string name="create_playlist">Create playlist</string>
+    <string name="ok">Ok</string>
 
 </resources>

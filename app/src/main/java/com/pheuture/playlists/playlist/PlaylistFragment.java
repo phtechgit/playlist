@@ -113,7 +113,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
 
         textViewTitle.setText(activity.getResources().getString(R.string.give_your_playlist_a_name));
 
-        editText.setHint("My playlist #" + (playlistEntities.size() + 1));
+        editText.setHint("My playlist #" + (playlistEntities.size()));
         editText.setFilters(new InputFilter[]{new EditTextInputFilter()});
         editText.setVisibility(View.VISIBLE);
         textViewRight.setText(activity.getResources().getString(R.string.create));

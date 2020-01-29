@@ -4,7 +4,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import com.android.volley.AuthFailureError;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -19,12 +19,12 @@ import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_h
 import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.service.PendingApiExecutorService;
-import com.pheuture.playlists.interfaces.ApiConstant;
-import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.constants.ApiConstant;
+import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
-import com.pheuture.playlists.utils.Url;
+import com.pheuture.playlists.constants.Url;
 import com.pheuture.playlists.utils.VolleyClient;
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -12,7 +12,7 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 
-public class VolleyClient {
+public final class VolleyClient {
     private static final String TAG = VolleyClient.class.getSimpleName();
     private static RequestQueue mRequestQueue;
 

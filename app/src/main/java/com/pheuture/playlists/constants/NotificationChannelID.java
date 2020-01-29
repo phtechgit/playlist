@@ -1,4 +1,4 @@
-package com.pheuture.playlists.interfaces;
+package com.pheuture.playlists.constants;
 
 /**
  * creator: Shashank

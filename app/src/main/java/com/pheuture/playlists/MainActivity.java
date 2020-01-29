@@ -33,13 +33,12 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
-import static com.pheuture.playlists.utils.Constants.PlayerRepeatModes.REPEAT_MODE_ALL;
-import static com.pheuture.playlists.utils.Constants.PlayerRepeatModes.REPEAT_MODE_OFF;
-import static com.pheuture.playlists.utils.Constants.PlayerRepeatModes.REPEAT_MODE_ONE;
+import static com.pheuture.playlists.constants.Constants.PlayerRepeatModes.REPEAT_MODE_ALL;
+import static com.pheuture.playlists.constants.Constants.PlayerRepeatModes.REPEAT_MODE_OFF;
+import static com.pheuture.playlists.constants.Constants.PlayerRepeatModes.REPEAT_MODE_ONE;
 
 public class MainActivity extends BaseActivity implements NavController.OnDestinationChangedListener,
         RecyclerViewClickListener, MediaQueueRecyclerAdapter.ClickType,
@@ -79,7 +78,8 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     }
 
     @Override
-    public void initializations() {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
@@ -87,7 +87,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
 
         setupConnectivityChangeBroadcastReceiver();
 
-        proceedWithPermissions(null, true);
+        proceedWithPermissions(REQUEST_CODE_GRANT_PERMISSIONS,READ_WRITE_EXTERNAL_STORAGE_PERMISSION, null, true);
 
         bottomSheetBehavior = BottomSheetBehavior.from( binding.layoutBottomSheet.constraintLayoutBottomSheet);
         bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
@@ -214,7 +214,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             @Override
             public void onChanged(Boolean show) {
                 if (show){
-                   binding.layoutAppBar.toolbar.setVisibility(View.VISIBLE);
+                    binding.layoutAppBar.toolbar.setVisibility(View.VISIBLE);
                 } else {
                     binding.layoutAppBar.toolbar.setVisibility(View.GONE);
                 }
@@ -234,7 +234,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                 Logger.e(TAG, "state_ended");
                 binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
                 binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
-                binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+                binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(R.drawable.exo_icon_play));
                 break;
             case Player.STATE_READY:
                 if (playWhenReady) {
@@ -242,20 +242,20 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                     // media actually playing
                     binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
                     binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
-                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
+                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(R.drawable.exo_icon_pause));
                 } else {
                     Logger.e(TAG, "state_ready_paused");
                     // player paused in any state
                     binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
                     binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
-                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(R.drawable.exo_icon_play));
                 }
                 break;
             case Player.STATE_IDLE:
                 Logger.e(TAG, "state_idle");
                 binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
                 binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
-                binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+                binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(R.drawable.exo_icon_play));
                 break;
             default:
                 break;
@@ -263,7 +263,8 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     }
 
     @Override
-    public void setListeners() {
+    protected void onStart() {
+        super.onStart();
         binding.layoutBottomSheet.imageViewTogglePlay.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewNext.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewClose.setOnClickListener(this);
@@ -355,16 +356,17 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     @Override
     public void onRecyclerViewHolderClick(Bundle bundle) {
         int position = bundle.getInt(ARG_PARAM1, -1);
-        int type = bundle.getInt(ARG_PARAM2, 1);
+        int clickType = bundle.getInt(ARG_PARAM2, 1);
         QueueMediaEntity queueMediaEntity = bundle.getParcelable(ARG_PARAM3);
 
-        if (type == SELECT) {
+        if (clickType == SELECT) {
             viewModel.setMedia(viewModel.getPlaylistMutableLiveData().getValue(), queueMediaEntity, false);
-        } else if (type == REMOVE){
+
+        } else if (clickType == REMOVE){
             if (queueMediaEntity != null) {
                 viewModel.removeQueueMedia(queueMediaEntity);
             }
-        } else if (type == DRAG) {
+        } else if (clickType == DRAG) {
             Logger.e(TAG, "drag started");
             itemTouchHelper.startDrag(binding.layoutBottomSheet.recyclerViewMediaQueue.findViewHolderForLayoutPosition(position));
         }
@@ -378,7 +380,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        proceedWithPermissions(null, true);
+        proceedWithPermissions(REQUEST_CODE_GRANT_PERMISSIONS,READ_WRITE_EXTERNAL_STORAGE_PERMISSION, null, true);
     }
 
     @Override

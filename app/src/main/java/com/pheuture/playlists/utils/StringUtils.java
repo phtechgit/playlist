@@ -6,7 +6,7 @@ import android.text.TextUtils;
  * creator: Shashank
  * date: 27-Dec-18.
  */
-public class StringUtils {
+public final class StringUtils {
 
     private StringUtils() {
         throw new IllegalStateException("utility class should not be instantiated ");

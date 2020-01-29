@@ -22,15 +22,16 @@ import androidx.lifecycle.ViewModelProviders;
 import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.MainActivityViewModel;
 import com.pheuture.playlists.R;
+import com.pheuture.playlists.constants.DefaultValues;
 import com.pheuture.playlists.databinding.FragmentSettingsBinding;
 import com.pheuture.playlists.upload.UploadActivity;
 import com.pheuture.playlists.base.BaseFragment;
-import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.utils.KeyboardUtils;
 import com.pheuture.playlists.utils.SharedPrefsUtils;
 
 public class SettingsFragment extends BaseFragment implements
-        CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener, Constants.DefaultValues {
+        CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener, DefaultValues {
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
     private MainActivityViewModel parentViewModel;
@@ -72,7 +73,6 @@ public class SettingsFragment extends BaseFragment implements
         binding.switchDownloadWhileRoaming.setChecked(downloadWhileRoamingStatus);
         binding.seekBarCrossFade.setProgress(crossFadeValue);
         binding.textViewSeekProgress.setText(crossFadeValue + " s");
-
     }
 
     @Override

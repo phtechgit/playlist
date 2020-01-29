@@ -1,5 +1,6 @@
 package com.pheuture.playlists.upload;
 
+import androidx.annotation.Nullable;
 import  androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -8,6 +9,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +23,6 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ActivityUploadBinding;
 import com.pheuture.playlists.base.BaseActivity;
-import com.pheuture.playlists.interfaces.RequestCodes;
 
 public class UploadActivity extends BaseActivity{
     private static final String TAG = UploadActivity.class.getSimpleName();
@@ -41,7 +42,8 @@ public class UploadActivity extends BaseActivity{
     }
 
     @Override
-    public void initializations() {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_upload);
 
         viewModel = ViewModelProviders.of(this,
@@ -78,7 +80,8 @@ public class UploadActivity extends BaseActivity{
     }
 
     @Override
-    public void setListeners() {
+    protected void onStart() {
+        super.onStart();
         binding.imageViewThumbnail.setOnClickListener(this);
         binding.buttonSubmit.setOnClickListener(this);
     }
@@ -95,7 +98,7 @@ public class UploadActivity extends BaseActivity{
                     }
                 }
             };
-            proceedWithPermissions(runnable, false);
+            proceedWithPermissions(REQUEST_CODE_GRANT_PERMISSIONS,READ_WRITE_EXTERNAL_STORAGE_PERMISSION, runnable, false);
 
         } else if (v.equals(binding.buttonSubmit)){
             if (TextUtils.getTrimmedLength(binding.ediTextTitle.getText().toString()) == 0){
@@ -115,7 +118,7 @@ public class UploadActivity extends BaseActivity{
                     onBackPressed();
                 }
             };
-            proceedWithPermissions(runnable, false);
+            proceedWithPermissions(REQUEST_CODE_GRANT_PERMISSIONS,READ_WRITE_EXTERNAL_STORAGE_PERMISSION, runnable, false);
         }
     }
 
@@ -145,4 +148,5 @@ public class UploadActivity extends BaseActivity{
             exoPlayer.release();
         }
     }
+
 }

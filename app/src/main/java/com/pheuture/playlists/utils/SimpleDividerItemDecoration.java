@@ -4,11 +4,13 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.View;
-import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
+import com.pheuture.playlists.constants.Constants;
+
+public final class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
 
     private Drawable mDivider;
     private int leftPadding = 0;

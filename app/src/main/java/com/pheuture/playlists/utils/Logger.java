@@ -12,7 +12,7 @@ import java.util.Calendar;
  * creator: Shashank
  * date: 27-Dec-18.
  */
-public class Logger {
+public final class Logger {
 
     private Logger() {
         throw new IllegalStateException("utility class should not be instantiated ");

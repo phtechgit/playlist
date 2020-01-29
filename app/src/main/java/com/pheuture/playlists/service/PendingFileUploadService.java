@@ -24,12 +24,12 @@ import com.pheuture.playlists.datasource.remote.ProgressRequestBody;
 import com.pheuture.playlists.datasource.remote.RemoteRepository;
 import com.pheuture.playlists.datasource.remote.ResponseModel;
 import com.pheuture.playlists.receiver.NotificationActionReceiver;
-import com.pheuture.playlists.interfaces.ApiConstant;
+import com.pheuture.playlists.constants.ApiConstant;
 import com.pheuture.playlists.utils.FileUtils;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.NetworkUtils;
-import com.pheuture.playlists.interfaces.NotificationChannelID;
-import com.pheuture.playlists.interfaces.NotificationID;
+import com.pheuture.playlists.constants.NotificationChannelID;
+import com.pheuture.playlists.constants.NotificationID;
 import com.pheuture.playlists.utils.ParserUtil;
 
 import org.jetbrains.annotations.NotNull;

@@ -1,5 +1,6 @@
 package com.pheuture.playlists.utils;
 
+import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -10,18 +11,19 @@ import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import java.text.DecimalFormat;
 
-public class FileUtils {
-    private static final String fileAuthority = "com.example.dgnc.testproject.provider";
-    //private static final String fileAuthority = "com.erp.test_app.provider";
+public final class FileUtils {
 
-    public static final String UNKNOWN_FILE_PATH = "";
-
-    public static String getFileAuthority() {
-        return fileAuthority;
-    }
-
-    public static String getPath(final Context context, Uri uri) {
-
+    /**
+     * Get a file path from a Uri. This will get the the path for Storage Access
+     * Framework Documents, as well as the _data field for the MediaStore and
+     * other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri     The Uri to query.
+     * @author paulburke
+     */
+    @SuppressLint("NewApi")
+    public static String getRealPathFromURI(final Context context, final Uri uri) {
         // DocumentProvider
         if (DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
@@ -67,47 +69,30 @@ public class FileUtils {
 
                 return getDataColumn(context, contentUri, selection, selectionArgs);
             }
-        }else if ("content".equalsIgnoreCase(uri.getScheme())) {
+
+            else if (isGoogleDriveDocument(uri)) {
+                return uri.getEncodedPath();
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+
+            // Return the remote address
+            if (isGooglePhotosUri(uri))
+                return uri.getLastPathSegment();
+
             return getDataColumn(context, uri, null, null);
-        }else if ("file".equalsIgnoreCase(uri.getScheme())) {
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();
-
-        }return UNKNOWN_FILE_PATH;
-    }
-
-    public static String getMIME(Context context, Uri uri) {
-        return context.getContentResolver().getType(uri);
-    }
-
-    public static String getName(Context context, Uri uri) {
-        String fileName = null;
-        try (Cursor cursor = context.getContentResolver()
-                .query(uri, null, null, null, null, null)) {
-            if (cursor != null && cursor.moveToFirst()) {
-                // get file name
-                fileName = cursor.getString(
-                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                cursor.close();
-            }
         }
-        return fileName;
+
+        return null;
     }
 
-    public static long getSize(Context context, Uri uri) {
-        long fileSize = 0;
-        try (Cursor cursor = context.getContentResolver()
-                .query(uri, null, null, null, null, null)) {
-            if (cursor != null && cursor.moveToFirst()) {
-
-                // get file size
-                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
-                if (!cursor.isNull(sizeIndex)) {
-                    fileSize = cursor.getLong(sizeIndex);
-                }
-                cursor.close();
-            }
-        }
-        return fileSize;
+    private static boolean isGoogleDriveDocument(Uri uri) {
+        return "com.google.android.apps.docs.storage".equals(uri.getAuthority());
     }
 
     /**
@@ -120,29 +105,33 @@ public class FileUtils {
      * @param selectionArgs (Optional) Selection arguments used in the query.
      * @return The value of the _data column, which is typically a file path.
      */
-    private static String getDataColumn(Context context, Uri uri, String selection,
-                                        String[] selectionArgs) {
-
+    public static String getDataColumn(Context context, Uri uri, String selection,
+                                       String[] selectionArgs) {
+        Cursor cursor = null;
         final String column = "_data";
         final String[] projection = {
                 column
         };
-        try (Cursor cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
-                null)) {
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
             if (cursor != null && cursor.moveToFirst()) {
-                final int column_index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(column_index);
+                final int index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(index);
             }
+        } finally {
+            if (cursor != null)
+                cursor.close();
         }
         return null;
     }
-
 
     /**
      * @param uri The Uri to check.
      * @return Whether the Uri authority is ExternalStorageProvider.
      */
-    private static boolean isExternalStorageDocument(Uri uri) {
+    public static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
@@ -150,7 +139,7 @@ public class FileUtils {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is DownloadsProvider.
      */
-    private static boolean isDownloadsDocument(Uri uri) {
+    public static boolean isDownloadsDocument(Uri uri) {
         return "com.android.providers.downloads.documents".equals(uri.getAuthority());
     }
 
@@ -158,8 +147,16 @@ public class FileUtils {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is MediaProvider.
      */
-    private static boolean isMediaDocument(Uri uri) {
+    public static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is Google Photos.
+     */
+    public static boolean isGooglePhotosUri(Uri uri) {
+        return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
 
     /**

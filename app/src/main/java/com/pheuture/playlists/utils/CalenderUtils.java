@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public class CalenderUtils {
+public final class CalenderUtils {
 
     public static boolean isSameYear(Calendar calendar){
         Calendar calendarCurrent=Calendar.getInstance();

@@ -7,7 +7,7 @@ import android.content.Context;
 
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaDao;
-import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.utils.Logger;
 
 import java.io.File;

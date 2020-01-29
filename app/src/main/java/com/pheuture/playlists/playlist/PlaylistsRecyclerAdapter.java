@@ -15,7 +15,7 @@ import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemPlaylistBinding;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
-import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.constants.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,67 +57,9 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
     void setData(List<PlaylistEntity> newData) {
         List<PlaylistEntity> newList = new ArrayList<>(newData);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallBack(oldList, newList), true);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new PlaylistDiffCallBack(oldList, newList), true);
         oldList = new ArrayList<>(newList);
         diffResult.dispatchUpdatesTo(this);
-    }
-
-    class DiffCallBack extends DiffUtil.Callback{
-        private List<PlaylistEntity> oldList;
-        private List<PlaylistEntity> newList;
-
-        public DiffCallBack(List<PlaylistEntity> oldList, List<PlaylistEntity> newList) {
-            this.oldList = oldList;
-            this.newList = newList;
-        }
-
-        @Override
-        public int getOldListSize() {
-            return oldList == null ? 0 : oldList.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-            return newList == null ? 0 : newList.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).getPlaylistID() == newList.get(newItemPosition).getPlaylistID();
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            PlaylistEntity oldModel = oldList.get(oldItemPosition);
-            PlaylistEntity newModel = newList.get(newItemPosition);
-
-            if (contentsDifferent(oldModel.getPlaylistName(), newModel.getPlaylistName())){
-                return false;
-            }
-            if (contentsDifferent(String.valueOf(oldModel.getSongsCount()), String.valueOf(newModel.getSongsCount()))){
-                return false;
-            }
-            if (contentsDifferent(String.valueOf(oldModel.getPlayDuration()), String.valueOf(newModel.getPlayDuration()))){
-                return false;
-            }
-            if (contentsDifferent(String.valueOf(oldModel.getCreatedOn()), String.valueOf(newModel.getCreatedOn()))){
-                return false;
-            }
-            return true;
-        }
-    }
-
-    private boolean contentsDifferent(String oldData, String newData) {
-        if (oldData == null && newData != null){
-            return false;
-        }
-        if (oldData != null && newData == null){
-            return false;
-        }
-        if (oldData == null){
-            return false;
-        }
-        return !oldData.equals(newData);
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

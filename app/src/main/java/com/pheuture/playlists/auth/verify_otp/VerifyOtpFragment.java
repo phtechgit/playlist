@@ -33,7 +33,7 @@ import com.pheuture.playlists.databinding.FragmentVerifyOtpBinding;
 import com.pheuture.playlists.interfaces.ButtonClickListener;
 import com.pheuture.playlists.receiver.SMSReceiver;
 import com.pheuture.playlists.base.BaseFragment;
-import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.utils.KeyboardUtils;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.ParserUtil;

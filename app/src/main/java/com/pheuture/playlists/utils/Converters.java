@@ -12,7 +12,8 @@ import java.util.ArrayList;
  * creator: Shashank
  * date: 07-Jan-19.
  */
-public class Converters {
+public final class Converters {
+
     @TypeConverter
     public static ArrayList<String> fromString(String value) {
         Type listType = new TypeToken<ArrayList<String>>() {}.getType();

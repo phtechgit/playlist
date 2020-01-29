@@ -1,30 +1,25 @@
 package com.pheuture.playlists.queue;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.gms.common.internal.StringResourceValueReader;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemQueueNotPlayingMediaBinding;
 import com.pheuture.playlists.databinding.ItemQueuePlayingMediaBinding;
-import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
 import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
 import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
-import com.pheuture.playlists.utils.Constants;
+import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.RecyclerItemMoveCallback;
 import com.pheuture.playlists.utils.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,13 +94,31 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         diffResult.dispatchUpdatesTo(this);
     }
 
-    public class PlayingMediaViewHolder extends RecyclerView.ViewHolder {
+    public class PlayingMediaViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
         private ItemQueuePlayingMediaBinding binding;
 
+        @SuppressLint("ClickableViewAccessibility")
         PlayingMediaViewHolder(@NonNull ItemQueuePlayingMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+            this.binding.imageViewDragHandle.setOnTouchListener(this);
             this.binding.imageViewRemove.setVisibility(View.GONE);
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            int pos = getAdapterPosition();
+            if (pos == RecyclerView.NO_POSITION){
+                return true;
+            }
+            Bundle bundle = new Bundle();
+            bundle.putInt(Constants.ARG_PARAM1, pos);
+            bundle.putInt(Constants.ARG_PARAM2, ClickType.DRAG);
+            bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
+
+            recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
+            return false;
         }
 
         public void setData(QueueMediaEntity model, List<Object> payloads) {
@@ -143,12 +156,14 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         }
     }
 
-    public class NotPlayingMediaViewHolder extends RecyclerView.ViewHolder {
+    public class NotPlayingMediaViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
         private ItemQueueNotPlayingMediaBinding binding;
 
+        @SuppressLint("ClickableViewAccessibility")
         NotPlayingMediaViewHolder(@NonNull ItemQueueNotPlayingMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+            this.binding.imageViewDragHandle.setOnTouchListener(this);
             this.binding.imageViewRemove.setVisibility(View.VISIBLE);
 
             binding.getRoot().setOnClickListener(new View.OnClickListener() {
@@ -184,6 +199,22 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
                     recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
                 }
             });
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            int pos = getAdapterPosition();
+            if (pos == RecyclerView.NO_POSITION){
+                return true;
+            }
+            Bundle bundle = new Bundle();
+            bundle.putInt(Constants.ARG_PARAM1, pos);
+            bundle.putInt(Constants.ARG_PARAM2, ClickType.DRAG);
+            bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
+
+            recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
+            return false;
         }
 
         public void setData(QueueMediaEntity model, List<Object> payloads) {

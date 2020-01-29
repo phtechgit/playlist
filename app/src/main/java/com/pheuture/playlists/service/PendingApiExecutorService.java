@@ -11,7 +11,7 @@ import com.pheuture.playlists.datasource.local.pending_api.PendingApiEntity;
 import com.pheuture.playlists.datasource.remote.FileUploadDao;
 import com.pheuture.playlists.datasource.remote.RemoteRepository;
 import com.pheuture.playlists.datasource.remote.ResponseModel;
-import com.pheuture.playlists.interfaces.ApiConstant;
+import com.pheuture.playlists.constants.ApiConstant;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.NetworkUtils;
 import org.jetbrains.annotations.NotNull;

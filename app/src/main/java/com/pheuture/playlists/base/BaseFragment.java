@@ -23,13 +23,14 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.interfaces.NotificationID;
-import com.pheuture.playlists.interfaces.RequestCodes;
+import com.pheuture.playlists.constants.DefaultValues;
+import com.pheuture.playlists.constants.NotificationID;
+import com.pheuture.playlists.constants.RequestCodes;
 
 import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
-public abstract class BaseFragment extends Fragment implements NotificationID, RequestCodes,
+public abstract class BaseFragment extends Fragment implements DefaultValues, NotificationID, RequestCodes,
         View.OnClickListener {
     public final String ARG_PARAM1 = "param1";
     public final String ARG_PARAM2 = "param2";

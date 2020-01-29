@@ -1,4 +1,4 @@
-package com.pheuture.playlists.interfaces;
+package com.pheuture.playlists.constants;
 
 public interface ApiConstant {
     String LAST_ID = "last";

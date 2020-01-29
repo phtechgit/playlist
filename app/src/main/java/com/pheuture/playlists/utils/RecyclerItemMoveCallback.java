@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class RecyclerItemMoveCallback extends ItemTouchHelper.Callback {
+public final class RecyclerItemMoveCallback extends ItemTouchHelper.Callback {
     private ItemTouchHelperContract itemTouchHelperContract;
 
     public RecyclerItemMoveCallback(ItemTouchHelperContract itemTouchHelperContract) {
