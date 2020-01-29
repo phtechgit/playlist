@@ -22,7 +22,7 @@
             android:maxLength="10"
             android:textColor="@color/grayB"
             android:textColorHint="@color/grayB"
-            android:textSize="@dimen/textSizeBody2"
+            android:textSize="@dimen/textSizeCaption"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.987"

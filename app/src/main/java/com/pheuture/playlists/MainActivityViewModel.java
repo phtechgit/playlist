@@ -17,6 +17,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -52,7 +53,7 @@ import java.util.List;
 import static android.content.Context.AUDIO_SERVICE;
 
 public class MainActivityViewModel extends BaseAndroidViewModel implements Constants.SnackBarActions,
-        AudioManager.OnAudioFocusChangeListener, Constants.PlayerRepeatModes, DefaultValues {
+        AudioManager.OnAudioFocusChangeListener, DefaultValues {
 
     private static final String TAG = MainActivityViewModel.class.getSimpleName();
     private MutableLiveData<String> title;
@@ -87,7 +88,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     private boolean connectedToNetwork = false;
     private boolean playingFromNetwork;
     private MutableLiveData<List<QueueMediaEntity>> queueMediaEntitiesMutableLiveData;
-    private MutableLiveData<Integer> repeatModeMutableLiveData = new MutableLiveData<>(REPEAT_MODE_OFF);
+    private MutableLiveData<Integer> repeatModeMutableLiveData = new MutableLiveData<>(ExoPlayer.REPEAT_MODE_OFF);
 
     public LiveData<PlaylistEntity> getPlaylistMutableLiveData() {
         return playlistMutableLiveData;
@@ -442,7 +443,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                     - currentDurationOfCurrentMedia) <= crossFadeValue) {
 
                 int repeatMode = repeatModeMutableLiveData.getValue();
-                if (repeatMode == REPEAT_MODE_ONE){
+                if (repeatMode == ExoPlayer.REPEAT_MODE_ONE){
                     //If single repeat play is ON
                     secondaryExoPlayer.setVolume(0f);
                     loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(currentMediaPosition));
@@ -452,7 +453,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                     secondaryExoPlayer.setVolume(0f);
                     loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
 
-                } else if (repeatMode == REPEAT_MODE_ALL){
+                } else if (repeatMode == ExoPlayer.REPEAT_MODE_ALL){
                     currentMediaPosition = RecyclerView.NO_POSITION;
                     secondaryExoPlayer.setVolume(0f);
                     loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
@@ -528,7 +529,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         //momentarily hold the playback to initiate the changes
         pausePlayback();
 
-        repeatModeMutableLiveData.postValue(REPEAT_MODE_OFF);
+        repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_OFF);
 
         currentMediaPosition = RecyclerView.NO_POSITION;
 
@@ -665,7 +666,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public void previous() {
-        repeatModeMutableLiveData.postValue(REPEAT_MODE_OFF);
+        repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_OFF);
 
         //if more media available to play & no pending callbacks
         if (queueMediaEntitiesMutableLiveData.getValue().size()>0 && currentMediaPosition != 0){
@@ -688,7 +689,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public void next() {
-        repeatModeMutableLiveData.postValue(REPEAT_MODE_OFF);
+        repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_OFF);
 
         //if more media available to play & no pending callbacks
         if ((queueMediaEntitiesMutableLiveData.getValue().size() - 1)> currentMediaPosition){
@@ -728,7 +729,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         //momentarily hold the playback to initiate the changes
         pausePlayback();
 
-        repeatModeMutableLiveData.postValue(REPEAT_MODE_OFF);
+        repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_OFF);
 
         currentMediaPosition = RecyclerView.NO_POSITION;
 
@@ -770,12 +771,12 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
     public void toggleRepeatMode() {
         int repeatMode = repeatModeMutableLiveData.getValue();
-        if (repeatMode == REPEAT_MODE_OFF) {
-            repeatModeMutableLiveData.postValue(REPEAT_MODE_ONE);
-        } else if (repeatMode == REPEAT_MODE_ONE){
-            repeatModeMutableLiveData.postValue(REPEAT_MODE_ALL);
-        } else if (repeatMode == REPEAT_MODE_ALL){
-            repeatModeMutableLiveData.postValue(REPEAT_MODE_OFF);
+        if (repeatMode == ExoPlayer.REPEAT_MODE_OFF) {
+            repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_ONE);
+        } else if (repeatMode == ExoPlayer.REPEAT_MODE_ONE){
+            repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_ALL);
+        } else if (repeatMode == ExoPlayer.REPEAT_MODE_ALL){
+            repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_OFF);
         }
     }
 

@@ -10,6 +10,7 @@ import android.view.ViewPropertyAnimator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.SeekBar;
 
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -37,9 +38,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
-import static com.pheuture.playlists.constants.Constants.PlayerRepeatModes.REPEAT_MODE_ALL;
-import static com.pheuture.playlists.constants.Constants.PlayerRepeatModes.REPEAT_MODE_OFF;
-import static com.pheuture.playlists.constants.Constants.PlayerRepeatModes.REPEAT_MODE_ONE;
 
 public class MainActivity extends BaseActivity implements NavController.OnDestinationChangedListener,
         RecyclerViewClickListener, MediaQueueRecyclerAdapter.ClickType,
@@ -190,11 +188,11 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         viewModel.getRepeatMode().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer repeatMode) {
-                if (repeatMode == REPEAT_MODE_OFF) {
+                if (repeatMode == ExoPlayer.REPEAT_MODE_OFF) {
                     binding.layoutBottomSheet.imageViewRepeat.setImageDrawable(getResources().getDrawable(R.drawable.exo_controls_repeat_off));
-                } else if (repeatMode == REPEAT_MODE_ONE){
+                } else if (repeatMode == ExoPlayer.REPEAT_MODE_ONE){
                     binding.layoutBottomSheet.imageViewRepeat.setImageDrawable(getResources().getDrawable(R.drawable.exo_controls_repeat_one ));
-                } else if (repeatMode == REPEAT_MODE_ALL){
+                } else if (repeatMode == ExoPlayer.REPEAT_MODE_ALL){
                     binding.layoutBottomSheet.imageViewRepeat.setImageDrawable(getResources().getDrawable(R.drawable.exo_controls_repeat_all));
                 }
             }

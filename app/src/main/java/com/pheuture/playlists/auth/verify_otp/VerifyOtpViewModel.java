@@ -2,20 +2,18 @@ package com.pheuture.playlists.auth.verify_otp;
 
 import android.app.Application;
 import android.util.Log;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AppSignatureHelper;
+import com.pheuture.playlists.base.BaseAndroidViewModel;
 import com.pheuture.playlists.datasource.local.LocalRepository;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
 import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
@@ -30,17 +28,15 @@ import com.pheuture.playlists.utils.SharedPrefsUtils;
 import com.pheuture.playlists.constants.Url;
 import com.pheuture.playlists.utils.VolleyClient;
 import org.json.JSONObject;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class VerifyOtpViewModel extends AndroidViewModel {
+public class VerifyOtpViewModel extends BaseAndroidViewModel {
     private static final String TAG = VerifyOtpViewModel.class.getSimpleName();
     private String phoneNumber;
     private MutableLiveData<Boolean> showProgress = new MutableLiveData<>();
-    private MutableLiveData<Boolean> showPrimaryProgress = new MutableLiveData<>(true);
     private MutableLiveData<Boolean> userVerifiedMutableLiveData = new MutableLiveData<>();
     private StringRequest stringRequest;
     private PlaylistDao playlistDao;
@@ -157,7 +153,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
         VolleyClient.getRequestQueue(getApplication()).cancelAll(TAG);
     }
 
-    public LiveData<Boolean> getShowNextButton() {
+     public LiveData<Boolean> getShowNextButton() {
         return showNextButton;
     }
 
@@ -204,10 +200,10 @@ public class VerifyOtpViewModel extends AndroidViewModel {
 
                     if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         showNextButton.postValue(true);
-                        Toast.makeText(getApplication(), getApplication().getResources().getString(R.string.failed_to_send_otp), Toast.LENGTH_SHORT).show();
+                        showSnackBar(getApplication().getResources().getString(R.string.failed_to_send_otp), Snackbar.LENGTH_SHORT);
                         return;
                     }
-                    Toast.makeText(getApplication(), getApplication().getResources().getString(R.string.otp_sent), Toast.LENGTH_SHORT).show();
+                    showSnackBar(getApplication().getResources().getString(R.string.otp_sent), Snackbar.LENGTH_SHORT);
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }
@@ -219,7 +215,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
                     showNextButton.postValue(true);
                     showProgress.postValue(false);
                     Logger.e(url, e.toString());
-                    Toast.makeText(getApplication(),VolleyClient.getErrorMsg(e) , Toast.LENGTH_SHORT).show();
+                    showSnackBar(VolleyClient.getErrorMsg(e), Snackbar.LENGTH_SHORT);
                 } catch (Exception ex) {
                     Logger.e(TAG, ex.toString());
                 }

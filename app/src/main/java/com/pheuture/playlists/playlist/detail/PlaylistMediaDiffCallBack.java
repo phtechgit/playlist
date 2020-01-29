@@ -35,16 +35,16 @@ public class PlaylistMediaDiffCallBack extends DiffUtil.Callback {
         PlaylistMediaEntity oldModel = oldList.get(oldItemPosition);
         PlaylistMediaEntity newModel = newList.get(newItemPosition);
 
-        if (contentsDifferent(oldModel.getMediaUrl(), newModel.getMediaUrl())){
+        if (contentsDifferent(oldModel.getMediaTitle(), newModel.getMediaTitle())) {
             return false;
         }
-        if (contentsDifferent(oldModel.getMediaName(), newModel.getMediaName())){
+        if (contentsDifferent(oldModel.getMovieName(), newModel.getMovieName())) {
             return false;
         }
-        if (contentsDifferent(oldModel.getMediaDescription(), newModel.getMediaDescription())){
+        if (contentsDifferent(oldModel.getMediaThumbnail(), newModel.getMediaThumbnail())) {
             return false;
         }
-        if (contentsDifferent(oldModel.getMediaThumbnail(), newModel.getMediaThumbnail())){
+        if (contentsDifferent(String.valueOf(oldModel.getPlayDuration()), String.valueOf(newModel.getPlayDuration()))) {
             return false;
         }
         return true;

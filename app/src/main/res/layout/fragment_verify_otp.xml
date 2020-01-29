@@ -26,7 +26,7 @@
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/textSizeBody2"
+                android:textSize="@dimen/textSizeSubtitle1"
                 android:textColor="@color/grayA" />
 
             <!--<ProgressBar
@@ -48,7 +48,6 @@
                 android:maxLength="6"
                 android:inputType="phone"
                 android:gravity="center"
-                android:textSize="@dimen/textSizeHeadline6"
                 android:imeOptions="actionDone"
                 android:textColor="@color/grayC"
                 android:background="@drawable/edittext_background_gray"/>

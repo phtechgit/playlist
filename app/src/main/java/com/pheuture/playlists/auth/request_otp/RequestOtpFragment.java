@@ -67,6 +67,13 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
                 }
             }
         });
+
+        viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
+            @Override
+            public void onChanged(Bundle bundle) {
+
+            }
+        });
     }
 
     @Override

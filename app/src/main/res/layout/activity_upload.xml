@@ -118,6 +118,7 @@
                     android:padding="16dp"
                     android:text="@string/community_guidelines"
                     android:textColor="@color/grayD"
+                    android:textSize="@dimen/textSizeBody2"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/ediText_description" />
@@ -126,9 +127,9 @@
                     android:id="@+id/textView_guidline2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:gravity="center"
                     android:padding="16dp"
+                    android:textSize="@dimen/textSizeBody2"
                     android:text="@string/copyright_policy"
                     android:textColor="@color/grayD"
                     app:layout_constraintTop_toBottomOf="@+id/textView_guidline1" />

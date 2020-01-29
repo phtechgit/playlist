@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/we_will_send_an_sms_message_to_verify_your_phone_number"
-                android:textSize="@dimen/textSizeBody2"
+                android:textSize="@dimen/textSizeSubtitle1"
                 android:textColor="@color/grayA" />
 
             <EditText
@@ -37,7 +37,6 @@
                 android:hint="@string/mobile_number"
                 android:maxLength="10"
                 android:inputType="phone"
-                android:textSize="@dimen/textSizeBody1"
                 android:imeOptions="actionDone"
                 android:textColor="@color/grayC"
                 android:background="@drawable/edittext_background_gray"

@@ -80,7 +80,7 @@
                 android:maxLines="2"
                 android:tag="decorator_ending_view"
                 android:text="@{mediaTitle}"
-                android:textSize="@dimen/textSizeBody2"
+                android:textSize="@dimen/textSizeBody1"
                 app:layout_constraintBottom_toTopOf="@+id/textView_creator"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail"

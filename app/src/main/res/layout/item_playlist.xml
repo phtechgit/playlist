@@ -67,7 +67,7 @@
             android:maxLines="1"
             android:text="@{model.createdByFormatted}"
             android:textColor="@color/grayC"
-            android:textSize="@dimen/textSizeBody1"
+            android:textSize="@dimen/textSizeCaption"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/relativeLayout_remove"
             app:layout_constraintStart_toEndOf="@+id/imageView_thumbnail"
