@@ -51,7 +51,8 @@ public class VerifyOtpViewModel extends BaseAndroidViewModel {
         showNextButton = new MutableLiveData<>(false);
         playlistDao = LocalRepository.getInstance(application).playlistDao();
         playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
-        messageMutableLiveData = new MutableLiveData<>(application.getResources().getString(R.string.waiting_to_automatically_detect_an_sms_send_to) + phoneNumber);
+        messageMutableLiveData = new MutableLiveData<>(application.getResources()
+                .getString(R.string.waiting_to_automatically_detect_an_sms_send_to) + " " + phoneNumber);
     }
 
     public void verifyOtp() {
@@ -181,7 +182,7 @@ public class VerifyOtpViewModel extends BaseAndroidViewModel {
     public void requestOtp() {
         showProgress.postValue(true);
         showNextButton.postValue(false);
-        messageMutableLiveData.postValue(getApplication().getResources().getString(R.string.waiting_to_automatically_detect_an_sms_send_to) + phoneNumber);
+        setMessageToShow(getApplication().getResources().getString(R.string.waiting_to_automatically_detect_an_sms_send_to) + " " + phoneNumber);
 
         AppSignatureHelper appSignatureHashHelper = new AppSignatureHelper(getApplication());
         String hashKey = appSignatureHashHelper.getAppSignatures().get(0);
@@ -197,7 +198,6 @@ public class VerifyOtpViewModel extends BaseAndroidViewModel {
                     Logger.e(url + ApiConstant.RESPONSE, stringResponse);
 
                     JSONObject response = new JSONObject(stringResponse);
-
                     if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         showNextButton.postValue(true);
                         showSnackBar(getApplication().getResources().getString(R.string.failed_to_send_otp), Snackbar.LENGTH_SHORT);

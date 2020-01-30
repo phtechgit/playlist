@@ -4,11 +4,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class PendingFileUploadParamEntity implements Parcelable {
+    private int mediaType;
+    private String key;
+    private String value;
+    private String extra;
 
-    public PendingFileUploadParamEntity(int mediaType, String key, String value, String extra) {
+    public PendingFileUploadParamEntity(int mediaType, String key, Object value, String extra) {
         this.mediaType = mediaType;
         this.key = key;
-        this.value = value;
+        this.value = value.toString();
         this.extra = extra;
     }
 
@@ -17,11 +21,12 @@ public class PendingFileUploadParamEntity implements Parcelable {
         int FILE = 2;
     }
 
-    private int mediaType;
-    private String key;
-    private String value;
-    private String extra;
-
+    protected PendingFileUploadParamEntity(int other, String createdOn, long timeStamp, Parcel in) {
+        mediaType = in.readInt();
+        key = in.readString();
+        value = in.readString();
+        extra = in.readString();
+    }
 
     protected PendingFileUploadParamEntity(Parcel in) {
         mediaType = in.readInt();

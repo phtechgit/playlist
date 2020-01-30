@@ -17,6 +17,7 @@ import com.pheuture.playlists.databinding.FragmentRequestOtpBinding;
 import com.pheuture.playlists.interfaces.ButtonClickListener;
 import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.utils.KeyboardUtils;
+import com.pheuture.playlists.utils.Logger;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -71,7 +72,7 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
         viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
             @Override
             public void onChanged(Bundle bundle) {
-
+                setSnackBar(binding.getRoot(), bundle);
             }
         });
     }

@@ -32,6 +32,7 @@ import com.pheuture.playlists.constants.Url;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static android.provider.MediaStore.Video.Thumbnails.FULL_SCREEN_KIND;
@@ -71,6 +72,8 @@ public class UploadViewModel extends BaseAndroidViewModel implements MediaEntity
     }
 
     protected void uploadMedia(String title, String description) {
+        Calendar calendar = Calendar.getInstance();
+        long timeStamp = calendar.getTimeInMillis();
         PendingFileUploadEntity pendingFileUploadEntity = new PendingFileUploadEntity();
         pendingFileUploadEntity.setTitle(title);
         pendingFileUploadEntity.setUrl(Url.MEDIA_UPLOAD);
@@ -90,13 +93,10 @@ public class UploadViewModel extends BaseAndroidViewModel implements MediaEntity
                 FileUtils.getRealPathFromURI(getApplication(), thumbnailUriLiveData.getValue()), "image/*"));
         paramEntities.add(new PendingFileUploadParamEntity(OTHER, MEDIA_TITLE, title, null));
         paramEntities.add(new PendingFileUploadParamEntity(OTHER, MEDIA_DESCRIPTION, description, null));
-        paramEntities.add(new PendingFileUploadParamEntity(OTHER, PLAY_DURATION, String.valueOf(getExoPlayer().getDuration()), null));
-        paramEntities.add(new PendingFileUploadParamEntity(OTHER, "videoSingers", "dummy", null));
-        paramEntities.add(new PendingFileUploadParamEntity(OTHER, "musicDirector", "dummy", null));
-        paramEntities.add(new PendingFileUploadParamEntity(OTHER, "movieName", "dummy", null));
-        paramEntities.add(new PendingFileUploadParamEntity(OTHER, "artists", "dummy", null));
-        paramEntities.add(new PendingFileUploadParamEntity(OTHER, "movieDirector", "dummy", null));
-        paramEntities.add(new PendingFileUploadParamEntity(OTHER, ApiConstant.USER_ID, String.valueOf(user.getUserID()), null));
+        paramEntities.add(new PendingFileUploadParamEntity(OTHER, PLAY_DURATION, getExoPlayer().getDuration(), null));
+        paramEntities.add(new PendingFileUploadParamEntity(OTHER, "createdOn", timeStamp, null));
+        paramEntities.add(new PendingFileUploadParamEntity(OTHER, "modifiedOn", timeStamp, null));
+        paramEntities.add(new PendingFileUploadParamEntity(OTHER, ApiConstant.USER_ID, user.getUserID(), null));
 
         pendingFileUploadEntity.setParams(ParserUtil.getInstance().toJson(paramEntities));
 

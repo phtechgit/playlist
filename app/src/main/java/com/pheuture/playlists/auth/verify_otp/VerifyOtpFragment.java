@@ -119,6 +119,13 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
                 }
             }
         });
+
+        viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
+            @Override
+            public void onChanged(Bundle bundle) {
+                setSnackBar(binding.getRoot(), bundle);
+            }
+        });
     }
 
     @Override

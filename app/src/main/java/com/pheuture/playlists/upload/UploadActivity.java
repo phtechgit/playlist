@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -108,7 +110,7 @@ public class UploadActivity extends BaseActivity{
                     }
                 }
             };
-            proceedWithPermissions(REQUEST_CODE_GRANT_PERMISSIONS,READ_WRITE_EXTERNAL_STORAGE_PERMISSION, runnable, false);
+            proceedWithPermissions(REQUEST_CODE_GRANT_PERMISSIONS, READ_WRITE_EXTERNAL_STORAGE_PERMISSION, runnable, false);
 
         } else if (v.equals(binding.buttonSubmit)){
             if (TextUtils.getTrimmedLength(binding.ediTextTitle.getText().toString()) == 0){

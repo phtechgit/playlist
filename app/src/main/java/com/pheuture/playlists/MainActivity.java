@@ -26,6 +26,7 @@ import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.RecyclerItemMoveCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -201,11 +202,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
             @Override
             public void onChanged(Bundle bundle) {
-                if (bundle.getBoolean(SNACK_BAR_SHOW, false)){
-                    showSnack(binding.coordinatorLayoutSnackBar, bundle);
-                } else {
-                    hideSnack();
-                }
+                setSnackBar(binding.coordinatorLayoutSnackBar, bundle);
             }
         });
 

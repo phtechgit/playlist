@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.R;
@@ -49,6 +50,17 @@ public abstract class BaseActivity extends AppCompatActivity implements DefaultV
         }
     }
 
+    protected void setSnackBar(View view, Bundle bundle) {
+        if (view == null || bundle == null){
+            return;
+        }
+        if (bundle.getBoolean(SNACK_BAR_SHOW, false)){
+            showSnack(view, bundle);
+        } else {
+            hideSnack();
+        }
+    }
+
     protected void hideSnack() {
         if (snackBar != null && snackBar.isShown()){
             snackBar.dismiss();
@@ -56,10 +68,6 @@ public abstract class BaseActivity extends AppCompatActivity implements DefaultV
     }
 
     protected void showSnack(View view, Bundle bundle) {
-        if (view == null || bundle == null){
-            return;
-        }
-
         String message = bundle.getString(SNACK_BAR_MESSAGE, "");
         int length = bundle.getInt(SNACK_BAR_LENGTH, Snackbar.LENGTH_SHORT);
 

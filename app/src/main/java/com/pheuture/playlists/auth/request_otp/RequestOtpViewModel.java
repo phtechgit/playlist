@@ -2,7 +2,6 @@ package com.pheuture.playlists.auth.request_otp;
 
 import android.app.Application;
 import android.util.Log;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -11,6 +10,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AppSignatureHelper;
 import com.pheuture.playlists.base.BaseAndroidViewModel;
@@ -76,10 +76,10 @@ public class RequestOtpViewModel extends BaseAndroidViewModel {
 
                     if (!response.optBoolean(ApiConstant.MESSAGE, false)) {
                         setShowNext(true);
-                        Toast.makeText(getApplication(), getApplication().getString(R.string.failed_to_send_otp), Toast.LENGTH_SHORT).show();
+                        showSnackBar(getApplication().getString(R.string.failed_to_send_otp), Snackbar.LENGTH_SHORT);
                         return;
                     }
-                    Toast.makeText(getApplication(), getApplication().getResources().getString(R.string.otp_sent), Toast.LENGTH_SHORT).show();
+                    showSnackBar(getApplication().getString(R.string.otp_sent), Snackbar.LENGTH_SHORT);
                     otpListener.onOtpSent();
                 } catch (Exception e) {
                     setShowNext(true);
@@ -93,7 +93,7 @@ public class RequestOtpViewModel extends BaseAndroidViewModel {
                     setShowNext(true);
                     showProgress.postValue(false);
                     Logger.e(url, e.toString());
-                    Toast.makeText(getApplication(),VolleyClient.getErrorMsg(e) , Toast.LENGTH_SHORT).show();
+                    showSnackBar(VolleyClient.getErrorMsg(e), Snackbar.LENGTH_SHORT);
                 } catch (Exception ex) {
                     Logger.e(TAG, ex.toString());
                 }

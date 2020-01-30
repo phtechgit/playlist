@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1031649875685",
+    "firebase_url": "https://playlists-fdc38.firebaseio.com",
+    "project_id": "playlists-fdc38",
+    "storage_bucket": "playlists-fdc38.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1031649875685:android:193c3dcd45fbbad37a660c",
+        "android_client_info": {
+          "package_name": "com.pheuture.playlists"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1031649875685-je1jgkg5kj5i8vi1h5g736j1sdrd53hc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBybadj2_Nn54bGw6wjSgc0HiQHNYyKfKQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1031649875685-je1jgkg5kj5i8vi1h5g736j1sdrd53hc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

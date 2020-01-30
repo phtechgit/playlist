@@ -25,6 +25,7 @@ public final class VolleyClient {
 
     public static String getErrorMsg(VolleyError volleyError){
         String message = null;
+
         if (volleyError instanceof NetworkError) {
             message = "Cannot connect to Internet... Please check your connection!";
         } else if (volleyError instanceof ServerError) {
