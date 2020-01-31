@@ -30,13 +30,14 @@ import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.constants.DefaultValues;
 import com.pheuture.playlists.constants.NotificationID;
 import com.pheuture.playlists.constants.RequestCodes;
+import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.utils.PermissionUtils;
 
 import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public abstract class BaseFragment extends Fragment implements DefaultValues, NotificationID, RequestCodes,
-        Constants.SnackBarActions, PermissionUtils.CommonPermissions, View.OnClickListener {
+        Constants.SnackBarActions, PermissionUtils.CommonPermissions, RecyclerViewClickListener.ClickType, View.OnClickListener {
     public final String ARG_PARAM1 = "param1";
     public final String ARG_PARAM2 = "param2";
     public final String ARG_PARAM3 = "param3";
@@ -61,7 +62,7 @@ public abstract class BaseFragment extends Fragment implements DefaultValues, No
         }
     }
 
-    protected void hideSnack() {
+    private void hideSnack() {
         if (snackBar != null && snackBar.isShown()){
             snackBar.dismiss();
         }
@@ -204,7 +205,7 @@ public abstract class BaseFragment extends Fragment implements DefaultValues, No
         }
     }*/
 
-    public void setUserInteraction(boolean isActive) {
+    private void setUserInteraction(boolean isActive) {
         if (mContext != null) {
             if (isActive) {
                 ((Activity) mContext).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);

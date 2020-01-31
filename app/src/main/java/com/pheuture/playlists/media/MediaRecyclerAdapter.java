@@ -20,7 +20,8 @@ import com.pheuture.playlists.constants.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements RecyclerViewClickListener.ClickType{
     private static final String TAG = MediaRecyclerAdapter.class.getSimpleName();
     private Context mContext;
     private List<MediaEntity> oldList;
@@ -67,7 +68,7 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         MyViewHolder(@NonNull ItemMediaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            binding.imageViewAdd.setVisibility(View.VISIBLE);
+            this.binding.imageViewAdd.setVisibility(View.VISIBLE);
 
             binding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -78,10 +79,10 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                     }
 
                     Bundle bundle = new Bundle();
-                    bundle.putInt(Constants.ARG_PARAM1, 1);
+                    bundle.putInt(Constants.ARG_PARAM1, SELECT);
                     bundle.putInt(Constants.ARG_PARAM2, pos);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
-                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(MyViewHolder.this, bundle);
                 }
             });
 
@@ -110,11 +111,11 @@ public class MediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                     }
 
                     Bundle bundle = new Bundle();
-                    bundle.putInt(Constants.ARG_PARAM1, 2);
+                    bundle.putInt(Constants.ARG_PARAM1, ADD);
                     bundle.putInt(Constants.ARG_PARAM2, pos);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(MyViewHolder.this, bundle);
                 }
             });
         }

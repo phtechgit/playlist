@@ -3,7 +3,10 @@ package com.pheuture.playlists.upload;
 import androidx.annotation.Nullable;
 import  androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.ActivityNavigator;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -47,8 +50,7 @@ public class UploadActivity extends BaseActivity{
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_upload);
 
-        viewModel = ViewModelProviders.of(this,
-                new UploadActivityViewModelFactory(getApplication(),
+        viewModel = new ViewModelProvider(this, new UploadActivityViewModelFactory(getApplication(),
                         getIntent().getParcelableExtra(ARG_PARAM1))).get(UploadViewModel.class);
 
         PlayerView playerView = binding.playerView;
@@ -160,6 +162,12 @@ public class UploadActivity extends BaseActivity{
         if (exoPlayer!=null){
             exoPlayer.release();
         }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        ActivityNavigator.applyPopAnimationsToPendingTransition(this);
     }
 
 }

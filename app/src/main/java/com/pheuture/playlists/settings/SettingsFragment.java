@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -47,8 +48,8 @@ public class SettingsFragment extends BaseFragment implements
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false);
-        parentViewModel = ViewModelProviders.of(activity).get(MainActivityViewModel.class);
-        viewModel = ViewModelProviders.of(this).get(SettingsViewModel.class);
+        parentViewModel = new ViewModelProvider(activity).get(MainActivityViewModel.class);
+        viewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
         return binding.getRoot();
     }
 

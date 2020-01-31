@@ -1,6 +1,7 @@
 package com.pheuture.playlists.auth;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.ActivityNavigator;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,5 +40,11 @@ public class SplashActivity extends AppCompatActivity {
             }
             finish();
         }, 1000);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        ActivityNavigator.applyPopAnimationsToPendingTransition(this);
     }
 }

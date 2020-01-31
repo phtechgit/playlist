@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.text.Editable;
@@ -62,8 +63,8 @@ public class VerifyOtpFragment extends BaseFragment implements TextWatcher,
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_verify_otp,
                 container, false);
-        parentViewModel = ViewModelProviders.of(activity).get(AuthViewModel.class);
-        viewModel = ViewModelProviders.of(this,
+        parentViewModel = new ViewModelProvider(activity).get(AuthViewModel.class);
+        viewModel = new ViewModelProvider(this,
                 new VerifyOtpViewModelFactory(activity.getApplication(),
                         parentViewModel.getPhoneNumber())).get(VerifyOtpViewModel.class);
         return binding.getRoot();

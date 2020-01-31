@@ -10,9 +10,10 @@ import androidx.room.PrimaryKey;
 import com.google.gson.annotations.SerializedName;
 import com.pheuture.playlists.utils.StringUtils;
 
+import org.jetbrains.annotations.NotNull;
+
 @Entity
 public class UserEntity implements Parcelable {
-
 	@NonNull
 	@PrimaryKey
 	@SerializedName("userID")
@@ -131,6 +132,7 @@ public class UserEntity implements Parcelable {
 		this.modifiedOn = modifiedOn;
 	}
 
+	@NotNull
 	@Override
 	public String toString() {
 		return "UserEntity{" +

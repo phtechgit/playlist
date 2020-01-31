@@ -5,6 +5,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -38,8 +39,8 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_request_otp, container, false);
-        parentViewModel = ViewModelProviders.of(activity).get(AuthViewModel.class);
-        viewModel = ViewModelProviders.of(this).get(RequestOtpViewModel.class);
+        parentViewModel = new ViewModelProvider(activity).get(AuthViewModel.class);
+        viewModel = new ViewModelProvider(this).get(RequestOtpViewModel.class);
         return binding.getRoot();
     }
 

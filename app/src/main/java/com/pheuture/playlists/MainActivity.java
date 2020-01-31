@@ -29,20 +29,22 @@ import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.ActivityNavigator;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 import static androidx.navigation.Navigation.findNavController;
 
 public class MainActivity extends BaseActivity implements NavController.OnDestinationChangedListener,
-        RecyclerViewClickListener, MediaQueueRecyclerAdapter.ClickType,
-        RecyclerItemMoveCallback.ItemTouchHelperContract,
+        RecyclerViewClickListener, RecyclerItemMoveCallback.ItemTouchHelperContract,
         ConnectivityChangeReceiver.ConnectivityChangeListener, SeekBar.OnSeekBarChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -81,7 +83,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
         setSupportActionBar(binding.layoutAppBar.toolbar);
 
@@ -352,7 +354,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     }
 
     @Override
-    public void onRecyclerViewHolderClick(Bundle bundle) {
+    public void onRecyclerViewHolderClick(RecyclerView.ViewHolder viewHolder, Bundle bundle) {
         int position = bundle.getInt(ARG_PARAM1, -1);
         int clickType = bundle.getInt(ARG_PARAM2, 1);
         QueueMediaEntity queueMediaEntity = bundle.getParcelable(ARG_PARAM3);
@@ -366,7 +368,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             }
         } else if (clickType == DRAG) {
             Logger.e(TAG, "drag started");
-            itemTouchHelper.startDrag(binding.layoutBottomSheet.recyclerViewMediaQueue.findViewHolderForLayoutPosition(position));
+            itemTouchHelper.startDrag(viewHolder);
         }
     }
 
@@ -412,4 +414,11 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        ActivityNavigator.applyPopAnimationsToPendingTransition(this);
+    }
+
 }

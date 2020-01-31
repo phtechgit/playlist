@@ -20,8 +20,10 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.FragmentNavigator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -56,8 +58,8 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_playlist, container, false);
-        parentViewModel = ViewModelProviders.of(activity).get(MainActivityViewModel.class);
-        viewModel = ViewModelProviders.of(this).get(PlaylistViewModel.class);
+        parentViewModel = new ViewModelProvider(activity).get(MainActivityViewModel.class);
+        viewModel = new ViewModelProvider(this).get(PlaylistViewModel.class);
         return binding.getRoot();
     }
 
@@ -224,13 +226,13 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
     }
 
     @Override
-    public void onRecyclerViewHolderClick(Bundle bundle) {
+    public void onRecyclerViewHolderClick(View viewHolder, Bundle bundle) {
         int position = bundle.getInt(ARG_PARAM1, -1);
-        int type = bundle.getInt(ARG_PARAM2, -1);
+        int clickType = bundle.getInt(ARG_PARAM2, -1);
         PlaylistEntity model = bundle.getParcelable(ARG_PARAM3);
 
         assert model != null;
-        if (type == 1) {
+        if (clickType == SELECT) {
             if (model.getPlaylistID() == RecyclerView.NO_ID){
                 showCreatePlaylistNameDialog();
 
@@ -238,8 +240,16 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
                 bundle.clear();
                 bundle.putLong(ARG_PARAM1, model.getPlaylistID());
 
+                View view1 = viewHolder.findViewById(R.id.textView_title);
+                View view2 = viewHolder.findViewById(R.id.textView_creator);
+                FragmentNavigator.Extras extras = new FragmentNavigator.Extras.Builder()
+                        .addSharedElement(view1, view1.getTransitionName())
+                        .addSharedElement(view2, view2.getTransitionName())
+                        .build();
+
                 Navigation.findNavController(binding.getRoot())
-                        .navigate(R.id.action_navigation_playlist_to_navigation_playlist_detail, bundle);
+                        .navigate(R.id.action_navigation_playlist_to_navigation_playlist_detail,
+                                bundle, null, extras);
             }
         } else {
             showDeletePlaylistDialog(position, model);

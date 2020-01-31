@@ -5,9 +5,11 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.TransitionInflater;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -44,14 +46,19 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = getActivity();
+        Object sharedElementEnterTransition = TransitionInflater.from(activity)
+                .inflateTransition(android.R.transition.fade);
+        setSharedElementEnterTransition(sharedElementEnterTransition);
     }
 
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        playlistModel = getArguments().getParcelable(ARG_PARAM1);
-        parentViewModel = ViewModelProviders.of(activity).get(MainActivityViewModel.class);
+        if (getArguments() != null) {
+            playlistModel = getArguments().getParcelable(ARG_PARAM1);
+        }
+        parentViewModel = new ViewModelProvider(activity).get(MainActivityViewModel.class);
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_media, container, false);
-        viewModel = ViewModelProviders.of(this, new MediaViewModelFactory(
+        viewModel = new ViewModelProvider(this, new MediaViewModelFactory(
                 activity.getApplication(), playlistModel)).get(MediaViewModel.class);
         return binding.getRoot();
     }
@@ -138,7 +145,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
     };
 
     @Override
-    public void onRecyclerViewHolderClick(Bundle bundle) {
+    public void onRecyclerViewHolderClick(View viewHolder, Bundle bundle) {
         int type = bundle.getInt(ARG_PARAM1, -1);
         int position = bundle.getInt(ARG_PARAM2, -1);
         MediaEntity mediaEntity = bundle.getParcelable(ARG_PARAM3);
@@ -146,7 +153,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
         String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity,
                 MediaEntity.class);
 
-        if (type == 1){
+        if (type == SELECT){
             QueueMediaEntity queueMediaEntity = ParserUtil.getInstance()
                     .fromJson(objectJsonString, QueueMediaEntity.class);
 

@@ -10,10 +10,12 @@
         android:id="@+id/navigation_playlists"
         android:name="com.pheuture.playlists.playlist.PlaylistFragment"
         android:label="@string/playlist_title"
-        tools:layout="@layout/fragment_playlist" >
+        tools:layout="@layout/fragment_playlist">
         <action
             android:id="@+id/action_navigation_playlist_to_navigation_playlist_detail"
-            app:destination="@id/navigation_playlist_detail" />
+            app:destination="@id/navigation_playlist_detail"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit" />
     </fragment>
 
     <fragment
@@ -23,7 +25,11 @@
         tools:layout="@layout/fragment_playlist_detail">
         <action
             android:id="@+id/action_navigation_playlist_detail_to_navigation_media"
-            app:destination="@id/navigation_media"/>
+            app:destination="@id/navigation_media"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -34,32 +40,20 @@
         <argument
             android:name="title"
             app:argType="string" />
-        <action
-            android:id="@+id/action_navigation_media_to_navigation_uploads"
-            app:destination="@id/navigation_uploads" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_trending"
         android:name="com.pheuture.playlists.trending.TrendingFragment"
         android:label="@string/trending_title"
-        tools:layout="@layout/fragment_trendings" >
+        tools:layout="@layout/fragment_trendings">
     </fragment>
 
     <fragment
         android:id="@+id/navigation_settings"
         android:name="com.pheuture.playlists.settings.SettingsFragment"
         android:label="@string/setting_title"
-        tools:layout="@layout/fragment_settings" >
-        <action
-            android:id="@+id/action_navigation_settings_to_navigation_uploads"
-            app:destination="@id/navigation_uploads" />
+        tools:layout="@layout/fragment_settings">
     </fragment>
-
-    <fragment
-        android:id="@+id/navigation_uploads"
-        android:name="com.pheuture.playlists.upload.UploadActivity"
-        android:label="Upload"
-        tools:layout="@layout/activity_upload" />
 
 </navigation>

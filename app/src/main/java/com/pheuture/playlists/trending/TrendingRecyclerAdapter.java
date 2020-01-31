@@ -25,7 +25,8 @@ import com.pheuture.playlists.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
+public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements RecyclerViewClickListener.ClickType, Filterable {
     private static final String TAG = TrendingRecyclerAdapter.class.getSimpleName();
     private Context mContext;
     private List<MediaEntity> masterList;
@@ -65,7 +66,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
         dataCount.postValue(filteredList.size());
     }
 
-    public LiveData<Integer> getDataCount() {
+    LiveData<Integer> getDataCount() {
         return dataCount;
     }
 
@@ -89,7 +90,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                     bundle.putInt(Constants.ARG_PARAM1, pos);
                     bundle.putParcelable(Constants.ARG_PARAM2, masterList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(this, bundle);
                 }
             });
         }
@@ -129,6 +130,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return filterResults;
             }
 
+            @SuppressWarnings("unchecked")
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 List<MediaEntity> newList = (ArrayList<MediaEntity>) filterResults.values;

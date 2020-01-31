@@ -5,10 +5,13 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.FragmentNavigator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.TransitionInflater;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -55,6 +58,9 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         activity = getActivity();
+        Object sharedElementEnterTransition = TransitionInflater.from(activity)
+                .inflateTransition(android.R.transition.fade);
+        setSharedElementEnterTransition(sharedElementEnterTransition);
     }
 
     @Override
@@ -105,8 +111,8 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_playlist_detail, container, false);
-        parentViewModel = ViewModelProviders.of(activity).get(MainActivityViewModel.class);
-        viewModel = ViewModelProviders.of(this, new PlaylistDetailViewModelFactory(
+        parentViewModel = new ViewModelProvider(activity).get(MainActivityViewModel.class);
+        viewModel = new ViewModelProvider(this, new PlaylistDetailViewModelFactory(
                 activity.getApplication(), getArguments().getLong(ARG_PARAM1))).get(PlaylistDetailViewModel.class);
         return binding.getRoot();
     }
@@ -144,13 +150,13 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
                         binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_round_dark);
                     }
 
-                    binding.textViewEmptySearchResult.setVisibility(View.GONE);
+                    binding.textViewEmptyResult.setVisibility(View.GONE);
                     binding.recyclerView.setVisibility(View.VISIBLE);
                 } else {
                     binding.imageViewPlay.setImageResource(R.drawable.ic_play_circular_grey);
                     binding.imageViewShuffle.setImageResource(R.drawable.ic_shuffle_round_dark);
                     binding.recyclerView.setVisibility(View.GONE);
-                    binding.textViewEmptySearchResult.setVisibility(View.VISIBLE);
+                    binding.textViewEmptyResult.setVisibility(View.VISIBLE);
                 }
 
                 boolean downloadPlaylistMedia = SharedPrefsUtils.getBooleanPreference(activity,
@@ -187,8 +193,12 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
             bundle.putParcelable(ARG_PARAM1, playlist);
             bundle.putString("title", playlist.getPlaylistName());
 
+            FragmentNavigator.Extras extras = new FragmentNavigator.Extras.Builder()
+                    .addSharedElement(binding.textViewTitle, binding.textViewTitle.getTransitionName())
+                    .build();
+
             Navigation.findNavController(binding.getRoot())
-                    .navigate(R.id.action_navigation_playlist_detail_to_navigation_media, bundle);
+                    .navigate(R.id.action_navigation_playlist_detail_to_navigation_media, bundle, null, extras);
 
         } else if (v.equals(binding.imageViewPlay)) {
             if (playlistMediaEntities.size()>0) {
@@ -203,13 +213,13 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
     }
 
     @Override
-    public void onRecyclerViewHolderClick(Bundle bundle) {
+    public void onRecyclerViewHolderClick(View viewHolder, Bundle bundle) {
         int position = bundle.getInt(ARG_PARAM1, -1);
         int type = bundle.getInt(ARG_PARAM2, -1);
         PlaylistMediaEntity playlistMediaEntity = bundle.getParcelable(ARG_PARAM3);
 
         assert playlistMediaEntity != null;
-        if (type == 1){
+        if (type == SELECT){
             String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntity,
                     PlaylistMediaEntity.class);
             QueueMediaEntity queueMediaEntity = ParserUtil.getInstance()
@@ -217,7 +227,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
             parentViewModel.setMedia(playlist, queueMediaEntity, true);
 
-        } else if (type == 2){
+        } else if (type == REMOVE){
             showRemoveMediaFromPlaylistAlert(position, playlistMediaEntity);
         }
         KeyboardUtils.hideKeyboard(activity, binding.getRoot());

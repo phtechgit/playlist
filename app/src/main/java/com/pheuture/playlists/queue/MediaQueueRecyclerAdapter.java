@@ -20,22 +20,20 @@ import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.utils.Logger;
 import com.pheuture.playlists.utils.StringUtils;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements RecyclerViewClickListener.ClickType {
     private static final String TAG = MediaQueueRecyclerAdapter.class.getSimpleName();
     private Context mContext;
     private int PLAYING_MEDIA = 1;
     private int NOT_PLAYING_MEDIA = 2;
     private List<QueueMediaEntity> oldList;
     private RecyclerViewClickListener recyclerViewClickListener;
-
-    public interface ClickType {
-        int SELECT = 1;
-        int REMOVE = 2;
-        int DRAG = 3;
-    }
 
     public MediaQueueRecyclerAdapter(Context context, RecyclerViewClickListener listener) {
         this.mContext = context;
@@ -76,7 +74,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder recyclerHolder, int position, List<Object> payloads) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder recyclerHolder, int position, @NotNull List<Object> payloads) {
         if (position == RecyclerView.NO_POSITION){
             return;
         }
@@ -114,10 +112,10 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             }
             Bundle bundle = new Bundle();
             bundle.putInt(Constants.ARG_PARAM1, pos);
-            bundle.putInt(Constants.ARG_PARAM2, ClickType.DRAG);
+            bundle.putInt(Constants.ARG_PARAM2, DRAG);
             bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-            recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
+            recyclerViewClickListener.onRecyclerViewHolderClick(this, bundle);
             return false;
         }
 
@@ -176,10 +174,10 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
 
                     Bundle bundle = new Bundle();
                     bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putInt(Constants.ARG_PARAM2, ClickType.SELECT);
+                    bundle.putInt(Constants.ARG_PARAM2, SELECT);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(NotPlayingMediaViewHolder.this, bundle);
                 }
             });
 
@@ -193,10 +191,10 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
 
                     Bundle bundle = new Bundle();
                     bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putInt(Constants.ARG_PARAM2, ClickType.REMOVE);
+                    bundle.putInt(Constants.ARG_PARAM2, REMOVE);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(NotPlayingMediaViewHolder.this, bundle);
                 }
             });
         }
@@ -210,10 +208,10 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             }
             Bundle bundle = new Bundle();
             bundle.putInt(Constants.ARG_PARAM1, pos);
-            bundle.putInt(Constants.ARG_PARAM2, ClickType.DRAG);
+            bundle.putInt(Constants.ARG_PARAM2, DRAG);
             bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-            recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
+            recyclerViewClickListener.onRecyclerViewHolderClick(this, bundle);
             return false;
         }
 

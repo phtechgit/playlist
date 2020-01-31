@@ -18,7 +18,8 @@ import com.pheuture.playlists.constants.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlaylistMediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class PlaylistMediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements RecyclerViewClickListener.ClickType{
     private static final String TAG = PlaylistMediaRecyclerAdapter.class.getSimpleName();
     private Context mContext;
     private List<PlaylistMediaEntity> oldList;
@@ -79,10 +80,10 @@ public class PlaylistMediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
 
                     Bundle bundle = new Bundle();
                     bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putInt(Constants.ARG_PARAM2, 1);
+                    bundle.putInt(Constants.ARG_PARAM2, SELECT);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(this, bundle);
                 }
             });
 
@@ -113,10 +114,10 @@ public class PlaylistMediaRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
 
                     Bundle bundle = new Bundle();
                     bundle.putInt(Constants.ARG_PARAM1, pos);
-                    bundle.putInt(Constants.ARG_PARAM2, 2);
+                    bundle.putInt(Constants.ARG_PARAM2, REMOVE);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewHolderClick(bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(this, bundle);
                 }
             });
         }

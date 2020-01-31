@@ -8,6 +8,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import com.pheuture.playlists.MainActivity;
 import com.pheuture.playlists.R;
@@ -31,7 +32,7 @@ public class UserProfileActivity extends BaseActivity implements TextWatcher {
         UserEntity user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 this, Constants.USER, ""), UserEntity.class);
 
-        viewModel = ViewModelProviders.of(this, new UserProfileViewModelFactory( getApplication(), user)).get(UserProfileViewModel.class);
+        viewModel = new ViewModelProvider(this, new UserProfileViewModelFactory( getApplication(), user)).get(UserProfileViewModel.class);
     }
 
     @Override

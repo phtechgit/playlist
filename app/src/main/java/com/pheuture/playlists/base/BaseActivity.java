@@ -15,10 +15,12 @@ import com.pheuture.playlists.constants.Constants;
 import com.pheuture.playlists.constants.DefaultValues;
 import com.pheuture.playlists.constants.NotificationID;
 import com.pheuture.playlists.constants.RequestCodes;
+import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.utils.PermissionUtils;
 
-public abstract class BaseActivity extends AppCompatActivity implements DefaultValues, NotificationID, RequestCodes,
-        Constants.SnackBarActions, PermissionUtils.CommonPermissions, View.OnClickListener {
+public abstract class BaseActivity extends AppCompatActivity implements DefaultValues,
+        NotificationID, RequestCodes, Constants.SnackBarActions, PermissionUtils.CommonPermissions,
+        RecyclerViewClickListener.ClickType, View.OnClickListener {
     public static final String ARG_PARAM1 = "param1";
     public static final String ARG_PARAM2 = "param2";
     public static final String ARG_PARAM3 = "param3";

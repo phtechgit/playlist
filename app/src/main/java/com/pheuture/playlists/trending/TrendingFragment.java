@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,8 +51,8 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     @Override
     public View myFragmentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_trendings, container, false);
-        parentViewModel = ViewModelProviders.of(activity).get(MainActivityViewModel.class);
-        viewModel = ViewModelProviders.of(this).get(TrendingViewModel.class);
+        parentViewModel = new ViewModelProvider(activity).get(MainActivityViewModel.class);
+        viewModel = new ViewModelProvider(this).get(TrendingViewModel.class);
         return binding.getRoot();
     }
 
@@ -116,7 +117,7 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     }
 
     @Override
-    public void onRecyclerViewHolderClick(Bundle bundle) {
+    public void onRecyclerViewHolderClick(View viewHolder, Bundle bundle) {
         MediaEntity mediaEntity = bundle.getParcelable(ARG_PARAM2);
 
         String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity,
