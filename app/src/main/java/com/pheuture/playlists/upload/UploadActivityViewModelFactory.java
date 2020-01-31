@@ -6,8 +6,6 @@ import android.net.Uri;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.pheuture.playlists.playlist.detail.PlaylistDetailViewModel;
-
 import org.jetbrains.annotations.NotNull;
 
 class UploadActivityViewModelFactory implements ViewModelProvider.Factory {

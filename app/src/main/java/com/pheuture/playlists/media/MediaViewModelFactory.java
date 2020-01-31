@@ -5,7 +5,7 @@ import android.app.Application;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
+import com.pheuture.playlists.playlist.PlaylistEntity;
 
 import org.jetbrains.annotations.NotNull;
 

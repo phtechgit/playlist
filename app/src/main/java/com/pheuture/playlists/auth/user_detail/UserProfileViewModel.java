@@ -5,27 +5,27 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.pending_api.PendingApiDao;
-import com.pheuture.playlists.datasource.local.pending_api.PendingApiEntity;
-import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
-import com.pheuture.playlists.service.PendingApiExecutorService;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
-import com.pheuture.playlists.constants.Url;
+import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.service.PendingApiLocalDao;
+import com.pheuture.playlists.base.service.PendingApiEntity;
+import com.pheuture.playlists.auth.UserEntity;
+import com.pheuture.playlists.base.service.PendingApiExecutorService;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.ParserUtil;
+import com.pheuture.playlists.base.utils.SharedPrefsUtils;
+import com.pheuture.playlists.base.constants.Url;
 
 import java.util.Calendar;
 
 public class UserProfileViewModel extends AndroidViewModel  {
     private static final String TAG = UserProfileViewModel.class.getSimpleName();
     private UserEntity userEntity;
-    private PendingApiDao pendingApiDao;
+    private PendingApiLocalDao pendingApiLocalDao;
 
     public UserProfileViewModel(@NonNull Application application, UserEntity user) {
         super(application);
         this.userEntity = user;
-        pendingApiDao = LocalRepository.getInstance(application).pendingApiDao();
+        pendingApiLocalDao = LocalRepository.getInstance(application).pendingApiLocalDao();
     }
 
     public void updateUserDetail(String firstName, String lastName) {
@@ -41,7 +41,7 @@ public class UserProfileViewModel extends AndroidViewModel  {
         PendingApiEntity pendingFileUploadEntity = new PendingApiEntity();
         pendingFileUploadEntity.setUrl(Url.UPDATE_USER_DETAIL);
         pendingFileUploadEntity.setParams(ParserUtil.getInstance().toJson(userEntity, UserEntity.class));
-        pendingApiDao.insert(pendingFileUploadEntity);
+        pendingApiLocalDao.insert(pendingFileUploadEntity);
 
         PendingApiExecutorService.startService(getApplication());
     }

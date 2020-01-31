@@ -10,17 +10,16 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
-import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
-import com.pheuture.playlists.datasource.local.media_handler.MediaDao;
-import com.pheuture.playlists.constants.ApiConstant;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
-import com.pheuture.playlists.constants.Url;
-import com.pheuture.playlists.utils.VolleyClient;
+import com.pheuture.playlists.auth.UserEntity;
+import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.media.MediaEntity;
+import com.pheuture.playlists.base.constants.ApiConstant;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.Logger;
+import com.pheuture.playlists.base.utils.ParserUtil;
+import com.pheuture.playlists.base.utils.SharedPrefsUtils;
+import com.pheuture.playlists.base.constants.Url;
+import com.pheuture.playlists.base.utils.VolleyClient;
 
 import org.json.JSONObject;
 
@@ -35,19 +34,21 @@ public class TrendingViewModel extends AndroidViewModel {
     private String searchQuery = "";
     private boolean reachedLast;
     private UserEntity user;
-    private MediaDao mediaDao;
+    private TrendingMediaLocalDao trendingMediaLocalDao;
     private LiveData<List<MediaEntity>> mediaEntitiesLive;
+    private TrendingRepository repository;
 
     public TrendingViewModel(@NonNull Application application) {
         super(application);
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 getApplication(), Constants.USER, ""), UserEntity.class);
 
-        mediaDao = LocalRepository.getInstance(application).mediaDao();
-
-        mediaEntitiesLive = mediaDao.getTrendingMediaEntitiesLive();
+        trendingMediaLocalDao = LocalRepository.getInstance(application).mediaLocalDao();
+        mediaEntitiesLive =
 
         getFreshData();
+        repository = new TrendingRepository();
+        repository.getDataLive();
     }
 
     public void getFreshData() {
@@ -67,8 +68,8 @@ public class TrendingViewModel extends AndroidViewModel {
 
                     List<MediaEntity> list = Arrays.asList(ParserUtil.getInstance()
                             .fromJson(response.optString(ApiConstant.DATA), MediaEntity[].class));
-                    mediaDao.deleteAll();
-                    mediaDao.insertAll(list);
+                    trendingMediaLocalDao.deleteAll();
+                    trendingMediaLocalDao.insert(list);
                 } catch (Exception e) {
                     Logger.e(TAG, e.toString());
                 }

@@ -11,9 +11,8 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemPlaylistBinding;
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
-import com.pheuture.playlists.constants.Constants;
+import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.base.constants.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +78,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                     bundle.putInt(Constants.ARG_PARAM1, adapterPosition);
                     bundle.putInt(Constants.ARG_PARAM2, SELECT);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(adapterPosition));
-                    recyclerViewClickListener.onRecyclerViewHolderClick(this, bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(MyViewHolder.this, bundle);
                 }
             });
 
@@ -95,7 +94,7 @@ public class PlaylistsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                     bundle.putInt(Constants.ARG_PARAM1, adapterPosition);
                     bundle.putInt(Constants.ARG_PARAM2, REMOVE);
                     bundle.putParcelable(Constants.ARG_PARAM3, oldList.get(adapterPosition));
-                    recyclerViewClickListener.onRecyclerViewHolderClick(this, bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(MyViewHolder.this, bundle);
                 }
             });
 

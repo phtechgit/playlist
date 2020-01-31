@@ -26,12 +26,12 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.constants.DefaultValues;
-import com.pheuture.playlists.constants.NotificationID;
-import com.pheuture.playlists.constants.RequestCodes;
-import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
-import com.pheuture.playlists.utils.PermissionUtils;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.constants.DefaultValues;
+import com.pheuture.playlists.base.constants.NotificationID;
+import com.pheuture.playlists.base.constants.RequestCodes;
+import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.base.utils.PermissionUtils;
 
 import org.jetbrains.annotations.NotNull;
 import java.util.List;

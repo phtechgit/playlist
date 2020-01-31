@@ -7,14 +7,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
-import com.pheuture.playlists.MainActivity;
+import com.pheuture.playlists.home.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.user_detail.UserProfileActivity;
-import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
-import com.pheuture.playlists.utils.StringUtils;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.ParserUtil;
+import com.pheuture.playlists.base.utils.SharedPrefsUtils;
+import com.pheuture.playlists.base.utils.StringUtils;
 
 public class SplashActivity extends AppCompatActivity {
 

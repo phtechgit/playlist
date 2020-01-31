@@ -9,15 +9,15 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
-import com.pheuture.playlists.MainActivity;
+
+import com.pheuture.playlists.home.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ActivityUserProfileBinding;
-import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
+import com.pheuture.playlists.auth.UserEntity;
 import com.pheuture.playlists.base.BaseActivity;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.ParserUtil;
+import com.pheuture.playlists.base.utils.SharedPrefsUtils;
 
 public class UserProfileActivity extends BaseActivity implements TextWatcher {
     private static final String TAG = UserProfileActivity.class.getSimpleName();

@@ -14,19 +14,20 @@ import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AppSignatureHelper;
 import com.pheuture.playlists.base.BaseAndroidViewModel;
-import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
-import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
-import com.pheuture.playlists.constants.ApiConstant;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
-import com.pheuture.playlists.constants.Url;
-import com.pheuture.playlists.utils.VolleyClient;
+import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.playlist.PlaylistLocalDao;
+import com.pheuture.playlists.playlist.PlaylistEntity;
+import com.pheuture.playlists.playist_detail.PlaylistMediaLocalDao;
+import com.pheuture.playlists.playist_detail.PlaylistMediaEntity;
+import com.pheuture.playlists.auth.UserEntity;
+import com.pheuture.playlists.base.constants.ApiConstant;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.Logger;
+import com.pheuture.playlists.base.utils.ParserUtil;
+import com.pheuture.playlists.base.utils.SharedPrefsUtils;
+import com.pheuture.playlists.base.constants.Url;
+import com.pheuture.playlists.base.utils.VolleyClient;
+
 import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,8 +40,8 @@ public class VerifyOtpViewModel extends BaseAndroidViewModel {
     private MutableLiveData<Boolean> showProgress = new MutableLiveData<>();
     private MutableLiveData<Boolean> userVerifiedMutableLiveData = new MutableLiveData<>();
     private StringRequest stringRequest;
-    private PlaylistDao playlistDao;
-    private PlaylistMediaDao playlistMediaDao;
+    private PlaylistLocalDao playlistLocalDao;
+    private PlaylistMediaLocalDao playlistMediaLocalDao;
     private MutableLiveData<Boolean> showNextButton;
     private String otp;
     private MutableLiveData<String> messageMutableLiveData;
@@ -49,8 +50,8 @@ public class VerifyOtpViewModel extends BaseAndroidViewModel {
         super(application);
         this.phoneNumber = phoneNumber;
         showNextButton = new MutableLiveData<>(false);
-        playlistDao = LocalRepository.getInstance(application).playlistDao();
-        playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
+        playlistLocalDao = LocalRepository.getInstance(application).playlistLocalDao();
+        playlistMediaLocalDao = LocalRepository.getInstance(application).playlistMediaLocalDao();
         messageMutableLiveData = new MutableLiveData<>(application.getResources()
                 .getString(R.string.waiting_to_automatically_detect_an_sms_send_to) + " " + phoneNumber);
     }
@@ -94,15 +95,15 @@ public class VerifyOtpViewModel extends BaseAndroidViewModel {
                     List<PlaylistEntity> playlistEntities = Arrays.asList(ParserUtil.getInstance()
                             .fromJson(response.optString("playlistdetail"),
                                     PlaylistEntity[].class));
-                    playlistDao.deleteAll();
-                    playlistDao.insertAll(playlistEntities);
+                    playlistLocalDao.deleteAll();
+                    playlistLocalDao.insertAll(playlistEntities);
 
                     List<PlaylistMediaEntity> playlistMediaEntities = Arrays.asList(
                             ParserUtil.getInstance().fromJson(
                                     response.optString("mediadetail"),
                                     PlaylistMediaEntity[].class));
-                    playlistMediaDao.deleteAll();
-                    playlistMediaDao.insertAll(playlistMediaEntities);
+                    playlistMediaLocalDao.deleteAll();
+                    playlistMediaLocalDao.insertAll(playlistMediaEntities);
 
                     setMessageToShow(getApplication().getResources().getString(R.string.user_verified_successfully));
                     userVerifiedMutableLiveData.setValue(true);

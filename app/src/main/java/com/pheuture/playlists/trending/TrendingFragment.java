@@ -13,24 +13,20 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pheuture.playlists.MainActivity;
-import com.pheuture.playlists.MainActivityViewModel;
+import com.pheuture.playlists.databinding.ItemMediaBinding;
+import com.pheuture.playlists.home.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentTrendingsBinding;
-import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
-import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.queue.QueueMediaEntity;
+import com.pheuture.playlists.media.MediaEntity;
+import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.base.BaseFragment;
-import com.pheuture.playlists.utils.KeyboardUtils;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.ParserUtil;
+import com.pheuture.playlists.base.utils.KeyboardUtils;
+import com.pheuture.playlists.base.utils.ParserUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TrendingFragment extends BaseFragment implements TextWatcher, RecyclerViewClickListener {
@@ -68,8 +64,8 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
 
         viewModel.getTrendingMediaLive().observe(this, new Observer<List<MediaEntity>>() {
             @Override
-            public void onChanged(List<MediaEntity> videoEntities) {
-                recyclerAdapter.setData(videoEntities);
+            public void onChanged(List<MediaEntity> trendingMediaEntities) {
+                recyclerAdapter.setData(trendingMediaEntities);
             }
         });
 
@@ -117,7 +113,7 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     }
 
     @Override
-    public void onRecyclerViewHolderClick(View viewHolder, Bundle bundle) {
+    public void onRecyclerViewHolderClick(RecyclerView.ViewHolder viewHolder, Bundle bundle) {
         MediaEntity mediaEntity = bundle.getParcelable(ARG_PARAM2);
 
         String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity,

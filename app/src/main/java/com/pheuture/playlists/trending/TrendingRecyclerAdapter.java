@@ -17,10 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemMediaBinding;
-import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.StringUtils;
+import com.pheuture.playlists.media.MediaEntity;
+import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +90,7 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.V
                     bundle.putInt(Constants.ARG_PARAM1, pos);
                     bundle.putParcelable(Constants.ARG_PARAM2, masterList.get(pos));
 
-                    recyclerViewClickListener.onRecyclerViewHolderClick(this, bundle);
+                    recyclerViewClickListener.onRecyclerViewHolderClick(MyViewHolder.this, bundle);
                 }
             });
         }

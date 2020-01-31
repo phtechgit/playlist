@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,22 +23,22 @@ import com.google.android.gms.auth.api.phone.SmsRetrieverClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.pheuture.playlists.MainActivity;
+import com.pheuture.playlists.home.MainActivity;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AuthViewModel;
 import com.pheuture.playlists.auth.user_detail.UserProfileActivity;
-import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
+import com.pheuture.playlists.auth.UserEntity;
 import com.pheuture.playlists.auth.request_otp.RequestOtpFragment;
 import com.pheuture.playlists.databinding.FragmentVerifyOtpBinding;
-import com.pheuture.playlists.interfaces.ButtonClickListener;
-import com.pheuture.playlists.receiver.SMSReceiver;
+import com.pheuture.playlists.base.interfaces.ButtonClickListener;
+import com.pheuture.playlists.base.receiver.SMSReceiver;
 import com.pheuture.playlists.base.BaseFragment;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.KeyboardUtils;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
-import com.pheuture.playlists.utils.StringUtils;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.KeyboardUtils;
+import com.pheuture.playlists.base.utils.Logger;
+import com.pheuture.playlists.base.utils.ParserUtil;
+import com.pheuture.playlists.base.utils.SharedPrefsUtils;
+import com.pheuture.playlists.base.utils.StringUtils;
 
 /**
  * A simple {@link Fragment} subclass.

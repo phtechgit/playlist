@@ -3,7 +3,7 @@ package com.pheuture.playlists.queue;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
-import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
+
 import java.util.List;
 
 public class MediaQueueDiffUtil extends DiffUtil.Callback {

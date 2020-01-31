@@ -2,8 +2,6 @@ package com.pheuture.playlists.playlist;
 
 import androidx.recyclerview.widget.DiffUtil;
 
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-
 import java.util.List;
 
 public class PlaylistDiffCallBack extends DiffUtil.Callback{

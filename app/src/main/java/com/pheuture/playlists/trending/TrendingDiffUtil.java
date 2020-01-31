@@ -1,7 +1,7 @@
 package com.pheuture.playlists.trending;
 
 import androidx.recyclerview.widget.DiffUtil;
-import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
+import com.pheuture.playlists.media.MediaEntity;
 import java.util.List;
 
 public class TrendingDiffUtil extends DiffUtil.Callback{

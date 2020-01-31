@@ -7,16 +7,15 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.constants.DefaultValues;
-import com.pheuture.playlists.constants.NotificationID;
-import com.pheuture.playlists.constants.RequestCodes;
-import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
-import com.pheuture.playlists.utils.PermissionUtils;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.constants.DefaultValues;
+import com.pheuture.playlists.base.constants.NotificationID;
+import com.pheuture.playlists.base.constants.RequestCodes;
+import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.base.utils.PermissionUtils;
 
 public abstract class BaseActivity extends AppCompatActivity implements DefaultValues,
         NotificationID, RequestCodes, Constants.SnackBarActions, PermissionUtils.CommonPermissions,

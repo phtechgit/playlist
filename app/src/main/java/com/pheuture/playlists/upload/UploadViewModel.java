@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Size;
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -15,20 +14,20 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.pheuture.playlists.base.BaseAndroidViewModel;
-import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler.PendingFileUploadDao;
-import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler.PendingFileUploadEntity;
-import com.pheuture.playlists.datasource.local.pending_api.pending_file_upload_handler.PendingFileUploadParamEntity;
-import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
-import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
-import com.pheuture.playlists.service.PendingFileUploadService;
-import com.pheuture.playlists.constants.ApiConstant;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.FileUtils;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
-import com.pheuture.playlists.constants.Url;
+import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.service.PendingFileUploadLocalDao;
+import com.pheuture.playlists.base.service.PendingFileUploadEntity;
+import com.pheuture.playlists.base.service.PendingFileUploadParamEntity;
+import com.pheuture.playlists.auth.UserEntity;
+import com.pheuture.playlists.media.MediaEntity;
+import com.pheuture.playlists.base.service.PendingFileUploadService;
+import com.pheuture.playlists.base.constants.ApiConstant;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.FileUtils;
+import com.pheuture.playlists.base.utils.Logger;
+import com.pheuture.playlists.base.utils.ParserUtil;
+import com.pheuture.playlists.base.utils.SharedPrefsUtils;
+import com.pheuture.playlists.base.constants.Url;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -46,11 +45,11 @@ public class UploadViewModel extends BaseAndroidViewModel implements MediaEntity
     private UserEntity user;
     private MutableLiveData<Uri> mediaUriLiveData = new MutableLiveData<>();
     private MutableLiveData<Uri> thumbnailUriLiveData = new MutableLiveData<>();
-    private PendingFileUploadDao pendingFileUploadDao;
+    private PendingFileUploadLocalDao pendingFileUploadLocalDao;
 
     public UploadViewModel(@NonNull Application application, Uri mediaUri) {
         super(application);
-        pendingFileUploadDao = LocalRepository.getInstance(application).pendingUploadDao();
+        pendingFileUploadLocalDao = LocalRepository.getInstance(application).pendingUploadLocalDao();
 
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 getApplication(), Constants.USER, ""), UserEntity.class);
@@ -100,7 +99,7 @@ public class UploadViewModel extends BaseAndroidViewModel implements MediaEntity
 
         pendingFileUploadEntity.setParams(ParserUtil.getInstance().toJson(paramEntities));
 
-        pendingFileUploadDao.insert(pendingFileUploadEntity);
+        pendingFileUploadLocalDao.insert(pendingFileUploadEntity);
 
         PendingFileUploadService.startService(getApplication());
     }

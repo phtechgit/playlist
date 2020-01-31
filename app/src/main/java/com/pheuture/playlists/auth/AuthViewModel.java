@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.pheuture.playlists.base.BaseAndroidViewModel;
-import com.pheuture.playlists.interfaces.ButtonClickListener;
+import com.pheuture.playlists.base.interfaces.ButtonClickListener;
 
 public class AuthViewModel extends BaseAndroidViewModel {
     private static final String TAG = AuthViewModel.class.getSimpleName();

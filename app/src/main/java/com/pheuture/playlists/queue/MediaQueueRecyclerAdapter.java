@@ -10,16 +10,14 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemQueueNotPlayingMediaBinding;
 import com.pheuture.playlists.databinding.ItemQueuePlayingMediaBinding;
-import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.StringUtils;
+import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.Logger;
+import com.pheuture.playlists.base.utils.StringUtils;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -5,20 +5,20 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.media_handler.offline.OfflineMediaDao;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.Logger;
+import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.media.OfflineMediaLocalDao;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.Logger;
 
 import java.io.File;
 
 public class SettingsViewModel extends AndroidViewModel {
     private static final String TAG = SettingsViewModel.class.getSimpleName();
-    private OfflineMediaDao offlineMediaDao;
+    private OfflineMediaLocalDao offlineMediaLocalDao;
 
     public SettingsViewModel(@NonNull Application application) {
         super(application);
-        offlineMediaDao = LocalRepository.getInstance(application).offlineMediaDao();
+        offlineMediaLocalDao = LocalRepository.getInstance(application).offlineMediaLocalDao();
     }
 
     public void deleteOfflineMedia() {
@@ -34,7 +34,7 @@ public class SettingsViewModel extends AndroidViewModel {
                     }
                 }
                 if (directory.delete()) {
-                    offlineMediaDao.deleteAll();
+                    offlineMediaLocalDao.deleteAll();
                 }
             }
         }

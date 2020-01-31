@@ -17,18 +17,17 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.pheuture.playlists.MainActivityViewModel;
+import com.pheuture.playlists.home.MainActivityViewModel;
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.constants.DefaultValues;
+import com.pheuture.playlists.base.constants.DefaultValues;
 import com.pheuture.playlists.databinding.FragmentSettingsBinding;
 import com.pheuture.playlists.upload.UploadActivity;
 import com.pheuture.playlists.base.BaseFragment;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.KeyboardUtils;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.KeyboardUtils;
+import com.pheuture.playlists.base.utils.SharedPrefsUtils;
 
 public class SettingsFragment extends BaseFragment implements
         CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener, DefaultValues {

@@ -6,7 +6,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.TransitionInflater;
@@ -19,17 +18,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.pheuture.playlists.MainActivity;
-import com.pheuture.playlists.MainActivityViewModel;
+import com.pheuture.playlists.home.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentMediaBinding;
-import com.pheuture.playlists.datasource.local.media_handler.queue.QueueMediaEntity;
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.queue.QueueMediaEntity;
+import com.pheuture.playlists.playlist.PlaylistEntity;
+import com.pheuture.playlists.playist_detail.PlaylistMediaEntity;
+import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.base.BaseFragment;
-import com.pheuture.playlists.utils.ParserUtil;
+import com.pheuture.playlists.base.utils.ParserUtil;
 import java.util.List;
 
 public class MediaFragment extends BaseFragment implements TextWatcher, RecyclerViewClickListener {
@@ -145,7 +142,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
     };
 
     @Override
-    public void onRecyclerViewHolderClick(View viewHolder, Bundle bundle) {
+    public void onRecyclerViewHolderClick(RecyclerView.ViewHolder viewHolder, Bundle bundle) {
         int type = bundle.getInt(ARG_PARAM1, -1);
         int position = bundle.getInt(ARG_PARAM2, -1);
         MediaEntity mediaEntity = bundle.getParcelable(ARG_PARAM3);

@@ -9,23 +9,23 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.pheuture.playlists.datasource.local.pending_api.PendingApiDao;
-import com.pheuture.playlists.datasource.local.pending_api.PendingApiEntity;
-import com.pheuture.playlists.datasource.local.user_handler.UserEntity;
-import com.pheuture.playlists.datasource.local.LocalRepository;
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistDao;
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaDao;
-import com.pheuture.playlists.datasource.local.playlist_handler.playlist_media_handler.PlaylistMediaEntity;
-import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
-import com.pheuture.playlists.service.PendingApiExecutorService;
-import com.pheuture.playlists.constants.ApiConstant;
-import com.pheuture.playlists.constants.Constants;
-import com.pheuture.playlists.utils.Logger;
-import com.pheuture.playlists.utils.ParserUtil;
-import com.pheuture.playlists.utils.SharedPrefsUtils;
-import com.pheuture.playlists.constants.Url;
-import com.pheuture.playlists.utils.VolleyClient;
+import com.pheuture.playlists.base.service.PendingApiLocalDao;
+import com.pheuture.playlists.base.service.PendingApiEntity;
+import com.pheuture.playlists.auth.UserEntity;
+import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.playlist.PlaylistLocalDao;
+import com.pheuture.playlists.playlist.PlaylistEntity;
+import com.pheuture.playlists.playist_detail.PlaylistMediaLocalDao;
+import com.pheuture.playlists.playist_detail.PlaylistMediaEntity;
+import com.pheuture.playlists.base.service.PendingApiExecutorService;
+import com.pheuture.playlists.base.constants.ApiConstant;
+import com.pheuture.playlists.base.constants.Constants;
+import com.pheuture.playlists.base.utils.Logger;
+import com.pheuture.playlists.base.utils.ParserUtil;
+import com.pheuture.playlists.base.utils.SharedPrefsUtils;
+import com.pheuture.playlists.base.constants.Url;
+import com.pheuture.playlists.base.utils.VolleyClient;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,15 +40,15 @@ import java.util.Objects;
 public class MediaViewModel extends AndroidViewModel {
     private static final String TAG = MediaViewModel.class.getSimpleName();
     private MutableLiveData<List<MediaEntity>> mediaEntitiesMutableLiveData;
-    private PlaylistMediaDao playlistMediaDao;
-    private PlaylistDao playlistDao;
+    private PlaylistMediaLocalDao playlistMediaLocalDao;
+    private PlaylistLocalDao playlistLocalDao;
     private long lastID;
     private long limit = 30;
     private String searchQuery = "";
     private boolean reachedLast;
     private PlaylistEntity playlistEntity;
     private UserEntity user;
-    private PendingApiDao pendingApiDao;
+    private PendingApiLocalDao pendingApiLocalDao;
 
     public MediaViewModel(@NonNull Application application, PlaylistEntity playlistEntity) {
         super(application);
@@ -56,9 +56,9 @@ public class MediaViewModel extends AndroidViewModel {
         user = ParserUtil.getInstance().fromJson(SharedPrefsUtils.getStringPreference(
                 getApplication(), Constants.USER, ""), UserEntity.class);
 
-        pendingApiDao = LocalRepository.getInstance(application).pendingApiDao();
-        playlistDao = LocalRepository.getInstance(application).playlistDao();
-        playlistMediaDao = LocalRepository.getInstance(application).playlistMediaDao();
+        pendingApiLocalDao = LocalRepository.getInstance(application).pendingApiLocalDao();
+        playlistLocalDao = LocalRepository.getInstance(application).playlistLocalDao();
+        playlistMediaLocalDao = LocalRepository.getInstance(application).playlistMediaLocalDao();
 
         mediaEntitiesMutableLiveData = new MutableLiveData<>(new ArrayList<>());
 
@@ -202,13 +202,13 @@ public class MediaViewModel extends AndroidViewModel {
         playlistMediaEntity.setPlaylistID(playlistEntity.getPlaylistID());
         playlistMediaEntity.setCreatedOn(date);
         playlistMediaEntity.setModifiedOn(date);
-        playlistMediaDao.insert(playlistMediaEntity);
+        playlistMediaLocalDao.insert(playlistMediaEntity);
 
         //update playlist
         playlistEntity.setSongsCount(playlistEntity.getSongsCount() + 1);
         playlistEntity.setPlayDuration(playlistEntity.getPlayDuration() + playlistMediaEntity.getPlayDuration());
         playlistEntity.setModifiedOn(date);
-        playlistDao.insert(playlistEntity);
+        playlistLocalDao.insert(playlistEntity);
 
         //add to pending uploads
         JSONObject params = new JSONObject();
@@ -225,7 +225,7 @@ public class MediaViewModel extends AndroidViewModel {
         PendingApiEntity pendingFileUploadEntity = new PendingApiEntity();
         pendingFileUploadEntity.setUrl(Url.PLAYLIST_MEDIA_ADD);
         pendingFileUploadEntity.setParams(params.toString());
-        pendingApiDao.insert(pendingFileUploadEntity);
+        pendingApiLocalDao.insert(pendingFileUploadEntity);
 
         //start ExecutorService
         PendingApiExecutorService.startService(getApplication());

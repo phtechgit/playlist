@@ -21,21 +21,18 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.FragmentNavigator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pheuture.playlists.MainActivityViewModel;
+import com.pheuture.playlists.home.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentPlaylistBinding;
-import com.pheuture.playlists.datasource.local.playlist_handler.PlaylistEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.base.BaseFragment;
-import com.pheuture.playlists.utils.EditTextInputFilter;
-import com.pheuture.playlists.utils.KeyboardUtils;
-import com.pheuture.playlists.utils.StringUtils;
+import com.pheuture.playlists.base.utils.EditTextInputFilter;
+import com.pheuture.playlists.base.utils.KeyboardUtils;
 
 import java.util.List;
 
@@ -226,7 +223,7 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
     }
 
     @Override
-    public void onRecyclerViewHolderClick(View viewHolder, Bundle bundle) {
+    public void onRecyclerViewHolderClick(RecyclerView.ViewHolder viewHolder, Bundle bundle) {
         int position = bundle.getInt(ARG_PARAM1, -1);
         int clickType = bundle.getInt(ARG_PARAM2, -1);
         PlaylistEntity model = bundle.getParcelable(ARG_PARAM3);
@@ -240,8 +237,9 @@ public class PlaylistFragment extends BaseFragment implements TextWatcher, Recyc
                 bundle.clear();
                 bundle.putLong(ARG_PARAM1, model.getPlaylistID());
 
-                View view1 = viewHolder.findViewById(R.id.textView_title);
-                View view2 = viewHolder.findViewById(R.id.textView_creator);
+                View view1 = viewHolder.itemView.findViewById(R.id.textView_title);
+                View view2 = viewHolder.itemView.findViewById(R.id.textView_creator);
+
                 FragmentNavigator.Extras extras = new FragmentNavigator.Extras.Builder()
                         .addSharedElement(view1, view1.getTransitionName())
                         .addSharedElement(view2, view2.getTransitionName())

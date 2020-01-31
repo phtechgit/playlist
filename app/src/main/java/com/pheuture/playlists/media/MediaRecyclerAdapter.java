@@ -13,9 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.ItemMediaBinding;
-import com.pheuture.playlists.datasource.local.media_handler.MediaEntity;
-import com.pheuture.playlists.interfaces.RecyclerViewClickListener;
-import com.pheuture.playlists.constants.Constants;
+import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
+import com.pheuture.playlists.base.constants.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
