@@ -36,7 +36,6 @@ public class TrendingViewModel extends AndroidViewModel {
     private UserEntity user;
     private TrendingMediaLocalDao trendingMediaLocalDao;
     private LiveData<List<MediaEntity>> mediaEntitiesLive;
-    private TrendingRepository repository;
 
     public TrendingViewModel(@NonNull Application application) {
         super(application);
@@ -44,11 +43,10 @@ public class TrendingViewModel extends AndroidViewModel {
                 getApplication(), Constants.USER, ""), UserEntity.class);
 
         trendingMediaLocalDao = LocalRepository.getInstance(application).mediaLocalDao();
-        mediaEntitiesLive =
+
+        mediaEntitiesLive = trendingMediaLocalDao.getTrendingMediaEntitiesLive();
 
         getFreshData();
-        repository = new TrendingRepository();
-        repository.getDataLive();
     }
 
     public void getFreshData() {

@@ -18,7 +18,7 @@ public interface TrendingMediaLocalDao {
     long insert(MediaEntity video);
 
     @Update
-    long update(MediaEntity video);
+    int update(MediaEntity video);
 
     @Delete
     void delete(MediaEntity mediaEntity);

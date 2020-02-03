@@ -10,12 +10,14 @@ import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.pheuture.playlists.R;
+import com.pheuture.playlists.base.utils.SingleMutableLiveData;
 import com.pheuture.playlists.databinding.ItemMediaBinding;
 import com.pheuture.playlists.media.MediaEntity;
 import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
