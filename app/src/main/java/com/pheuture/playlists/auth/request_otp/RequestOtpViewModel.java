@@ -17,6 +17,7 @@ import com.pheuture.playlists.base.BaseAndroidViewModel;
 import com.pheuture.playlists.base.constants.ApiConstant;
 import com.pheuture.playlists.base.utils.Logger;
 import com.pheuture.playlists.base.constants.Url;
+import com.pheuture.playlists.base.utils.SingleMutableLiveData;
 import com.pheuture.playlists.base.utils.VolleyClient;
 import org.json.JSONObject;
 import java.util.HashMap;
@@ -26,13 +27,14 @@ public class RequestOtpViewModel extends BaseAndroidViewModel {
     private static final String TAG = RequestOtpViewModel.class.getSimpleName();
     private MutableLiveData<Boolean> showNextButton;
     private MutableLiveData<Boolean> showProgress;
-    private OtpListener otpListener;
+    private SingleMutableLiveData<Boolean> otpSent;
     private String phoneNumber;
 
     public RequestOtpViewModel(@NonNull Application application) {
         super(application);
         showNextButton = new MutableLiveData<>(false);
         showProgress = new MutableLiveData<>(false);
+        otpSent = new SingleMutableLiveData<>();
     }
 
     public LiveData<Boolean> getShowNextButton() {
@@ -80,7 +82,8 @@ public class RequestOtpViewModel extends BaseAndroidViewModel {
                         return;
                     }
                     showSnackBar(getApplication().getString(R.string.otp_sent), Snackbar.LENGTH_SHORT);
-                    otpListener.onOtpSent();
+                    otpSent.postValue(true);
+
                 } catch (Exception e) {
                     setShowNext(true);
                     Logger.e(TAG, e.toString());
@@ -113,7 +116,7 @@ public class RequestOtpViewModel extends BaseAndroidViewModel {
         VolleyClient.getRequestQueue(getApplication()).add(jsonObjectRequest);
     }
 
-    public void setOtpSentListener(OtpListener otpListener) {
-        this.otpListener = otpListener;
+    public LiveData<Boolean> getOtpSent() {
+        return otpSent;
     }
 }

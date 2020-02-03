@@ -19,10 +19,7 @@ import com.pheuture.playlists.base.interfaces.ButtonClickListener;
 import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.base.utils.KeyboardUtils;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class RequestOtpFragment extends BaseFragment implements TextWatcher, ButtonClickListener, OtpListener{
+public class RequestOtpFragment extends BaseFragment implements TextWatcher, ButtonClickListener{
     private static final String TAG = RequestOtpFragment.class.getSimpleName();
     private FragmentActivity activity;
     private FragmentRequestOtpBinding binding;
@@ -75,12 +72,18 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
                 setSnackBar(binding.getRoot(), bundle);
             }
         });
+
+        viewModel.getOtpSent().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean sent) {
+                parentViewModel.setMoveToOtpVerifyPage(true);
+            }
+        });
     }
 
     @Override
     public void setListeners() {
         binding.ediTextPhone.addTextChangedListener(this);
-        viewModel.setOtpSentListener(this);
         parentViewModel.setOnButtonClickListener(this);
     }
 
@@ -121,10 +124,5 @@ public class RequestOtpFragment extends BaseFragment implements TextWatcher, But
     @Override
     public void afterTextChanged(Editable s) {
 
-    }
-
-    @Override
-    public void onOtpSent() {
-        parentViewModel.setMoveToOtpVerifyPage(true);
     }
 }

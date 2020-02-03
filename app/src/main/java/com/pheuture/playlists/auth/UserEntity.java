@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.RoomWarnings;
 
 import com.google.gson.annotations.SerializedName;
 import com.pheuture.playlists.base.utils.StringUtils;
@@ -14,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 @Entity
 public class UserEntity implements Parcelable {
+
+	@SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
 	@NonNull
 	@PrimaryKey
 	@SerializedName("userID")

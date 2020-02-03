@@ -14,7 +14,6 @@ import com.pheuture.playlists.media.MediaEntity;
 @Entity
 public class PlaylistMediaEntity extends MediaEntity implements Parcelable {
 
-	@SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
     @NonNull
     @PrimaryKey(autoGenerate = true)
 	@SerializedName("playlistMediaID")
