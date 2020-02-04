@@ -2,7 +2,6 @@ package com.pheuture.playlists.base;
 
 public class ResourceJava<T>{
     private T data = null;
-    private String mesage = null;
 
     public class Loading{
         private T data;

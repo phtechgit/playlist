@@ -5,7 +5,6 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -30,9 +29,9 @@ import java.util.Map;
 
 public class TrendingViewModel extends AndroidViewModel {
     private static final String TAG = TrendingViewModel.class.getSimpleName();
-    private int limit = 20;
+
     private String searchQuery = "";
-    private boolean reachedLast;
+
     private UserEntity user;
     private TrendingMediaLocalDao trendingMediaLocalDao;
     private LiveData<List<MediaEntity>> mediaEntitiesLive;

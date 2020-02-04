@@ -3,9 +3,17 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-
+    signingConfigs {
+        release {
+            storeFile file('D:\\Current Projects\\Pheuture\\App Keys\\Playlists\\pheuture_playlist_release_keystore.jks')
+            storePassword '45-0D-CB-BD-DB-EA'
+            keyPassword 'D2-F5-A6-9F-B3-70'
+            keyAlias = 'key0'
+        }
+    }
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
+
     defaultConfig {
         applicationId "com.pheuture.playlists"
         minSdkVersion 21
@@ -14,12 +22,20 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
 
         debug {
             applicationIdSuffix = '.debug'
         }
+        release {
+            debuggable = false
+            jniDebuggable = false
+            signingConfig signingConfigs.release
+            minifyEnabled = true
+        }
     }
+
     dataBinding {
         enabled = true
     }
