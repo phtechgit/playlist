@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Entity
 public class UserEntity implements Parcelable {
+
 	@NonNull
 	@PrimaryKey
 	@SerializedName("userID")

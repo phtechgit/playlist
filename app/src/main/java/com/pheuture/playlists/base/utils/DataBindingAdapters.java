@@ -16,6 +16,7 @@ public final class DataBindingAdapters {
         if (imageUrl==null || imageUrl.length()==0){
             return;
         }
+
         Glide.with(view.getContext())
                 .load(imageUrl)
                 .override(160,90)
