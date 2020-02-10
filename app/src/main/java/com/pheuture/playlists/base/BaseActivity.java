@@ -82,6 +82,26 @@ public abstract class BaseActivity extends AppCompatActivity implements DefaultV
         snackBar.show();
     }
 
+    protected void setError(View view, String error){
+        if (error == null || error.length() == 0){
+            if (snackBar != null && snackBar.isShown()){
+                snackBar.dismiss();
+            }
+            return;
+        }
+
+        snackBar = Snackbar.make(view, error, Snackbar.LENGTH_SHORT);
+        View snackBarView = snackBar.getView();
+        snackBarView.setBackgroundColor(getResources().getColor(R.color.WhiteC));
+
+        TextView textView = snackBarView.findViewById(R.id.snackbar_text);
+        textView.setTextColor(getResources().getColor(R.color.grayF));
+
+        snackBar.show();
+    }
+
+    protected void showError(String errorMessage, boolean show){}
+
     public void hideProgress(View progressBar){
         if (progressBar!=null) {
             progressBar.setVisibility(View.GONE);

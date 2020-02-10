@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import androidx.annotation.Nullable;
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.base.datasource.remote.FileUploadDao;
 import com.pheuture.playlists.base.datasource.remote.RemoteRepository;
 import com.pheuture.playlists.base.datasource.remote.ResponseModel;
@@ -32,7 +32,7 @@ public class PendingApiExecutorService extends Service {
 
     public synchronized static void startService(Context context) {
         try {
-            if (NetworkUtils.online(context)) {
+            if (NetworkUtils.isConnected(context)) {
                 Intent intent = new Intent(context, PendingApiExecutorService.class);
                 context.startService(intent);
             }

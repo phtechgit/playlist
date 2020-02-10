@@ -83,7 +83,7 @@ public class MediaQueueRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         }
     }
 
-    public void updateData(final List<QueueMediaEntity> newList) {
+    public void setData(final List<QueueMediaEntity> newList) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MediaQueueDiffUtil(oldList, newList),
                 true);
         oldList = new ArrayList<>(newList);

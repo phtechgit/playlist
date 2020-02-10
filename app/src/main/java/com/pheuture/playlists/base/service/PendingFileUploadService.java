@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.pheuture.playlists.R;
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.base.datasource.remote.FileUploadDao;
 import com.pheuture.playlists.base.datasource.remote.ProgressRequestBody;
 import com.pheuture.playlists.base.datasource.remote.RemoteRepository;
@@ -67,7 +67,7 @@ public class PendingFileUploadService extends Service implements NotificationCha
 
     public synchronized static void startService(Context context) {
         try {
-            if (NetworkUtils.online(context)) {
+            if (NetworkUtils.isConnected(context)) {
                 Intent intent = new Intent(context, PendingFileUploadService.class);
                 context.startService(intent);
             }

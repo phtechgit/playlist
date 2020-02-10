@@ -4,7 +4,6 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -12,7 +11,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.base.service.PendingApiLocalDao;
 import com.pheuture.playlists.base.service.PendingApiEntity;
 import com.pheuture.playlists.auth.UserEntity;
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.playlist.PlaylistLocalDao;
 import com.pheuture.playlists.playlist.PlaylistEntity;
 import com.pheuture.playlists.playist_detail.PlaylistMediaLocalDao;
@@ -25,17 +24,14 @@ import com.pheuture.playlists.base.utils.ParserUtil;
 import com.pheuture.playlists.base.utils.SharedPrefsUtils;
 import com.pheuture.playlists.base.constants.Url;
 import com.pheuture.playlists.base.utils.VolleyClient;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class MediaViewModel extends AndroidViewModel {
     private static final String TAG = MediaViewModel.class.getSimpleName();
@@ -43,11 +39,11 @@ public class MediaViewModel extends AndroidViewModel {
     private PlaylistMediaLocalDao playlistMediaLocalDao;
     private PlaylistLocalDao playlistLocalDao;
     private long lastID;
-    private long limit = 30;
+    private UserEntity user;
+    private long limit = 50;
     private String searchQuery = "";
     private boolean reachedLast;
     private PlaylistEntity playlistEntity;
-    private UserEntity user;
     private PendingApiLocalDao pendingApiLocalDao;
 
     public MediaViewModel(@NonNull Application application, PlaylistEntity playlistEntity) {
@@ -75,7 +71,6 @@ public class MediaViewModel extends AndroidViewModel {
             @Override
             public void onResponse(String stringResponse) {
                 try {
-
                     Logger.e(url + ApiConstant.RESPONSE, stringResponse);
 
                     JSONObject response = new JSONObject(stringResponse);
@@ -114,7 +109,6 @@ public class MediaViewModel extends AndroidViewModel {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put(ApiConstant.PLAYLIST_ID, String.valueOf(playlistEntity.getPlaylistID()));
                 params.put(ApiConstant.LAST_ID, String.valueOf(lastID));
                 params.put(ApiConstant.SEARCH_QUERY, ((searchQuery==null)?"":searchQuery));
                 params.put(ApiConstant.LIMIT, String.valueOf(limit));
@@ -195,9 +189,9 @@ public class MediaViewModel extends AndroidViewModel {
         long date = calendar.getTimeInMillis();
 
         //update playlist media
-        List<MediaEntity> mediaEntities = new ArrayList<>(Objects.requireNonNull(mediaEntitiesMutableLiveData.getValue()));
+        /*List<MediaEntity> mediaEntities = new ArrayList<>(Objects.requireNonNull(mediaEntitiesMutableLiveData.getValue()));
         mediaEntities.remove(adapterPosition);
-        mediaEntitiesMutableLiveData.setValue(mediaEntities);
+        mediaEntitiesMutableLiveData.setValue(mediaEntities);*/
 
         playlistMediaEntity.setPlaylistID(playlistEntity.getPlaylistID());
         playlistMediaEntity.setCreatedOn(date);
@@ -238,5 +232,13 @@ public class MediaViewModel extends AndroidViewModel {
 
     public String getSearchQuery() {
         return searchQuery;
+    }
+
+    public boolean mediaAlreadyAddedToPlaylist(long mediaID) {
+        PlaylistMediaEntity playlistMediaEntity = playlistMediaLocalDao.getPlaylistMedia(playlistEntity.getPlaylistID(), mediaID);
+        if (playlistMediaEntity==null){
+            return false;
+        }
+        return true;
     }
 }

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.TransitionInflater;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -27,6 +28,8 @@ import com.pheuture.playlists.playist_detail.PlaylistMediaEntity;
 import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.base.utils.ParserUtil;
+
+import java.util.Arrays;
 import java.util.List;
 
 public class MediaFragment extends BaseFragment implements TextWatcher, RecyclerViewClickListener {
@@ -38,6 +41,7 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
     private LinearLayoutManager layoutManager;
     private PlaylistEntity playlistModel;
     private FragmentActivity activity;
+    private List<MediaEntity> mediaEntities;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,12 +76,15 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
         binding.recyclerView.setAdapter(recyclerAdapter);
         binding.recyclerView.setHasFixedSize(true);
 
+        /*Parcelable state = layoutManager.onSaveInstanceState();
+        layoutManager.onRestoreInstanceState(state);*/
+
         viewModel.getPlaylistMediaListLive().observe(this, new Observer<List<MediaEntity>>() {
             @Override
-            public void onChanged(List<MediaEntity> videoEntities) {
-                recyclerAdapter.setData(videoEntities);
-
-                if (videoEntities.size()>0){
+            public void onChanged(List<MediaEntity> newMediaEntities) {
+                mediaEntities = newMediaEntities;
+                recyclerAdapter.setData(mediaEntities);
+                if (mediaEntities.size()>0){
                     binding.textViewEmptySearchResult.setVisibility(View.GONE);
                     binding.recyclerView.setVisibility(View.VISIBLE);
                 } else {
@@ -86,7 +93,6 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
                         binding.textViewEmptySearchResult.setVisibility(View.VISIBLE);
                     }
                 }
-
             }
         });
     }
@@ -147,16 +153,22 @@ public class MediaFragment extends BaseFragment implements TextWatcher, Recycler
         int position = bundle.getInt(ARG_PARAM2, -1);
         MediaEntity mediaEntity = bundle.getParcelable(ARG_PARAM3);
 
-        String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity,
-                MediaEntity.class);
-
         if (type == SELECT){
-            QueueMediaEntity queueMediaEntity = ParserUtil.getInstance()
-                    .fromJson(objectJsonString, QueueMediaEntity.class);
+            String objectJsonString = ParserUtil.getInstance().toJson(mediaEntities);
+            List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
+                    .fromJson(objectJsonString, QueueMediaEntity[].class));
 
-            parentViewModel.setMedia(null, queueMediaEntity, true);
+            parentViewModel.setMedia(queueMediaEntities, position, true);
 
         } else {
+            String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity);
+
+            if (viewModel.mediaAlreadyAddedToPlaylist(mediaEntity.getMediaID())){
+                parentViewModel.showSnackBar("Already added to " + playlistModel.getPlaylistName(),
+                        Snackbar.LENGTH_SHORT);
+                return;
+            }
+
             PlaylistMediaEntity playlistMediaEntity = ParserUtil.getInstance()
                     .fromJson(objectJsonString, PlaylistMediaEntity.class);
 

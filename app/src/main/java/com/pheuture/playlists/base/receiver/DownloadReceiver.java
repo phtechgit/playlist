@@ -8,7 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.pheuture.playlists.base.service.FileMoveIntentService;
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.media.OfflineMediaLocalDao;
 
 import java.io.File;

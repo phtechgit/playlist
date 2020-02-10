@@ -10,9 +10,7 @@ import android.view.ViewPropertyAnimator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.SeekBar;
 
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback;
 import com.pheuture.playlists.R;
@@ -44,7 +42,7 @@ import static androidx.navigation.Navigation.findNavController;
 
 public class MainActivity extends BaseActivity implements NavController.OnDestinationChangedListener,
         RecyclerViewClickListener, RecyclerItemMoveCallback.ItemTouchHelperContract,
-        ConnectivityChangeReceiver.ConnectivityChangeListener, SeekBar.OnSeekBarChangeListener {
+        ConnectivityChangeReceiver.ConnectivityChangeListener, SeekBar.OnSeekBarChangeListener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private ActivityMainBinding binding;
@@ -53,6 +51,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     private MediaQueueRecyclerAdapter recyclerAdapter;
     private ConnectivityChangeReceiver connectivityChangeReceiver;
     private ItemTouchHelper itemTouchHelper;
+    private List<QueueMediaEntity> queueMediaEntities;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -81,22 +80,21 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
         setSupportActionBar(binding.layoutAppBar.toolbar);
 
         setupConnectivityChangeBroadcastReceiver();
 
-        proceedWithPermissions(REQUEST_CODE_GRANT_PERMISSIONS,READ_WRITE_EXTERNAL_STORAGE_PERMISSION, null, true);
-
         bottomSheetBehavior = BottomSheetBehavior.from( binding.layoutBottomSheet.constraintLayoutBottomSheet);
-        bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
+        bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings)
-                .build();
+                R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings).build();
 
         NavController navController = findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -115,153 +113,59 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         itemTouchHelper = new ItemTouchHelper(itemMoveCallback);
         itemTouchHelper.attachToRecyclerView(binding.layoutBottomSheet.recyclerViewMediaQueue);
 
-        viewModel.getTitle().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                setTitle(s);
-            }
-        });
-
-        viewModel.getExoPlayer().observe(this, new Observer<SimpleExoPlayer>() {
-            @Override
-            public void onChanged(SimpleExoPlayer exoPlayer) {
-                binding.layoutBottomSheet.playerView.setPlayer(exoPlayer);
-            }
-        });
-
-        viewModel.getCurrentlyPlayingQueueMedia().observe(this, new Observer<QueueMediaEntity>() {
-            @Override
-            public void onChanged(QueueMediaEntity currentlyPlayingQueueMediaEntity) {
-                //set media info
-                binding.layoutBottomSheet.textViewTitle.setText(currentlyPlayingQueueMediaEntity.getMediaTitle());
-                binding.layoutBottomSheet.textViewCreator.setText(currentlyPlayingQueueMediaEntity.getMovieName());
-
-                //show bottom sheet
-                binding.layoutBottomSheet.constraintLayoutBottomSheet.setVisibility(View.VISIBLE);
-                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN){
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                }
-            }
-        });
-
         viewModel.getQueueMediaEntities().observe(this, new Observer<List<QueueMediaEntity>>() {
             @Override
-            public void onChanged(List<QueueMediaEntity> queueMediaEntities) {
-                recyclerAdapter.updateData(queueMediaEntities);
-
-                //if more media available to play
-                if (viewModel.nextMediaAvailable()) {
-                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_light);
-                } else {
-                    binding.layoutBottomSheet.imageViewNext.setImageResource(R.drawable.ic_next_grey);
-                }
-
-                //if can shuffle
-                if (viewModel.canShuffle()){
-                    binding.layoutBottomSheet.imageViewShuffle.setImageResource(R.drawable.exo_controls_shuffle_on);
-                } else {
-                    binding.layoutBottomSheet.imageViewShuffle.setImageResource(R.drawable.exo_controls_shuffle_off);
-                }
-
-                if (viewModel.previousMediaAvailable()) {
-                    binding.layoutBottomSheet.imageViewPrevious.setImageResource(R.drawable.ic_previous_light);
-                } else {
-                    binding.layoutBottomSheet.imageViewPrevious.setImageResource(R.drawable.ic_previous_dark);
-                }
+            public void onChanged(List<QueueMediaEntity> newQueueMediaEntities) {
+                queueMediaEntities = newQueueMediaEntities;
+                recyclerAdapter.setData(queueMediaEntities);
             }
         });
 
-        viewModel.getPlayingMediaProgress().observe(this, new Observer<Integer>() {
+        viewModel.getViewStatesLive().observe(this, new Observer<MainViewStates>() {
             @Override
-            public void onChanged(Integer progress) {
-                binding.layoutBottomSheet.progressBar.setProgress(progress);
+            public void onChanged(MainViewStates viewStates) {
+                setTitle(viewStates.getTitle());
+
+                binding.bottomNavView.setVisibility(viewStates.getBottomNavigationViewVisibility());
+
+                binding.layoutBottomSheet.constraintLayoutBottomSheet.setVisibility(viewStates.getBottomSheetVisibility());
+                bottomSheetBehavior.setState(viewStates.getBottomSheetState());
+
+                binding.layoutBottomSheet.playerView.setPlayer(viewStates.getExoPlayer());
+
+                binding.layoutBottomSheet.progressBuffering.setVisibility(viewStates.getBufferVisibility());
+
+                binding.layoutBottomSheet.imageViewTogglePlay.setImageResource(viewStates.getTogglePlayButtonImageResource());
+                binding.layoutBottomSheet.progressBar.setProgress(viewStates.getProgress());
+
+                binding.layoutBottomSheet.textViewTitle.setText(viewStates.getCurrentlyPlayingMediaTitle());
+                binding.layoutBottomSheet.textViewCreator.setText(viewStates.getCurrentlyPLayingMediaCreator());
+
+                binding.layoutBottomSheet.imageViewPrevious.setImageResource(viewStates.getPreviousButtonImageResource());
+                binding.layoutBottomSheet.imageViewPrevious.setEnabled(viewStates.isPreviousEnabled());
+
+                binding.layoutBottomSheet.imageViewNext.setImageResource(viewStates.getNextButtonImageResource());
+                binding.layoutBottomSheet.imageViewNext.setEnabled(viewStates.isNextEnabled());
+
+                binding.layoutBottomSheet.imageViewShuffle.setImageResource(viewStates.getShuffleButtonImageResource());
+                binding.layoutBottomSheet.imageViewShuffle.setEnabled(viewStates.isShuffleEnabled());
+
+                binding.layoutBottomSheet.imageViewRepeat.setImageResource(viewStates.getRepeatButtonImageResource());
+                binding.layoutBottomSheet.imageViewRepeat.setEnabled(viewStates.isRepeatEnabled());
+
+                setError(binding.coordinatorLayoutSnackBar, viewStates.getError());
             }
         });
 
-        viewModel.getPlayBackState().observe(this, new Observer<Bundle>() {
-            @Override
-            public void onChanged(Bundle bundle) {
-                boolean playWhenReady = bundle.getBoolean(ARG_PARAM1);
-                int playBackState = bundle.getInt(ARG_PARAM2);
-                checkPlayBackState(playWhenReady, playBackState);
-            }
-        });
-
-        viewModel.getRepeatMode().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer repeatMode) {
-                if (repeatMode == ExoPlayer.REPEAT_MODE_OFF) {
-                    binding.layoutBottomSheet.imageViewRepeat.setImageDrawable(getResources().getDrawable(R.drawable.exo_controls_repeat_off));
-                } else if (repeatMode == ExoPlayer.REPEAT_MODE_ONE){
-                    binding.layoutBottomSheet.imageViewRepeat.setImageDrawable(getResources().getDrawable(R.drawable.exo_controls_repeat_one ));
-                } else if (repeatMode == ExoPlayer.REPEAT_MODE_ALL){
-                    binding.layoutBottomSheet.imageViewRepeat.setImageDrawable(getResources().getDrawable(R.drawable.exo_controls_repeat_all));
-                }
-            }
-        });
-
-        viewModel.getSnackBar().observe(this, new Observer<Bundle>() {
-            @Override
-            public void onChanged(Bundle bundle) {
-                setSnackBar(binding.coordinatorLayoutSnackBar, bundle);
-            }
-        });
-
-        viewModel.getShowActionBar().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean show) {
-                if (show){
-                    binding.layoutAppBar.toolbar.setVisibility(View.VISIBLE);
-                } else {
-                    binding.layoutAppBar.toolbar.setVisibility(View.GONE);
-                }
-            }
-        });
-    }
-
-    private void checkPlayBackState(boolean playWhenReady, int playbackState) {
-        switch (playbackState) {
-            case Player.STATE_BUFFERING:
-                Logger.e(TAG, "state_buffering");
-                /*binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));*/
-                binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
-                binding.layoutBottomSheet.progressBuffering.setVisibility(View.VISIBLE);
-                break;
-            case Player.STATE_ENDED:
-                Logger.e(TAG, "state_ended");
-                binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
-                binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
-                binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(R.drawable.exo_icon_play));
-                break;
-            case Player.STATE_READY:
-                if (playWhenReady) {
-                    Logger.e(TAG, "state_ready_playing");
-                    // media actually playing
-                    binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
-                    binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
-                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(R.drawable.exo_icon_pause));
-                } else {
-                    Logger.e(TAG, "state_ready_paused");
-                    // player paused in any state
-                    binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
-                    binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
-                    binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(R.drawable.exo_icon_play));
-                }
-                break;
-            case Player.STATE_IDLE:
-                Logger.e(TAG, "state_idle");
-                binding.layoutBottomSheet.progressBuffering.setVisibility(View.GONE);
-                binding.layoutBottomSheet.imageViewTogglePlay.setVisibility(View.VISIBLE);
-                binding.layoutBottomSheet.imageViewTogglePlay.setImageDrawable(getResources().getDrawable(R.drawable.exo_icon_play));
-                break;
-            default:
-                break;
+        if (savedInstanceState == null){
+            proceedWithPermissions(REQUEST_CODE_GRANT_PERMISSIONS,
+                    READ_WRITE_EXTERNAL_STORAGE_PERMISSION,null, true);
         }
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         binding.layoutBottomSheet.imageViewTogglePlay.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewNext.setOnClickListener(this);
         binding.layoutBottomSheet.imageViewClose.setOnClickListener(this);
@@ -280,8 +184,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
             viewModel.next();
 
         } else if (v.equals(binding.layoutBottomSheet.imageViewClose)){
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-            binding.bottomNavView.setVisibility(View.VISIBLE);
+            viewModel.closeBottomSheet();
 
         } else if (v.equals(binding.layoutBottomSheet.imageViewShuffle)){
             viewModel.shuffle();
@@ -359,14 +262,13 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         QueueMediaEntity queueMediaEntity = bundle.getParcelable(ARG_PARAM3);
 
         if (clickType == SELECT) {
-            viewModel.setMedia(viewModel.getPlaylistMutableLiveData().getValue(), queueMediaEntity, false);
+            viewModel.setMedia(queueMediaEntities, position, false);
 
         } else if (clickType == REMOVE){
             if (queueMediaEntity != null) {
                 viewModel.removeQueueMedia(queueMediaEntity);
             }
         } else if (clickType == DRAG) {
-            Logger.e(TAG, "drag started");
             itemTouchHelper.startDrag(viewHolder);
         }
     }
@@ -419,5 +321,4 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         super.finish();
         ActivityNavigator.applyPopAnimationsToPendingTransition(this);
     }
-
 }

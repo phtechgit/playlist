@@ -14,7 +14,7 @@ import com.pheuture.playlists.base.BaseAndroidViewModel;
 import com.pheuture.playlists.base.service.PendingApiLocalDao;
 import com.pheuture.playlists.base.service.PendingApiEntity;
 import com.pheuture.playlists.auth.UserEntity;
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.playlist.PlaylistLocalDao;
 import com.pheuture.playlists.playlist.PlaylistEntity;
 import com.pheuture.playlists.media.OfflineMediaLocalDao;

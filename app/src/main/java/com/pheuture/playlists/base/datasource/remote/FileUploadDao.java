@@ -1,10 +1,13 @@
 package com.pheuture.playlists.base.datasource.remote;
 
+import com.pheuture.playlists.auth.UserEntity;
+
 import java.util.List;
 import java.util.Map;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Multipart;
@@ -19,6 +22,7 @@ public interface FileUploadDao {
     @POST("{url}")
     Call<ResponseModel> simpleApiCall(
             @Path("url") String url,
+            @Body UserEntity userEntity,
             @FieldMap Map<String, String> params);
 
     @Multipart

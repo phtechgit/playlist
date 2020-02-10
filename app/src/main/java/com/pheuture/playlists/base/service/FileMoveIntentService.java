@@ -5,7 +5,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
 
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.media.OfflineMediaLocalDao;
 import com.pheuture.playlists.base.constants.Constants;
 import com.pheuture.playlists.base.utils.Logger;

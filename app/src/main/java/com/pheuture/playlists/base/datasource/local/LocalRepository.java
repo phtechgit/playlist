@@ -1,4 +1,4 @@
-package com.pheuture.playlists.base;
+package com.pheuture.playlists.base.datasource.local;
 
 import android.content.Context;
 import androidx.room.Database;

@@ -5,7 +5,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.media.OfflineMediaLocalDao;
 import com.pheuture.playlists.base.constants.Constants;
 import com.pheuture.playlists.base.utils.Logger;

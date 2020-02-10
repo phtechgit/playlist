@@ -14,7 +14,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.pheuture.playlists.base.BaseAndroidViewModel;
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.base.service.PendingFileUploadLocalDao;
 import com.pheuture.playlists.base.service.PendingFileUploadEntity;
 import com.pheuture.playlists.base.service.PendingFileUploadParamEntity;

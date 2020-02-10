@@ -10,7 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pheuture.playlists.auth.UserEntity;
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.media.MediaEntity;
 import com.pheuture.playlists.base.constants.ApiConstant;
 import com.pheuture.playlists.base.constants.Constants;
@@ -29,9 +29,7 @@ import java.util.Map;
 
 public class TrendingViewModel extends AndroidViewModel {
     private static final String TAG = TrendingViewModel.class.getSimpleName();
-
     private String searchQuery = "";
-
     private UserEntity user;
     private TrendingMediaLocalDao trendingMediaLocalDao;
     private LiveData<List<MediaEntity>> mediaEntitiesLive;

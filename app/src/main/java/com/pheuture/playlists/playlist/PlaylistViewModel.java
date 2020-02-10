@@ -12,7 +12,7 @@ import com.pheuture.playlists.base.BaseAndroidViewModel;
 import com.pheuture.playlists.base.service.PendingApiLocalDao;
 import com.pheuture.playlists.base.service.PendingApiEntity;
 import com.pheuture.playlists.auth.UserEntity;
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.playist_detail.PlaylistMediaLocalDao;
 import com.pheuture.playlists.base.service.PendingApiExecutorService;
 import com.pheuture.playlists.base.constants.Constants;

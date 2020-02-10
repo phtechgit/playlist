@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.pheuture.playlists.base.utils.NetworkUtils;
+import com.pheuture.playlists.base.utils.SingleMutableLiveData;
 
 public class ConnectivityChangeReceiver extends BroadcastReceiver {
     private static final String TAG = ConnectivityChangeReceiver.class.getSimpleName();
     private ConnectivityChangeListener connectivityChangeListener;
+    private SingleMutableLiveData networkStatus = new SingleMutableLiveData();
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -29,12 +31,13 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
             // Do not ignore this call, as this is not the sticky broadcast and the connectivity
             // state has actually changed
             if (connectivityChangeListener!=null){
-                connectivityChangeListener.onConnectivityChange(NetworkUtils.online(context));
+                connectivityChangeListener.onConnectivityChange(NetworkUtils.isConnected(context));
             }
         }*/
         if (connectivityChangeListener!=null){
-            connectivityChangeListener.onConnectivityChange(NetworkUtils.online(context));
+            connectivityChangeListener.onConnectivityChange(NetworkUtils.isConnected(context));
         }
+        networkStatus.postValue(NetworkUtils.isConnected(context));
     }
 
     public interface ConnectivityChangeListener{

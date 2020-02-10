@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-
+import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -32,7 +32,8 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.R;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.base.constants.DefaultValues;
 import com.pheuture.playlists.media.OfflineMediaLocalDao;
 import com.pheuture.playlists.queue.QueueMediaDao;
@@ -47,6 +48,7 @@ import com.pheuture.playlists.base.utils.Logger;
 import com.pheuture.playlists.base.utils.ParserUtil;
 import com.pheuture.playlists.base.utils.SharedPrefsUtils;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -56,18 +58,13 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         AudioManager.OnAudioFocusChangeListener, DefaultValues {
 
     private static final String TAG = MainActivityViewModel.class.getSimpleName();
-    private MutableLiveData<String> title;
     private DataSource.Factory dataSourceFactory;
     private SimpleExoPlayer exoPlayer1;
     private SimpleExoPlayer exoPlayer2;
-    private MutableLiveData<SimpleExoPlayer> exoPlayerMutableLiveData;
-    private MutableLiveData<PlaylistEntity> playlistMutableLiveData;
     private int bottomSheetState = BottomSheetBehavior.STATE_HIDDEN;
-    private MutableLiveData<Bundle> playbackStateMutableLiveData;
     private MutableLiveData<Integer> playingMediaProgress;
     private MutableLiveData<QueueMediaEntity> currentlyPlayingQueueMediaMutableLiveData;
     private MutableLiveData<Boolean> isNewMediaAddedToPlaylist;
-    private MutableLiveData<Boolean> showActionBar;
     private PlaylistMediaLocalDao playlistMediaLocalDao;
     private QueueMediaDao queueMediaLocalDao;
     private OfflineMediaLocalDao offlineMediaLocalDao;
@@ -89,10 +86,9 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     private boolean playingFromNetwork;
     private MutableLiveData<List<QueueMediaEntity>> queueMediaEntitiesMutableLiveData;
     private MutableLiveData<Integer> repeatModeMutableLiveData = new MutableLiveData<>(ExoPlayer.REPEAT_MODE_OFF);
-
-    public LiveData<PlaylistEntity> getPlaylistMutableLiveData() {
-        return playlistMutableLiveData;
-    }
+    private List<QueueMediaEntity> currentQueueMediaList;
+    private QueueMediaEntity currentQueueMedia;
+    private MutableLiveData<MainViewStates> viewStatesLive = new MutableLiveData<>();
 
     public LiveData<List<QueueMediaEntity>> getQueueMediaEntities() {
         return queueMediaEntitiesMutableLiveData;
@@ -106,12 +102,10 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         return isNewMediaAddedToPlaylist;
     }
 
-    public LiveData<String> getTitle() {
-        return title;
-    }
-
     public void setTitle(String title) {
-        this.title.postValue(title);
+        MainViewStates viewStates = viewStatesLive.getValue();
+        viewStates.setTitle(title);
+        viewStatesLive.postValue(viewStates);
     }
 
     public int calculatePercentage(long totalDuration, long currentDuration) {
@@ -119,10 +113,6 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             return 0;
         }
         return (int)((currentDuration * 100)/totalDuration);
-    }
-
-    public LiveData<SimpleExoPlayer> getExoPlayer() {
-        return exoPlayerMutableLiveData;
     }
 
     public LiveData<Integer> getPlayingMediaProgress() {
@@ -133,20 +123,8 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         bottomSheetState = newState;
     }
 
-    public LiveData<Bundle> getPlayBackState() {
-        return playbackStateMutableLiveData;
-    }
-
     public void setNetworkStatus(boolean connected) {
         connectedToNetwork = connected;
-    }
-
-    public LiveData<QueueMediaEntity> getCurrentlyPlayingQueueMedia() {
-        return currentlyPlayingQueueMediaMutableLiveData;
-    }
-
-    public LiveData<Boolean> getShowActionBar() {
-        return showActionBar;
     }
 
     public LiveData<Integer> getRepeatMode() {
@@ -155,6 +133,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
+        currentQueueMediaList = new ArrayList<>();
 
         //set timerHandler that runs at 'defaultTimerInMilliSec' to update progress and check if
         // need to change track for crossFade feature
@@ -183,20 +162,14 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
 
         exoPlayer2.addListener(playerListener2);
-        exoPlayerMutableLiveData = new MutableLiveData<>();
 
         playlistMediaLocalDao = LocalRepository.getInstance(application).playlistMediaLocalDao();
         queueMediaLocalDao = LocalRepository.getInstance(application).queueMediaLocalDao();
         offlineMediaLocalDao = LocalRepository.getInstance(application).offlineMediaLocalDao();
 
-        playlistMutableLiveData = new MutableLiveData<>();
         currentlyPlayingQueueMediaMutableLiveData = new MutableLiveData<>();
-        playbackStateMutableLiveData = new MutableLiveData<>();
         playingMediaProgress = new MutableLiveData<>();
         isNewMediaAddedToPlaylist = new MutableLiveData<>();
-        showActionBar = new MutableLiveData<>();
-
-        title = new MutableLiveData<>();
 
         queueMediaEntitiesMutableLiveData = new MutableLiveData<>();
         queueMediaEntitiesMutableLiveData.postValue(queueMediaLocalDao.getQueueMediaEntities());
@@ -396,17 +369,14 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         }
     }
 
-    public Runnable timerRunnable = new Runnable() {
-        @Override
-        public void run() {
-            SimpleExoPlayer exoPlayer = getExoPlayer().getValue();
-            if (exoPlayer != null && bottomSheetState != BottomSheetBehavior.STATE_HIDDEN
-                    && exoPlayer.getPlaybackState() == Player.STATE_READY && exoPlayer.getPlayWhenReady()) {
-                proceed();
-            }
-            //reset handler
-            setLooper();
+    public Runnable timerRunnable = () -> {
+        SimpleExoPlayer exoPlayer = getExoPlayer().getValue();
+        if (exoPlayer != null && bottomSheetState != BottomSheetBehavior.STATE_HIDDEN
+                && exoPlayer.getPlaybackState() == Player.STATE_READY && exoPlayer.getPlayWhenReady()) {
+            proceed();
         }
+        //reset handler
+        setLooper();
     };
 
     public void proceed() {
@@ -419,6 +389,7 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 primaryExoPlayer = exoPlayer1;
                 secondaryExoPlayer = exoPlayer2;
                 nextPlayer = EXO_PLAYER_2;
+
             } else {
                 primaryExoPlayer = exoPlayer2;
                 secondaryExoPlayer = exoPlayer1;
@@ -525,72 +496,29 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         playMedia(getExoPlayer().getValue(), queueMediaEntity);
     }
 
-    public void setMedia(PlaylistEntity playlistEntity, QueueMediaEntity queueMediaEntity, boolean refreshData){
+    public void setMedia(List<QueueMediaEntity> newQueueMediaEntities, int position, boolean refreshData){
         //momentarily hold the playback to initiate the changes
         pausePlayback();
 
         repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_OFF);
 
-        currentMediaPosition = RecyclerView.NO_POSITION;
+        currentQueueMediaList = newQueueMediaEntities;
+        currentMediaPosition = position;
+        currentQueueMedia = currentQueueMediaList.get(currentMediaPosition);
 
-        if (refreshData) {
-            queueMediaLocalDao.deleteAll();
-        }
-
-        if (playlistEntity == null){
-            queueMediaEntity.setPosition(++currentMediaPosition);
-            queueMediaLocalDao.insert(queueMediaEntity);
-
-        } else {
-            List<QueueMediaEntity> queueMediaEntities = null;
-            if (refreshData) {
-                List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaLocalDao.getPlaylistMediaMediaEntities(playlistEntity.getPlaylistID());
-
-                String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
-                queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
-                        .fromJson(objectJsonString, QueueMediaEntity[].class));
-
-                for (int i=0; i<queueMediaEntities.size(); i++){
-                    QueueMediaEntity queueMediaEntity1 = queueMediaEntities.get(i);
-                    queueMediaEntity1.setPosition(i);
-                    queueMediaEntities.set(i, queueMediaEntity1);
-                }
-
-                //insert all media with 'In_Queue' status.
-                queueMediaLocalDao.insertAll(queueMediaEntities);
-            }
-
-            if (queueMediaEntity == null){
-                if (queueMediaEntities != null) {
-                    queueMediaEntity = queueMediaEntities.get(++currentMediaPosition);
-                }
-            } else {
-                if (refreshData) {
-                    queueMediaEntity = queueMediaLocalDao.getQueueMediaEntity(queueMediaEntity.getMediaID());
-                    currentMediaPosition = queueMediaEntity.getPosition();
-
-                } else {
-                    currentMediaPosition = queueMediaEntity.getPosition();
-                }
-            }
-        }
-        playlistMutableLiveData.postValue(playlistEntity);
-
+        SimpleExoPlayer exoPlayer = null;
         if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
-            exoPlayer1.setVolume(1f);
-            loadMediaIn(EXO_PLAYER_1, queueMediaEntity);
+            exoPlayer = exoPlayer1;
 
         } else if (currentPlayer == EXO_PLAYER_2) {
-            exoPlayer2.setVolume(1f);
-            loadMediaIn(EXO_PLAYER_2, queueMediaEntity);
+            exoPlayer = exoPlayer2;
         }
+        exoPlayer.setVolume(1f);
+        loadMediaIn();
         requestAudioFocus();
     }
 
-    public void loadMediaIn(int player, QueueMediaEntity queueMediaEntity) {
-        currentPlayer = player;
-
-        SimpleExoPlayer exoPlayer;
+    public void loadMediaIn() {
         if (currentPlayer == EXO_PLAYER_1){
             exoPlayer = exoPlayer1;
         } else {
@@ -606,7 +534,12 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
         queueMediaEntitiesMutableLiveData.setValue(queueMediaLocalDao.getQueueMediaEntities());
         currentlyPlayingQueueMediaMutableLiveData.setValue(queueMediaEntity);
-        exoPlayerMutableLiveData.setValue(exoPlayer);
+
+        MainViewStates viewStates = viewStatesLive.getValue();
+        viewStates.setExoPlayer(exoPlayer);
+        viewStatesLive.postValue(viewStates);
+
+
         playingMediaProgress.postValue(0);
 
         playMedia(exoPlayer, queueMediaEntity);
@@ -638,24 +571,51 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public void setPlaybackState(boolean playWhenReady, int playbackState) {
-        if (playingFromNetwork && !connectedToNetwork && playbackState == PlaybackState.STATE_STOPPED
-                && bottomSheetState!= BottomSheetBehavior.STATE_HIDDEN){
-            showSnackBar("No internet connectivity...", Snackbar.LENGTH_LONG);
-        }
-        if (playbackState == Player.STATE_ENDED){
-            pausePlayback();
-            abandonAudioFocus();
+        MainViewStates viewStates = viewStatesLive.getValue();
+        if (viewStates == null) {
+            viewStates = new MainViewStates();
         }
 
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(Constants.ARG_PARAM1, playWhenReady);
-        bundle.putInt(Constants.ARG_PARAM2, playbackState);
-        playbackStateMutableLiveData.postValue(bundle);
+        if (playingFromNetwork && !connectedToNetwork && playbackState == PlaybackState.STATE_STOPPED
+                && bottomSheetState!= BottomSheetBehavior.STATE_HIDDEN){
+            viewStates.setError("No internet connectivity.");
+        }
+
+        switch (playbackState) {
+            case Player.STATE_BUFFERING:
+                viewStates.setBufferVisibility(View.VISIBLE);
+                break;
+            case Player.STATE_READY:
+                if (playWhenReady) {
+                    // media actually playing
+                    viewStates.setBufferVisibility(View.GONE);
+                    viewStates.setTogglePlayButtonImageResource(R.drawable.exo_icon_pause);
+                } else {
+                    // player paused in any state
+                    viewStates.setBufferVisibility(View.GONE);
+                    viewStates.setTogglePlayButtonImageResource(R.drawable.exo_icon_play);
+                }
+                break;
+            case Player.STATE_ENDED:
+                pausePlayback();
+                abandonAudioFocus();
+
+                viewStates.setBufferVisibility(View.GONE);
+                viewStates.setTogglePlayButtonImageResource(R.drawable.exo_icon_play);
+                break;
+            case Player.STATE_IDLE:
+                viewStates.setBufferVisibility(View.GONE);
+                viewStates.setTogglePlayButtonImageResource(R.drawable.exo_icon_play);
+                break;
+            default:
+                break;
+        }
+        viewStatesLive.postValue(viewStates);
     }
 
     public void seekPlayer(int progress) {
         try {
-            SimpleExoPlayer exoPlayer = exoPlayerMutableLiveData.getValue();
+            SimpleExoPlayer exoPlayer = viewStatesLive.getValue().getExoPlayer();
 
             long totalDurationOfCurrentMedia = exoPlayer.getDuration();
             long currentDurationOfCurrentMedia = (progress * totalDurationOfCurrentMedia)/100;
@@ -754,7 +714,6 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         queueMediaLocalDao.insertAll(queueMediaEntities);
 
         QueueMediaEntity queueMediaEntity = queueMediaEntities.get(++currentMediaPosition);
-        playlistMutableLiveData.postValue(playlist);
 
         if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
             exoPlayer1.setVolume(1f);
@@ -889,5 +848,16 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         abandonAudioFocus();
 
         super.onCleared();
+    }
+
+    public LiveData<MainViewStates> getViewStatesLive() {
+        return viewStatesLive;
+    }
+
+    public void closeBottomSheet() {
+        MainViewStates viewStates = viewStatesLive.getValue();
+        viewStates.setBottomNavigationViewVisibility(View.VISIBLE);
+        viewStates.setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
+        viewStates.setBottomSheetVisibility(View.GONE);
     }
 }

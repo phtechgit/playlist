@@ -28,6 +28,7 @@ import com.pheuture.playlists.base.BaseFragment;
 import com.pheuture.playlists.base.utils.KeyboardUtils;
 import com.pheuture.playlists.base.utils.ParserUtil;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class TrendingFragment extends BaseFragment implements TextWatcher, RecyclerViewClickListener {
@@ -38,6 +39,7 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
     private TrendingViewModel viewModel;
     private TrendingRecyclerAdapter recyclerAdapter;
     private LinearLayoutManager layoutManager;
+    private List<MediaEntity> trendingMediaEntities;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,7 +67,8 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
 
         viewModel.getTrendingMediaLive().observe(this, new Observer<List<MediaEntity>>() {
             @Override
-            public void onChanged(List<MediaEntity> trendingMediaEntities) {
+            public void onChanged(List<MediaEntity> newTrendingMediaEntities) {
+                trendingMediaEntities = newTrendingMediaEntities;
                 recyclerAdapter.setData(trendingMediaEntities);
             }
         });
@@ -115,14 +118,15 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
 
     @Override
     public void onRecyclerViewHolderClick(RecyclerView.ViewHolder viewHolder, Bundle bundle) {
+        int type = bundle.getInt(ARG_PARAM1, -1);
+        int position = bundle.getInt(ARG_PARAM2, -1);
         MediaEntity mediaEntity = bundle.getParcelable(ARG_PARAM2);
 
-        String objectJsonString = ParserUtil.getInstance().toJson(mediaEntity,
-                MediaEntity.class);
-        QueueMediaEntity queueMediaEntity = ParserUtil.getInstance()
-                .fromJson(objectJsonString, QueueMediaEntity.class);
+        String objectJsonString = ParserUtil.getInstance().toJson(trendingMediaEntities);
+        List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
+                .fromJson(objectJsonString, QueueMediaEntity[].class));
 
-        parentViewModel.setMedia(null, queueMediaEntity, true);
+        parentViewModel.setMedia(queueMediaEntities, position, true);
         KeyboardUtils.hideKeyboard(activity, binding.getRoot());
     }
 

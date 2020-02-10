@@ -14,7 +14,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.auth.AppSignatureHelper;
 import com.pheuture.playlists.base.BaseAndroidViewModel;
-import com.pheuture.playlists.base.LocalRepository;
+import com.pheuture.playlists.base.datasource.local.LocalRepository;
 import com.pheuture.playlists.playlist.PlaylistLocalDao;
 import com.pheuture.playlists.playlist.PlaylistEntity;
 import com.pheuture.playlists.playist_detail.PlaylistMediaLocalDao;

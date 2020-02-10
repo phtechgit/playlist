@@ -36,6 +36,7 @@ import com.pheuture.playlists.base.utils.KeyboardUtils;
 import com.pheuture.playlists.base.utils.ParserUtil;
 import com.pheuture.playlists.base.utils.SharedPrefsUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class PlaylistDetailFragment extends BaseFragment implements RecyclerViewClickListener {
@@ -199,9 +200,11 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
                     .navigate(R.id.action_navigation_playlist_detail_to_navigation_media, bundle, null, extras);
 
         } else if (v.equals(binding.imageViewPlay)) {
-            if (playlistMediaEntities.size()>0) {
-                parentViewModel.setMedia(playlist, null, true);
-            }
+            String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
+            List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
+                    .fromJson(objectJsonString, QueueMediaEntity[].class));
+
+            parentViewModel.setMedia(queueMediaEntities, 0, true);
 
         } else if (v.equals(binding.imageViewShuffle)) {
             if (playlistMediaEntities.size()>2) {
@@ -218,12 +221,11 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
 
         assert playlistMediaEntity != null;
         if (clickType == SELECT){
-            String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntity,
-                    PlaylistMediaEntity.class);
-            QueueMediaEntity queueMediaEntity = ParserUtil.getInstance()
-                    .fromJson(objectJsonString, QueueMediaEntity.class);
+            String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
+            List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
+                    .fromJson(objectJsonString, QueueMediaEntity[].class));
 
-            parentViewModel.setMedia(playlist, queueMediaEntity, true);
+            parentViewModel.setMedia(queueMediaEntities, position, true);
 
         } else if (clickType == REMOVE){
             showRemoveMediaFromPlaylistAlert(position, playlistMediaEntity);
