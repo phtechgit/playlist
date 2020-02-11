@@ -8,7 +8,6 @@ import android.media.AudioManager;
 import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import androidx.annotation.NonNull;
@@ -38,18 +37,14 @@ import com.pheuture.playlists.base.constants.DefaultValues;
 import com.pheuture.playlists.media.OfflineMediaLocalDao;
 import com.pheuture.playlists.queue.QueueMediaDao;
 import com.pheuture.playlists.queue.QueueMediaEntity;
-import com.pheuture.playlists.playlist.PlaylistEntity;
 import com.pheuture.playlists.playist_detail.PlaylistMediaLocalDao;
 import com.pheuture.playlists.media.OfflineMediaEntity;
 import com.pheuture.playlists.base.BaseAndroidViewModel;
-import com.pheuture.playlists.playist_detail.PlaylistMediaEntity;
 import com.pheuture.playlists.base.constants.Constants;
 import com.pheuture.playlists.base.utils.Logger;
-import com.pheuture.playlists.base.utils.ParserUtil;
 import com.pheuture.playlists.base.utils.SharedPrefsUtils;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import static android.content.Context.AUDIO_SERVICE;
@@ -58,41 +53,36 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         AudioManager.OnAudioFocusChangeListener, DefaultValues {
 
     private static final String TAG = MainActivityViewModel.class.getSimpleName();
-    private DataSource.Factory dataSourceFactory;
-    private SimpleExoPlayer exoPlayer1;
-    private SimpleExoPlayer exoPlayer2;
-    private int bottomSheetState = BottomSheetBehavior.STATE_HIDDEN;
-    private MutableLiveData<Integer> playingMediaProgress;
-    private MutableLiveData<QueueMediaEntity> currentlyPlayingQueueMediaMutableLiveData;
-    private MutableLiveData<Boolean> isNewMediaAddedToPlaylist;
-    private PlaylistMediaLocalDao playlistMediaLocalDao;
-    private QueueMediaDao queueMediaLocalDao;
-    private OfflineMediaLocalDao offlineMediaLocalDao;
-    private int EXO_PLAYER_1 = 1;
-    private int EXO_PLAYER_2 = 2;
-    private int currentPlayer = RecyclerView.NO_POSITION;
-    private int currentMediaPosition = RecyclerView.NO_POSITION;
-    private Handler timerHandler = new Handler();
-    private long totalDurationOfCurrentMedia = 0;
-    private long currentDurationOfCurrentMedia = 0;
-    private int defaultTimerInMilliSec = 100;
     private AudioManager audioManager;
     private AudioFocusRequest audioFocusRequestBuilder;
     private boolean playbackDelayed = false;
     private boolean playbackNowAuthorized = false;
     private boolean resumeOnFocusGain = false;
     private final Object focusLock = new Object();
-    private boolean connectedToNetwork = false;
-    private boolean playingFromNetwork;
-    private MutableLiveData<List<QueueMediaEntity>> queueMediaEntitiesMutableLiveData;
-    private MutableLiveData<Integer> repeatModeMutableLiveData = new MutableLiveData<>(ExoPlayer.REPEAT_MODE_OFF);
+    private PlaylistMediaLocalDao playlistMediaLocalDao;
+    private QueueMediaDao queueMediaLocalDao;
+    private OfflineMediaLocalDao offlineMediaLocalDao;
+    private DataSource.Factory dataSourceFactory;
+    private SimpleExoPlayer exoPlayer1;
+    private SimpleExoPlayer exoPlayer2;
+    private int EXO_PLAYER_1 = 1;
+    private int EXO_PLAYER_2 = 2;
+    private int currentPlayer;
+    private int currentMediaPosition;
+    private Handler timerHandler = new Handler();
     private List<QueueMediaEntity> currentQueueMediaList;
-    private QueueMediaEntity currentQueueMedia;
-    private MutableLiveData<MainViewStates> viewStatesLive = new MutableLiveData<>();
-
-    public LiveData<List<QueueMediaEntity>> getQueueMediaEntities() {
-        return queueMediaEntitiesMutableLiveData;
-    }
+    private MainViewStates viewStates;
+    private MutableLiveData<MainViewStates> viewStatesLive;
+    private boolean connectedToNetwork;
+    private boolean playingFromNetwork;
+    private int repeatMode = ExoPlayer.REPEAT_MODE_OFF;
+    private boolean mediaPlaying = false;
+    private long totalDurationOfCurrentMedia = 0;
+    private long currentDurationOfCurrentMedia = 0;
+    private int defaultTimerInMilliSec = 100;
+    private int bottomSheetState = BottomSheetBehavior.STATE_HIDDEN;
+    private MutableLiveData<Boolean> isNewMediaAddedToPlaylist;
+    private MutableLiveData<List<QueueMediaEntity>> currentQueueMediaListLive;
 
     public void setNewMediaAdded(boolean b) {
         isNewMediaAddedToPlaylist.postValue(b);
@@ -103,7 +93,6 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public void setTitle(String title) {
-        MainViewStates viewStates = viewStatesLive.getValue();
         viewStates.setTitle(title);
         viewStatesLive.postValue(viewStates);
     }
@@ -115,29 +104,38 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         return (int)((currentDuration * 100)/totalDuration);
     }
 
-    public LiveData<Integer> getPlayingMediaProgress() {
-        return playingMediaProgress;
-    }
-
     public void setBottomSheetState(int newState) {
         bottomSheetState = newState;
+        switch (newState) {
+            case BottomSheetBehavior.STATE_HIDDEN:
+                resetAllPlayers();
+                break;
+            case BottomSheetBehavior.STATE_EXPANDED:
+                break;
+            case BottomSheetBehavior.STATE_HALF_EXPANDED:
+                break;
+            case BottomSheetBehavior.STATE_COLLAPSED:
+                break;
+            case BottomSheetBehavior.STATE_DRAGGING:
+                break;
+            case BottomSheetBehavior.STATE_SETTLING:
+                break;
+        }
     }
 
     public void setNetworkStatus(boolean connected) {
         connectedToNetwork = connected;
     }
 
-    public LiveData<Integer> getRepeatMode() {
-        return repeatModeMutableLiveData;
-    }
-
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
+        viewStates = new MainViewStates();
+        viewStatesLive = new MutableLiveData<>();
         currentQueueMediaList = new ArrayList<>();
-
-        //set timerHandler that runs at 'defaultTimerInMilliSec' to update progress and check if
-        // need to change track for crossFade feature
-        setLooper();
+        currentQueueMediaListLive = new MutableLiveData<>();
+        currentPlayer = RecyclerView.NO_POSITION;
+        currentMediaPosition = RecyclerView.NO_POSITION;
+        isNewMediaAddedToPlaylist = new MutableLiveData<>();
 
         audioManager = (AudioManager) getApplication().getSystemService(AUDIO_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -159,20 +157,15 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
         exoPlayer2 = ExoPlayerFactory.newSimpleInstance(application);
 
         exoPlayer1.addListener(playerListener1);
-
-
         exoPlayer2.addListener(playerListener2);
 
         playlistMediaLocalDao = LocalRepository.getInstance(application).playlistMediaLocalDao();
         queueMediaLocalDao = LocalRepository.getInstance(application).queueMediaLocalDao();
         offlineMediaLocalDao = LocalRepository.getInstance(application).offlineMediaLocalDao();
 
-        currentlyPlayingQueueMediaMutableLiveData = new MutableLiveData<>();
-        playingMediaProgress = new MutableLiveData<>();
-        isNewMediaAddedToPlaylist = new MutableLiveData<>();
-
-        queueMediaEntitiesMutableLiveData = new MutableLiveData<>();
-        queueMediaEntitiesMutableLiveData.postValue(queueMediaLocalDao.getQueueMediaEntities());
+        //set timerHandler that runs at 'defaultTimerInMilliSec' to update progress and check if
+        // need to change track for crossFade feature
+        setLooper();
     }
 
     public void requestAudioFocus(){
@@ -208,13 +201,12 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     public void pausePlayback() {
         exoPlayer1.setPlayWhenReady(false);
         exoPlayer2.setPlayWhenReady(false);
-        Logger.e(TAG, "playback paused");
+        abandonAudioFocus();
     }
 
     public void playbackNow() {
         exoPlayer1.setPlayWhenReady(true);
         exoPlayer2.setPlayWhenReady(true);
-
     }
 
     public Player.EventListener playerListener1 = new Player.EventListener() {
@@ -256,7 +248,6 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             Logger.e(TAG, "onPlayerError: " + error.getMessage());
             if (currentPlayer == EXO_PLAYER_1) {
                 pausePlayback();
-                abandonAudioFocus();
             }
         }
 
@@ -316,7 +307,6 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
             Logger.e(TAG, "onPlayerError: " + error.getMessage());
             if (currentPlayer == EXO_PLAYER_2) {
                 pausePlayback();
-                abandonAudioFocus();
             }
         }
 
@@ -370,82 +360,73 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public Runnable timerRunnable = () -> {
-        SimpleExoPlayer exoPlayer = getExoPlayer().getValue();
-        if (exoPlayer != null && bottomSheetState != BottomSheetBehavior.STATE_HIDDEN
-                && exoPlayer.getPlaybackState() == Player.STATE_READY && exoPlayer.getPlayWhenReady()) {
-            proceed();
+        SimpleExoPlayer exoPlayer = viewStates.getExoPlayer();
+        if (mediaPlaying) {
+            loop();
         }
         //reset handler
         setLooper();
     };
 
-    public void proceed() {
+    private void loop() {
         try {
-            int nextPlayer;
-            SimpleExoPlayer primaryExoPlayer;
-            SimpleExoPlayer secondaryExoPlayer;
+            SimpleExoPlayer currentExoPlayer;
+            SimpleExoPlayer nextExoPlayer;
 
             if (currentPlayer == EXO_PLAYER_1){
-                primaryExoPlayer = exoPlayer1;
-                secondaryExoPlayer = exoPlayer2;
-                nextPlayer = EXO_PLAYER_2;
+                currentExoPlayer = exoPlayer1;
+                nextExoPlayer = exoPlayer2;
 
             } else {
-                primaryExoPlayer = exoPlayer2;
-                secondaryExoPlayer = exoPlayer1;
-                nextPlayer = EXO_PLAYER_1;
+                currentExoPlayer = exoPlayer2;
+                nextExoPlayer = exoPlayer1;
             }
-            totalDurationOfCurrentMedia = primaryExoPlayer.getDuration();
-            currentDurationOfCurrentMedia = primaryExoPlayer.getCurrentPosition();
+
+            totalDurationOfCurrentMedia = currentExoPlayer.getDuration();
+            currentDurationOfCurrentMedia = currentExoPlayer.getCurrentPosition();
 
             int crossFadeValue = (SharedPrefsUtils.getIntegerPreference(getApplication(),
                     Constants.CROSS_FADE_VALUE, CROSS_FADE_DURATION_DEFAULT) * 1000);
 
-            //increase volume if player
-            if (queueMediaEntitiesMutableLiveData.getValue().size()>1 && primaryExoPlayer.getVolume()<1f) {
+            //increase volume if current player.
+            if (currentExoPlayer.getVolume()<1f) {
                 float volume = (float) currentDurationOfCurrentMedia / (float) crossFadeValue;
-                primaryExoPlayer.setVolume(volume);
-                secondaryExoPlayer.setVolume(1f-volume);
-                /*Logger.e(TAG, "volume: exoPlayerMutableLiveData:" + exoPlayer1.getVolume() + ", exoPlayer2:" + exoPlayer2.getVolume());*/
+                currentExoPlayer.setVolume(volume);
+                nextExoPlayer.setVolume(1f-volume);
             }
 
             //check if it is time to change the track
             if (totalDurationOfCurrentMedia > 0 && (totalDurationOfCurrentMedia
                     - currentDurationOfCurrentMedia) <= crossFadeValue) {
-
-                int repeatMode = repeatModeMutableLiveData.getValue();
                 if (repeatMode == ExoPlayer.REPEAT_MODE_ONE){
                     //If single repeat play is ON
-                    secondaryExoPlayer.setVolume(0f);
-                    loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(currentMediaPosition));
+                    nextExoPlayer.setVolume(0f);
+                    loadMedia(nextExoPlayer);
 
                 } else if (nextMediaAvailable()) {
                     //if more media available to play
-                    secondaryExoPlayer.setVolume(0f);
-                    loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
+                    ++currentMediaPosition;
+                    nextExoPlayer.setVolume(0f);
+                    loadMedia(nextExoPlayer);
 
                 } else if (repeatMode == ExoPlayer.REPEAT_MODE_ALL){
-                    currentMediaPosition = RecyclerView.NO_POSITION;
-                    secondaryExoPlayer.setVolume(0f);
-                    loadMediaIn(nextPlayer, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
+                    currentMediaPosition = 0;
+                    nextExoPlayer.setVolume(0f);
+                    loadMedia(nextExoPlayer);
                 }
             }
 
             int progress = calculatePercentage(totalDurationOfCurrentMedia,
                     currentDurationOfCurrentMedia);
 
-            if (currentlyPlayingQueueMediaMutableLiveData.getValue() != null) {
+            QueueMediaEntity queueMediaEntity = currentQueueMediaList.get(currentMediaPosition);
+            queueMediaEntity.setProgress((int) currentDurationOfCurrentMedia);
+            currentQueueMediaList.set(currentMediaPosition, queueMediaEntity);
 
-                List<QueueMediaEntity> queueMediaEntities = queueMediaEntitiesMutableLiveData.getValue();
-                QueueMediaEntity queueMediaEntity = queueMediaEntities.get(currentMediaPosition);
-                queueMediaEntity.setProgress((int) currentDurationOfCurrentMedia);
-                queueMediaEntities.set(currentMediaPosition, queueMediaEntity);
-
-                queueMediaEntitiesMutableLiveData.setValue(queueMediaEntities);
-                currentlyPlayingQueueMediaMutableLiveData.setValue(queueMediaEntity);
-                //update progress
-                playingMediaProgress.postValue(progress);
-            }
+            //update progress
+            viewStates.setMaxProgress(totalDurationOfCurrentMedia);
+            viewStates.setProgress(currentDurationOfCurrentMedia);
+            viewStatesLive.postValue(viewStates);
         } catch (Exception e) {
             Logger.e(TAG, e.toString());
         }
@@ -453,129 +434,123 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
 
     public void resetAllPlayers(){
         pausePlayback();
-        abandonAudioFocus();
     }
 
     public void togglePlay() {
-        SimpleExoPlayer exoPlayer;
-        if (currentPlayer == EXO_PLAYER_1){
-            exoPlayer = exoPlayer1;
-        } else {
-            exoPlayer = exoPlayer2;
-        }
+        SimpleExoPlayer exoPlayer = getCurrentExoPlayer();
 
         if (exoPlayer.getPlayWhenReady()){
             pausePlayback();
-            abandonAudioFocus();
+
         } else {
             if (exoPlayer.getPlaybackState() == Player.STATE_IDLE) {
-                playMedia(exoPlayer, currentlyPlayingQueueMediaMutableLiveData.getValue());
+                loadMedia(getCurrentExoPlayer());
 
             } else if (exoPlayer.getPlaybackState() == Player.STATE_ENDED){
-                rePlayCurrentMedia();
+                prepareMediaToPlay(getCurrentExoPlayer());
             }
             requestAudioFocus();
         }
     }
 
-    private void rePlayCurrentMedia() {
-        QueueMediaEntity queueMediaEntity = currentlyPlayingQueueMediaMutableLiveData.getValue();
-        if (queueMediaEntity==null){
-            return;
-        }
-        queueMediaEntity.setProgress(0);
-        List<QueueMediaEntity> queueMediaEntities = queueMediaEntitiesMutableLiveData.getValue();
-        if (queueMediaEntities==null){
-            return;
-        }
-        queueMediaEntities.set(currentMediaPosition, queueMediaEntity);
-        queueMediaLocalDao.insert(queueMediaEntity);
-        queueMediaEntitiesMutableLiveData.setValue(queueMediaEntities);
-        currentlyPlayingQueueMediaMutableLiveData.setValue(queueMediaEntity);
-        playingMediaProgress.postValue(0);
-        playMedia(getExoPlayer().getValue(), queueMediaEntity);
-    }
-
-    public void setMedia(List<QueueMediaEntity> newQueueMediaEntities, int position, boolean refreshData){
+    public void setMediaListToQueue(List<QueueMediaEntity> newQueueMediaEntities, int position){
         //momentarily hold the playback to initiate the changes
         pausePlayback();
 
-        repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_OFF);
+        setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);
 
         currentQueueMediaList = newQueueMediaEntities;
         currentMediaPosition = position;
-        currentQueueMedia = currentQueueMediaList.get(currentMediaPosition);
 
-        SimpleExoPlayer exoPlayer = null;
-        if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
-            exoPlayer = exoPlayer1;
-
-        } else if (currentPlayer == EXO_PLAYER_2) {
-            exoPlayer = exoPlayer2;
-        }
+        SimpleExoPlayer exoPlayer  = getCurrentExoPlayer();
         exoPlayer.setVolume(1f);
-        loadMediaIn();
+        loadMedia(exoPlayer);
         requestAudioFocus();
     }
 
-    public void loadMediaIn() {
-        if (currentPlayer == EXO_PLAYER_1){
-            exoPlayer = exoPlayer1;
-        } else {
-            exoPlayer = exoPlayer2;
-        }
+    public void setShuffledMediaListToQueue(List<QueueMediaEntity> newQueueMediaEntities) {
+        //momentarily hold the playback to initiate the changes
+        pausePlayback();
 
-        queueMediaLocalDao.changeStateOfAllMedia(QueueMediaEntity.QueueMediaState.IN_QUEUE);
-        queueMediaLocalDao.setMediaStatusBelowPosition(QueueMediaEntity.QueueMediaState.PLAYED, queueMediaEntity.getPosition());
+        setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);
 
-        queueMediaEntity.setProgress(0);
-        queueMediaEntity.setState(QueueMediaEntity.QueueMediaState.PLAYING);
-        queueMediaLocalDao.insert(queueMediaEntity);
+        Collections.shuffle(newQueueMediaEntities);
+        currentQueueMediaList = newQueueMediaEntities;
+        currentMediaPosition = 0;
 
-        queueMediaEntitiesMutableLiveData.setValue(queueMediaLocalDao.getQueueMediaEntities());
-        currentlyPlayingQueueMediaMutableLiveData.setValue(queueMediaEntity);
+        SimpleExoPlayer exoPlayer  = getCurrentExoPlayer();
+        exoPlayer.setVolume(1f);
 
-        MainViewStates viewStates = viewStatesLive.getValue();
-        viewStates.setExoPlayer(exoPlayer);
-        viewStatesLive.postValue(viewStates);
-
-
-        playingMediaProgress.postValue(0);
-
-        playMedia(exoPlayer, queueMediaEntity);
+        loadMedia(exoPlayer);
     }
 
-    public void playMedia(SimpleExoPlayer exoPlayer, QueueMediaEntity queueMediaEntity) {
-        Uri mediaUri;
+    public void loadMedia(SimpleExoPlayer exoPlayer) {
+        QueueMediaEntity queueMediaEntity = currentQueueMediaList.get(currentMediaPosition);
+        queueMediaEntity.setProgress(0);
+        currentQueueMediaList.set(currentMediaPosition, queueMediaEntity);
 
+        prepareMediaToPlay(exoPlayer);
+
+        requestAudioFocus();
+    }
+
+    public void prepareMediaToPlay(SimpleExoPlayer exoPlayer){
+        Uri mediaUri;
         //check if media is available offline then load from it else stream from server
-        OfflineMediaEntity offlineMedia = offlineMediaLocalDao.getOfflineMedia(queueMediaEntity.getMediaID());
+        OfflineMediaEntity offlineMedia = offlineMediaLocalDao.getOfflineMedia(currentQueueMediaList.get(currentMediaPosition).getMediaID());
         if (offlineMedia != null && offlineMedia.getDownloadStatus()== DownloadManager.STATUS_SUCCESSFUL) {
             File file = new File(offlineMedia.getDownloadedFilePath());
             mediaUri = Uri.fromFile(file);
             playingFromNetwork = false;
             Logger.e(TAG, "media loading Offline from: " + mediaUri);
 
-
         } else {
-            mediaUri = Uri.parse(queueMediaEntity.getMediaUrl());
+            mediaUri = Uri.parse(currentQueueMediaList.get(currentMediaPosition).getMediaUrl());
             playingFromNetwork = true;
             Logger.e(TAG, "media loading Online from: " + mediaUri);
         }
 
         //create media source
-        MediaSource mediaSource = new ProgressiveMediaSource
-                .Factory(dataSourceFactory).createMediaSource(mediaUri);
+        MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaUri);
         exoPlayer.prepare(mediaSource);
-        exoPlayer.seekTo(queueMediaEntity.getProgress());
+        exoPlayer.seekTo(currentQueueMediaList.get(currentMediaPosition).getProgress());
+
+        viewStates.setExoPlayer(exoPlayer);
+        viewStatesLive.postValue(viewStates);
+    }
+
+    private SimpleExoPlayer getCurrentExoPlayer() {
+        if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
+            return exoPlayer1;
+        } else {
+            return exoPlayer2;
+        }
+    }
+
+    private SimpleExoPlayer getNextExoPlayer() {
+        if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
+            return exoPlayer2;
+        } else {
+            return exoPlayer1;
+        }
+    }
+
+    private void setRepeatMode(int repeatMode) {
+        this.repeatMode = repeatMode;
+        if (repeatMode == ExoPlayer.REPEAT_MODE_OFF){
+            viewStates.setRepeatButtonImageResource(R.drawable.exo_controls_repeat_off);
+            viewStates.setRepeatEnabled(false);
+        } else if (repeatMode == ExoPlayer.REPEAT_MODE_ONE){
+            viewStates.setRepeatButtonImageResource(R.drawable.exo_controls_repeat_one);
+            viewStates.setRepeatEnabled(true);
+        } else if (repeatMode == ExoPlayer.REPEAT_MODE_ALL){
+            viewStates.setRepeatButtonImageResource(R.drawable.exo_controls_repeat_all);
+            viewStates.setRepeatEnabled(true);
+        }
+        viewStatesLive.postValue(viewStates);
     }
 
     public void setPlaybackState(boolean playWhenReady, int playbackState) {
-        MainViewStates viewStates = viewStatesLive.getValue();
-        if (viewStates == null) {
-            viewStates = new MainViewStates();
-        }
-
         if (playingFromNetwork && !connectedToNetwork && playbackState == PlaybackState.STATE_STOPPED
                 && bottomSheetState!= BottomSheetBehavior.STATE_HIDDEN){
             viewStates.setError("No internet connectivity.");
@@ -598,7 +573,6 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
                 break;
             case Player.STATE_ENDED:
                 pausePlayback();
-                abandonAudioFocus();
 
                 viewStates.setBufferVisibility(View.GONE);
                 viewStates.setTogglePlayButtonImageResource(R.drawable.exo_icon_play);
@@ -614,218 +588,96 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public void seekPlayer(int progress) {
-        try {
-            SimpleExoPlayer exoPlayer = viewStatesLive.getValue().getExoPlayer();
+        SimpleExoPlayer exoPlayer = viewStates.getExoPlayer();
+        long totalDurationOfCurrentMedia = exoPlayer.getDuration();
+        long currentDurationOfCurrentMedia = (progress * totalDurationOfCurrentMedia)/100;
+        exoPlayer.seekTo(currentDurationOfCurrentMedia);
+    }
 
-            long totalDurationOfCurrentMedia = exoPlayer.getDuration();
-            long currentDurationOfCurrentMedia = (progress * totalDurationOfCurrentMedia)/100;
-            exoPlayer.seekTo(currentDurationOfCurrentMedia);
-        } catch (Exception e) {
-            Logger.e(TAG, e.toString());
-        }
+    public boolean previousMediaAvailable() {
+        return (currentQueueMediaList.size()>0 && currentMediaPosition>0);
     }
 
     public void previous() {
-        repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_OFF);
+        setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);
 
         //if more media available to play & no pending callbacks
-        if (queueMediaEntitiesMutableLiveData.getValue().size()>0 && currentMediaPosition != 0){
+        if (previousMediaAvailable()){
             if (currentPlayer == EXO_PLAYER_1) {
                 exoPlayer1.setVolume(1f);
-                loadMediaIn(EXO_PLAYER_1, queueMediaEntitiesMutableLiveData.getValue().get(--currentMediaPosition));
+                loadMedia(exoPlayer1);
             } else {
                 exoPlayer2.setVolume(1f);
-                loadMediaIn(EXO_PLAYER_2, queueMediaEntitiesMutableLiveData.getValue().get(--currentMediaPosition));
+                loadMedia(exoPlayer2);
             }
         }
     }
 
-    public boolean previousMediaAvailable() {
-        return (queueMediaEntitiesMutableLiveData.getValue().size()>0 && currentMediaPosition!=0);
-    }
-
     public boolean nextMediaAvailable() {
-        return (queueMediaEntitiesMutableLiveData.getValue().size()-1)> currentMediaPosition;
+        return (currentQueueMediaList.size()-1)> currentMediaPosition;
     }
 
     public void next() {
-        repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_OFF);
+        setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);
 
         //if more media available to play & no pending callbacks
-        if ((queueMediaEntitiesMutableLiveData.getValue().size() - 1)> currentMediaPosition){
+        if (nextMediaAvailable()){
             if (currentPlayer == EXO_PLAYER_1) {
                 exoPlayer1.setVolume(1f);
-                loadMediaIn(EXO_PLAYER_1, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
+                loadMedia(exoPlayer1);
             } else {
                 exoPlayer2.setVolume(1f);
-                loadMediaIn(EXO_PLAYER_2, queueMediaEntitiesMutableLiveData.getValue().get(++currentMediaPosition));
+                loadMedia(exoPlayer2);
             }
         }
     }
 
     public boolean canShuffle() {
-        return (queueMediaEntitiesMutableLiveData.getValue().size()-2)> currentMediaPosition;
+        return (currentQueueMediaList.size()-2)> currentMediaPosition;
     }
 
     public void shuffle() {
-        List<QueueMediaEntity> queueMediaEntityList = queueMediaLocalDao.getQueueMediaEntities(QueueMediaEntity.QueueMediaState.IN_QUEUE);
-        if (queueMediaEntityList.size()>1) {
-            queueMediaLocalDao.delete(queueMediaEntityList);
-
-            int startingPosition = queueMediaEntityList.get(0).getPosition();
-            Collections.shuffle(queueMediaEntityList);
-            for (int i=0; i<queueMediaEntityList.size(); i++){
-                QueueMediaEntity queueMediaEntity = queueMediaEntityList.get(i);
-                queueMediaEntity.setPosition(startingPosition++);
-                queueMediaEntityList.set(i, queueMediaEntity);
-            }
-            queueMediaLocalDao.insertAll(queueMediaEntityList);
-            queueMediaEntitiesMutableLiveData.postValue(queueMediaLocalDao.getQueueMediaEntities());
+        stopLooper();
+        if (canShuffle()){
+            List<QueueMediaEntity> shuffledQueueList = currentQueueMediaList.subList(currentMediaPosition + 1, currentQueueMediaList.size());
+            currentQueueMediaList.removeAll(shuffledQueueList);
+            Collections.shuffle(shuffledQueueList);
+            currentQueueMediaList.addAll(shuffledQueueList);
             showSnackBar("queue shuffled", Snackbar.LENGTH_SHORT);
         }
-    }
-
-    public void setShuffledMedia(PlaylistEntity playlist) {
-        //momentarily hold the playback to initiate the changes
-        pausePlayback();
-
-        repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_OFF);
-
-        currentMediaPosition = RecyclerView.NO_POSITION;
-
-        queueMediaLocalDao.deleteAll();
-
-        List<PlaylistMediaEntity> playlistMediaEntities = playlistMediaLocalDao.getPlaylistMediaMediaEntities(playlist.getPlaylistID());
-
-        String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
-        List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
-                .fromJson(objectJsonString, QueueMediaEntity[].class));
-
-        //shuffle the media
-        Collections.shuffle(queueMediaEntities);
-
-        for (int i=0; i<queueMediaEntities.size(); i++){
-            QueueMediaEntity queueMediaEntity1 = queueMediaEntities.get(i);
-            queueMediaEntity1.setPosition(i);
-            queueMediaEntities.set(i, queueMediaEntity1);
-        }
-
-        //insert all media with 'In_Queue' status.
-        queueMediaLocalDao.insertAll(queueMediaEntities);
-
-        QueueMediaEntity queueMediaEntity = queueMediaEntities.get(++currentMediaPosition);
-
-        if (currentPlayer == EXO_PLAYER_1 || currentPlayer == RecyclerView.NO_POSITION){
-            exoPlayer1.setVolume(1f);
-            Logger.e(TAG, "ExoPlayer1 volume set to: 1f");
-            loadMediaIn(EXO_PLAYER_1, queueMediaEntity);
-
-        } else if (currentPlayer == EXO_PLAYER_2) {
-            exoPlayer2.setVolume(1f);
-            loadMediaIn(EXO_PLAYER_2, queueMediaEntity);
-        }
-
-        requestAudioFocus();
+        setLooper();
     }
 
     public void toggleRepeatMode() {
-        int repeatMode = repeatModeMutableLiveData.getValue();
         if (repeatMode == ExoPlayer.REPEAT_MODE_OFF) {
-            repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_ONE);
+            setRepeatMode(ExoPlayer.REPEAT_MODE_ONE);
         } else if (repeatMode == ExoPlayer.REPEAT_MODE_ONE){
-            repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_ALL);
+            setRepeatMode(ExoPlayer.REPEAT_MODE_ALL);
         } else if (repeatMode == ExoPlayer.REPEAT_MODE_ALL){
-            repeatModeMutableLiveData.postValue(ExoPlayer.REPEAT_MODE_OFF);
+            setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);
         }
     }
 
-    public void removeQueueMedia(QueueMediaEntity queueMediaEntity) {
-        String title = queueMediaEntity.getMediaTitle();
-        int position = queueMediaEntity.getPosition();
-        List<QueueMediaEntity> queueMediaEntities = queueMediaEntitiesMutableLiveData.getValue();
-        if (queueMediaEntities != null && queueMediaEntities.size()>0) {
-            queueMediaEntities.remove(position);
-            queueMediaLocalDao.delete(queueMediaEntity);
+    public void removeQueueMedia(int position) {
+        stopLooper();
 
-            for (int i=position; i<queueMediaEntities.size(); i++){
-                queueMediaEntity = queueMediaEntities.get(i);
-                queueMediaEntity.setPosition(i);
-                queueMediaEntities.set(i, queueMediaEntity);
-            }
-            queueMediaLocalDao.insertAll(queueMediaEntities);
-            queueMediaEntitiesMutableLiveData.postValue(queueMediaEntities);
-            showSnackBar(title + " removed from queue", Snackbar.LENGTH_SHORT);
-        }
+        QueueMediaEntity queueMediaEntity = currentQueueMediaList.get(position);
+        currentQueueMediaList.remove(position);
+        currentMediaPosition = currentQueueMediaList.indexOf(queueMediaEntity);
+
+        showSnackBar(queueMediaEntity.getMediaTitle() + " removed from queue", Snackbar.LENGTH_SHORT);
+
+        setLooper();
     }
 
     public void moveQueueMedia(int fromPosition, int toPosition) {
         stopLooper();
 
-        try {
-            int startPosition;
-            int endPosition;
-            if (toPosition < fromPosition) {
-                startPosition = toPosition;
-                endPosition = fromPosition;
-            } else {
-                startPosition = fromPosition;
-                endPosition = toPosition;
-            }
+        QueueMediaEntity queueMediaEntity = currentQueueMediaList.get(fromPosition);
+        currentQueueMediaList.remove(fromPosition);
+        currentQueueMediaList.add(toPosition, queueMediaEntity);
 
-            List<QueueMediaEntity> queueMediaEntities = queueMediaEntitiesMutableLiveData.getValue();
-            if (queueMediaEntities == null) {
-                return;
-            }
-            QueueMediaEntity queueMediaEntity = queueMediaEntities.get(fromPosition);
-            queueMediaEntities.remove(fromPosition);
-            queueMediaEntities.add(toPosition, queueMediaEntity);
-
-            if ((fromPosition<currentMediaPosition && toPosition<currentMediaPosition)
-                    || (fromPosition>currentMediaPosition && toPosition>currentMediaPosition)){
-                for (int i = startPosition; i <= endPosition; i++){
-                    queueMediaEntity = queueMediaEntities.get(i);
-                    queueMediaEntity.setPosition(i);
-                    queueMediaEntities.set(i, queueMediaEntity);
-                }
-            } else if (fromPosition!=currentMediaPosition){
-                if (toPosition>=currentMediaPosition){
-                    queueMediaEntity.setState(QueueMediaEntity.QueueMediaState.IN_QUEUE);
-                } else {
-                    queueMediaEntity.setState(QueueMediaEntity.QueueMediaState.PLAYED);
-                }
-                for (int i = startPosition; i <= endPosition; i++){
-                    queueMediaEntity = queueMediaEntities.get(i);
-                    queueMediaEntity.setPosition(i);
-                    queueMediaEntities.set(i, queueMediaEntity);
-                    if (queueMediaEntity.getState() == QueueMediaEntity.QueueMediaState.PLAYING){
-                        currentMediaPosition = i;
-                    }
-                }
-            } else {
-                int state;
-                if (toPosition>currentMediaPosition){
-                    state = QueueMediaEntity.QueueMediaState.PLAYED;
-                } else {
-                    state = QueueMediaEntity.QueueMediaState.IN_QUEUE;
-                }
-                for (int i = startPosition; i <= endPosition; i++){
-                    queueMediaEntity = queueMediaEntities.get(i);
-                    queueMediaEntity.setPosition(i);
-                    if (queueMediaEntity.getState()!= QueueMediaEntity.QueueMediaState.PLAYING) {
-                        queueMediaEntity.setState(state);
-                    } else {
-                        currentMediaPosition = i;
-                    }
-                    queueMediaEntities.set(i, queueMediaEntity);
-                }
-            }
-
-            queueMediaLocalDao.insertAll(queueMediaEntities);
-            queueMediaEntitiesMutableLiveData.setValue(queueMediaEntities);
-            currentlyPlayingQueueMediaMutableLiveData.setValue(queueMediaEntities.get(currentMediaPosition));
-        } catch (Exception e) {
-            Logger.e(TAG, e.toString());
-        }
+        currentMediaPosition = currentQueueMediaList.indexOf(queueMediaEntity);
 
         setLooper();
     }
@@ -842,10 +694,10 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     protected void onCleared() {
         stopLooper();
 
+        pausePlayback();
+
         exoPlayer1.release();
         exoPlayer2.release();
-
-        abandonAudioFocus();
 
         super.onCleared();
     }
@@ -855,9 +707,12 @@ public class MainActivityViewModel extends BaseAndroidViewModel implements Const
     }
 
     public void closeBottomSheet() {
-        MainViewStates viewStates = viewStatesLive.getValue();
         viewStates.setBottomNavigationViewVisibility(View.VISIBLE);
         viewStates.setBottomSheetState(BottomSheetBehavior.STATE_HIDDEN);
         viewStates.setBottomSheetVisibility(View.GONE);
+    }
+
+    public LiveData<List<QueueMediaEntity>> getQueueMediaEntities() {
+        return currentQueueMediaListLive;
     }
 }

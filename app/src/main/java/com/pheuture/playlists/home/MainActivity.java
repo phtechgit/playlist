@@ -10,7 +10,6 @@ import android.view.ViewPropertyAnimator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.SeekBar;
 
-import com.google.android.exoplayer2.Player;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback;
 import com.pheuture.playlists.R;
@@ -21,7 +20,6 @@ import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;
 import com.pheuture.playlists.queue.MediaQueueRecyclerAdapter;
 import com.pheuture.playlists.base.receiver.ConnectivityChangeReceiver;
 import com.pheuture.playlists.base.utils.KeyboardUtils;
-import com.pheuture.playlists.base.utils.Logger;
 import com.pheuture.playlists.base.utils.RecyclerItemMoveCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -82,40 +80,35 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         super.onCreate(savedInstanceState);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
         setSupportActionBar(binding.layoutAppBar.toolbar);
 
+        Runnable runnable = this::initiate;
+
+        if (savedInstanceState == null){
+            //Check permissions first time
+            proceedWithPermissions(REQUEST_CODE_GRANT_PERMISSIONS,
+                    READ_WRITE_EXTERNAL_STORAGE_PERMISSION, runnable, true);
+
+        } else {
+            initiate();
+        }
+    }
+
+    private void initiate() {
         setupConnectivityChangeBroadcastReceiver();
 
-        bottomSheetBehavior = BottomSheetBehavior.from( binding.layoutBottomSheet.constraintLayoutBottomSheet);
-        bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        setUpBottomNavigation();
 
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings).build();
+        setUpBottomSheet();
 
-        NavController navController = findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.bottomNavView, navController);
-
-        navController.addOnDestinationChangedListener(this);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerAdapter = new MediaQueueRecyclerAdapter(this, this);
-
-        binding.layoutBottomSheet.recyclerViewMediaQueue.setLayoutManager(layoutManager);
-        binding.layoutBottomSheet.recyclerViewMediaQueue.setAdapter(recyclerAdapter);
-
-        //enable drag listener
-        RecyclerItemMoveCallback itemMoveCallback = new RecyclerItemMoveCallback(this);
-        itemTouchHelper = new ItemTouchHelper(itemMoveCallback);
-        itemTouchHelper.attachToRecyclerView(binding.layoutBottomSheet.recyclerViewMediaQueue);
+        setUpRecycler();
 
         viewModel.getQueueMediaEntities().observe(this, new Observer<List<QueueMediaEntity>>() {
             @Override
             public void onChanged(List<QueueMediaEntity> newQueueMediaEntities) {
+                //Update Data.
                 queueMediaEntities = newQueueMediaEntities;
                 recyclerAdapter.setData(queueMediaEntities);
             }
@@ -124,6 +117,7 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         viewModel.getViewStatesLive().observe(this, new Observer<MainViewStates>() {
             @Override
             public void onChanged(MainViewStates viewStates) {
+                //Update Views.
                 setTitle(viewStates.getTitle());
 
                 binding.bottomNavView.setVisibility(viewStates.getBottomNavigationViewVisibility());
@@ -136,7 +130,8 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                 binding.layoutBottomSheet.progressBuffering.setVisibility(viewStates.getBufferVisibility());
 
                 binding.layoutBottomSheet.imageViewTogglePlay.setImageResource(viewStates.getTogglePlayButtonImageResource());
-                binding.layoutBottomSheet.progressBar.setProgress(viewStates.getProgress());
+                binding.layoutBottomSheet.progressBar.setMax((int) viewStates.getMaxProgress());
+                binding.layoutBottomSheet.progressBar.setProgress((int) viewStates.getProgress());
 
                 binding.layoutBottomSheet.textViewTitle.setText(viewStates.getCurrentlyPlayingMediaTitle());
                 binding.layoutBottomSheet.textViewCreator.setText(viewStates.getCurrentlyPLayingMediaCreator());
@@ -156,11 +151,35 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
                 setError(binding.coordinatorLayoutSnackBar, viewStates.getError());
             }
         });
+    }
 
-        if (savedInstanceState == null){
-            proceedWithPermissions(REQUEST_CODE_GRANT_PERMISSIONS,
-                    READ_WRITE_EXTERNAL_STORAGE_PERMISSION,null, true);
-        }
+    private void setUpBottomNavigation() {
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_playlists, R.id.navigation_trending, R.id.navigation_settings).build();
+
+        NavController navController = findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(binding.bottomNavView, navController);
+
+        navController.addOnDestinationChangedListener(this);
+    }
+
+    private void setUpBottomSheet() {
+        bottomSheetBehavior = BottomSheetBehavior.from( binding.layoutBottomSheet.constraintLayoutBottomSheet);
+        bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    private void setUpRecycler() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerAdapter = new MediaQueueRecyclerAdapter(this, this);
+        binding.layoutBottomSheet.recyclerViewMediaQueue.setLayoutManager(layoutManager);
+        binding.layoutBottomSheet.recyclerViewMediaQueue.setAdapter(recyclerAdapter);
+
+        //enable drag listener
+        RecyclerItemMoveCallback itemMoveCallback = new RecyclerItemMoveCallback(this);
+        itemTouchHelper = new ItemTouchHelper(itemMoveCallback);
+        itemTouchHelper.attachToRecyclerView(binding.layoutBottomSheet.recyclerViewMediaQueue);
     }
 
     @Override
@@ -201,51 +220,34 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
             viewModel.setBottomSheetState(newState);
-            switch (newState) {
-                case BottomSheetBehavior.STATE_HIDDEN:
-                    viewModel.resetAllPlayers();
-                    break;
-                case BottomSheetBehavior.STATE_EXPANDED:
-                    binding.layoutBottomSheet.progressBar.getThumb().setVisible(true, true);
-                    break;
-                case BottomSheetBehavior.STATE_HALF_EXPANDED:
-                    /*bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);*/
-                    break;
-                case BottomSheetBehavior.STATE_COLLAPSED:
-                    binding.layoutBottomSheet.progressBar.getThumb().setVisible(false, true);
-                    break;
-                case BottomSheetBehavior.STATE_DRAGGING:
-                    break;
-                case BottomSheetBehavior.STATE_SETTLING:
-                    /*bottomSheetBehavior.setHideable(false);*/
-                    break;
-            }
         }
 
         @Override
         public void onSlide(@NonNull View view, float slideOffset) {
-            if (slideOffset>=0) {
-                float height_to_animate = slideOffset * binding.bottomNavView.getHeight();
-                ViewPropertyAnimator animator = binding.bottomNavView.animate();
-                animator.translationY(height_to_animate)
-                        .setInterpolator(new DecelerateInterpolator())
-                        .setDuration(0)
-                        .start();
-            }
+            animateBottomNavigationView(slideOffset);
         }
     };
 
+    private void animateBottomNavigationView(float slideOffset) {
+        if (slideOffset>=0) {
+            float height_to_animate = slideOffset * binding.bottomNavView.getHeight();
+            ViewPropertyAnimator animator = binding.bottomNavView.animate();
+            animator.translationY(height_to_animate)
+                    .setInterpolator(new DecelerateInterpolator())
+                    .setDuration(0)
+                    .start();
+        }
+    }
+
     @Override
     public void onConnectivityChange(boolean connected) {
-        Logger.e(TAG, "onConnectivityChange");
         viewModel.setNetworkStatus(connected);
     }
 
     @Override
     public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
-        if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN
-                && bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED){
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN && bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED){
+            viewModel.setBottomSheetState(BottomSheetBehavior.STATE_COLLAPSED);
         }
         KeyboardUtils.hideKeyboard(this, binding.getRoot());
     }
@@ -262,12 +264,10 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
         QueueMediaEntity queueMediaEntity = bundle.getParcelable(ARG_PARAM3);
 
         if (clickType == SELECT) {
-            viewModel.setMedia(queueMediaEntities, position, false);
+            viewModel.setMediaListToQueue(queueMediaEntities, position);
 
         } else if (clickType == REMOVE){
-            if (queueMediaEntity != null) {
-                viewModel.removeQueueMedia(queueMediaEntity);
-            }
+            viewModel.removeQueueMedia(position);
         } else if (clickType == DRAG) {
             itemTouchHelper.startDrag(viewHolder);
         }
@@ -285,23 +285,6 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
     }
 
     @Override
-    public void onBackPressed() {
-        if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN
-                && bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED) {
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            return;
-        }
-        KeyboardUtils.hideKeyboard(this, binding.getRoot());
-        super.onBackPressed();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(connectivityChangeReceiver);
-    }
-
-    @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser){
             viewModel.seekPlayer(progress);
@@ -314,6 +297,22 @@ public class MainActivity extends BaseActivity implements NavController.OnDestin
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN && bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED) {
+            viewModel.setBottomSheetState(BottomSheetBehavior.STATE_COLLAPSED);
+            return;
+        }
+        KeyboardUtils.hideKeyboard(this, binding.getRoot());
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(connectivityChangeReceiver);
     }
 
     @Override

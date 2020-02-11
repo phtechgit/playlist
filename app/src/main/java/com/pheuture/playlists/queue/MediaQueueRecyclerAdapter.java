@@ -12,6 +12,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.pheuture.playlists.R;
+import com.pheuture.playlists.base.utils.SingleMutableLiveData;
 import com.pheuture.playlists.databinding.ItemQueueNotPlayingMediaBinding;
 import com.pheuture.playlists.databinding.ItemQueuePlayingMediaBinding;
 import com.pheuture.playlists.base.interfaces.RecyclerViewClickListener;

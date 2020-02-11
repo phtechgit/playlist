@@ -10,14 +10,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pheuture.playlists.databinding.ItemMediaBinding;
 import com.pheuture.playlists.home.MainActivityViewModel;
 import com.pheuture.playlists.R;
 import com.pheuture.playlists.databinding.FragmentTrendingsBinding;
@@ -126,7 +124,7 @@ public class TrendingFragment extends BaseFragment implements TextWatcher, Recyc
         List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
                 .fromJson(objectJsonString, QueueMediaEntity[].class));
 
-        parentViewModel.setMedia(queueMediaEntities, position, true);
+        parentViewModel.setMediaListToQueue(queueMediaEntities, position);
         KeyboardUtils.hideKeyboard(activity, binding.getRoot());
     }
 

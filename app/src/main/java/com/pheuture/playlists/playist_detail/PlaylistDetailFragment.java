@@ -204,12 +204,14 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
             List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
                     .fromJson(objectJsonString, QueueMediaEntity[].class));
 
-            parentViewModel.setMedia(queueMediaEntities, 0, true);
+            parentViewModel.setMediaListToQueue(queueMediaEntities, 0);
 
         } else if (v.equals(binding.imageViewShuffle)) {
-            if (playlistMediaEntities.size()>2) {
-                parentViewModel.setShuffledMedia(playlist);
-            }
+            String objectJsonString = ParserUtil.getInstance().toJson(playlistMediaEntities);
+            List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
+                    .fromJson(objectJsonString, QueueMediaEntity[].class));
+
+            parentViewModel.setShuffledMediaListToQueue(queueMediaEntities);
         }
     }
 
@@ -225,7 +227,7 @@ public class PlaylistDetailFragment extends BaseFragment implements RecyclerView
             List<QueueMediaEntity> queueMediaEntities = Arrays.asList(ParserUtil.getInstance()
                     .fromJson(objectJsonString, QueueMediaEntity[].class));
 
-            parentViewModel.setMedia(queueMediaEntities, position, true);
+            parentViewModel.setMediaListToQueue(queueMediaEntities, position);
 
         } else if (clickType == REMOVE){
             showRemoveMediaFromPlaylistAlert(position, playlistMediaEntity);

@@ -12,7 +12,8 @@ public class MainViewStates {
     private int bottomSheetVisibility = View.GONE;
     private int bottomSheetState = BottomSheetBehavior.STATE_HIDDEN;
     private SimpleExoPlayer exoPlayer;
-    private int progress;
+    private long maxProgress;
+    private long progress;
     private String currentlyPlayingMediaTitle;
     private String currentlyPLayingMediaCreator;
 
@@ -126,11 +127,11 @@ public class MainViewStates {
         this.previousEnabled = previousEnabled;
     }
 
-    public int getProgress() {
+    public long getProgress() {
         return progress;
     }
 
-    public void setProgress(int progress) {
+    public void setProgress(long progress) {
         this.progress = progress;
     }
 
@@ -188,5 +189,13 @@ public class MainViewStates {
 
     public void setBottomNavigationViewVisibility(int bottomNavigationViewVisibility) {
         this.bottomNavigationViewVisibility = bottomNavigationViewVisibility;
+    }
+
+    public long getMaxProgress() {
+        return maxProgress;
+    }
+
+    public void setMaxProgress(long maxProgress) {
+        this.maxProgress = maxProgress;
     }
 }
